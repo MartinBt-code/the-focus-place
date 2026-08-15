@@ -117,8 +117,51 @@
   .rt-box.go .rt-msg, .rt-box.early .rt-msg{color:var(--navy);}
   .rt-stats{display:flex; gap:24px; margin-top:20px; font-family:'Space Mono';}
   .rt-stats div{flex:1;}
-  .rt-stats .num{font-family:'Anton'; font-size:28px; color:var(--orange);}
+  .rt-stats .num{font-family:'Anton'; font-size:28px; color:var(--orange); transition:color .15s, transform .15s;}
   .rt-stats .lbl{font-size:11px; color:var(--gray); text-transform:uppercase; letter-spacing:1px;}
+  .num.bump{transform:scale(1.18);}
+  .num.bump.good{color:var(--green);}
+  .num.bump.bad{color:#E74C3C;}
+
+  /* shared pop-in animation for test targets */
+  @keyframes popIn{
+    0%{transform:translate(-50%,-50%) scale(0.4); opacity:0;}
+    60%{transform:translate(-50%,-50%) scale(1.15); opacity:1;}
+    100%{transform:translate(-50%,-50%) scale(1); opacity:1;}
+  }
+  @keyframes popInPlain{
+    0%{transform:scale(0.5); opacity:0;}
+    100%{transform:scale(1); opacity:1;}
+  }
+
+  /* Sustained Attention letter */
+  #cptMsg{transition:opacity .1s ease;}
+
+  /* Peripheral Vision */
+  #pvBox{display:flex; align-items:center; justify-content:center;}
+  #pvTarget{transition:opacity .12s ease-out; box-shadow:0 0 18px 4px var(--orange-dim);}
+  #pvTarget.show{animation:popIn .18s ease-out forwards;}
+  .pv-compass{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px;}
+  .pv-btn{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:20px; padding:0; transition:transform .12s, border-color .12s, background .15s, color .15s;
+  }
+  .pv-btn:hover{transform:translateY(-2px);}
+  .pv-btn:active{transform:scale(0.92);}
+  .pv-btn.center{border:none; cursor:default; color:var(--gray);}
+  .pv-btn.center:hover{transform:none;}
+  .pv-btn.correct{background:var(--green); border-color:var(--green); color:var(--navy);}
+  .pv-btn.wrong{background:#C0392B; border-color:#C0392B; color:var(--off-white);}
+
+  /* Hand-Eye Coordination */
+  #hecTarget{box-shadow:0 0 20px 4px var(--orange-dim); transition:transform .1s ease;}
+  #hecTarget.show{animation:popInPlain .15s ease-out;}
+  #hecTarget:active{transform:scale(0.85);}
+  .hec-pulse{position:absolute; border-radius:50%; border:2px solid var(--orange); opacity:0; pointer-events:none;}
+  @keyframes pulseOut{
+    0%{opacity:0.7; transform:scale(0.4);}
+    100%{opacity:0; transform:scale(2.2);}
+  }
 
   /* SECTION SHARED */
   section{padding:100px 0;}
@@ -342,15 +385,16 @@
           <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
           <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
         </div>
-        <div id="pvDirections" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;">
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore-vlavo')">↖</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore')">↑</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore-vpravo')">↗</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('vpravo')">→</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('vlavo')">←</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole-vlavo')">↙</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole')">↓</button>
-          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole-vpravo')">↘</button>
+        <div id="pvDirections" class="pv-compass">
+          <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswer('hore-vlavo')">↖</button>
+          <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswer('hore')">↑</button>
+          <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswer('hore-vpravo')">↗</button>
+          <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswer('vlavo')">←</button>
+          <span class="pv-btn center">●</span>
+          <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswer('vpravo')">→</button>
+          <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswer('dole-vlavo')">↙</button>
+          <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswer('dole')">↓</button>
+          <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
         </div>
         <div class="rt-stats" style="margin-top:16px;">
           <div><div class="num" id="pvScore">0</div><div class="lbl">Skóre</div></div>
@@ -639,11 +683,30 @@ const CPT_ROUNDS = 20;
 let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptRts = [];
 let cptTimer, cptShownAt, cptWaitingResponse = false, cptRunning = false;
 
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function cptFlash(cls){
+  cptBox.classList.add(cls);
+  setTimeout(() => cptBox.classList.remove(cls), 220);
+}
+
 function startCPT(){
   cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptRts = [];
   updateCptStats();
   cptRunning = true;
-  nextCptRound();
+  cptMsg.style.opacity = '0';
+  cptMsg.textContent = 'Priprav sa...';
+  cptMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { cptMsg.style.opacity = '1'; });
+  cptTimer = setTimeout(() => {
+    cptMsg.style.fontSize = '64px';
+    nextCptRound();
+  }, 900);
 }
 
 function updateCptStats(){
@@ -656,30 +719,32 @@ function updateCptStats(){
 function nextCptRound(){
   if(cptRound >= CPT_ROUNDS){
     cptRunning = false;
+    cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Hotovo!';
     return;
   }
   cptRound++;
   cptWaitingResponse = false;
-  cptMsg.textContent = '';
-  const delay = 500 + Math.random()*700;
+  cptMsg.style.opacity = '0';
+  const delay = 650 + Math.random()*750;
   cptTimer = setTimeout(showCptLetter, delay);
 }
 
 function showCptLetter(){
   const letter = CPT_LETTERS[Math.floor(Math.random()*CPT_LETTERS.length)];
   cptMsg.textContent = letter;
+  cptMsg.style.opacity = '1';
   cptShownAt = performance.now();
   cptWaitingResponse = true;
   cptTimer = setTimeout(() => {
     if(cptWaitingResponse){
       cptWaitingResponse = false;
-      if(letter === CPT_TARGET) cptMisses++;
+      if(letter === CPT_TARGET){ cptMisses++; cptFlash('early'); }
       updateCptStats();
-      cptMsg.textContent = '';
-      setTimeout(nextCptRound, 300);
+      cptMsg.style.opacity = '0';
+      setTimeout(nextCptRound, 350);
     }
-  }, 900);
+  }, 1000);
 }
 
 cptBox.addEventListener('click', () => {
@@ -690,12 +755,16 @@ cptBox.addEventListener('click', () => {
   if(letter === CPT_TARGET){
     cptRts.push(Math.round(performance.now() - cptShownAt));
     cptHits++; cptScore++;
+    cptFlash('go');
+    bump(cptScoreEl, true);
   } else {
     cptScore = Math.max(0, cptScore - 1);
+    cptFlash('early');
+    bump(cptScoreEl, false);
   }
   updateCptStats();
-  cptMsg.textContent = '';
-  setTimeout(nextCptRound, 300);
+  cptMsg.style.opacity = '0';
+  setTimeout(nextCptRound, 350);
 });
 
 // ---- Peripheral Vision Test ----
@@ -703,6 +772,8 @@ const pvTarget = document.getElementById('pvTarget');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
+const pvButtons = {};
+document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
 
 const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
 const PV_POS = {
@@ -724,7 +795,7 @@ function startPV(){
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
-  nextPvRound();
+  pvTimer = setTimeout(nextPvRound, 500);
 }
 
 function nextPvRound(){
@@ -735,7 +806,7 @@ function nextPvRound(){
   pvRound++;
   pvAnswered = false;
   pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
-  const delay = 700 + Math.random()*900;
+  const delay = 800 + Math.random()*900;
   pvTimer = setTimeout(showPvTarget, delay);
 }
 
@@ -745,17 +816,30 @@ function showPvTarget(){
   pvTarget.style.top = pos.top;
   pvTarget.style.left = pos.left;
   pvTarget.style.transform = 'translate(-50%,-50%)';
+  pvTarget.classList.remove('show');
+  void pvTarget.offsetWidth;
+  pvTarget.classList.add('show');
   pvTarget.style.opacity = '1';
-  setTimeout(() => { pvTarget.style.opacity = '0'; }, 180);
+  setTimeout(() => { pvTarget.style.opacity = '0'; }, 320);
 }
 
 function pvAnswer(dir){
   if(!pvRunning || pvAnswered) return;
   pvAnswered = true;
-  if(dir === pvCurrentDir){ pvScore++; pvCorrect++; }
+  const correct = dir === pvCurrentDir;
+  const clicked = pvButtons[dir];
+  if(correct){
+    pvScore++; pvCorrect++;
+    clicked.classList.add('correct');
+  } else {
+    clicked.classList.add('wrong');
+    if(pvButtons[pvCurrentDir]) pvButtons[pvCurrentDir].classList.add('correct');
+  }
+  setTimeout(() => { Object.values(pvButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
   pvScoreEl.textContent = pvScore;
+  bump(pvScoreEl, correct);
   pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
-  setTimeout(nextPvRound, 400);
+  setTimeout(nextPvRound, 500);
 }
 
 // ---- Hand-Eye Coordination Test ----
@@ -774,8 +858,12 @@ function startHEC(){
   hecHitsEl.textContent = '0';
   hecAvgEl.textContent = '—';
   hecRunning = true;
-  hecMsg.style.display = 'none';
-  nextHecRound();
+  hecMsg.style.display = 'flex';
+  hecMsg.textContent = 'Priprav sa...';
+  setTimeout(() => {
+    hecMsg.style.display = 'none';
+    nextHecRound();
+  }, 700);
 }
 
 function nextHecRound(){
@@ -796,7 +884,22 @@ function nextHecRound(){
   hecTarget.style.left = (Math.random()*maxX) + 'px';
   hecTarget.style.top = (Math.random()*maxY) + 'px';
   hecTarget.style.display = 'block';
+  hecTarget.classList.remove('show');
+  void hecTarget.offsetWidth;
+  hecTarget.classList.add('show');
   hecShownAt = performance.now();
+}
+
+function hecPulse(x, y){
+  const p = document.createElement('div');
+  p.className = 'hec-pulse';
+  p.style.left = (x - 18) + 'px';
+  p.style.top = (y - 18) + 'px';
+  p.style.width = '36px';
+  p.style.height = '36px';
+  p.style.animation = 'pulseOut .45s ease-out forwards';
+  hecBox.appendChild(p);
+  setTimeout(() => p.remove(), 450);
 }
 
 hecTarget.addEventListener('click', (e) => {
@@ -805,9 +908,11 @@ hecTarget.addEventListener('click', (e) => {
   hecTimes.push(Math.round(performance.now() - hecShownAt));
   hecHits++;
   hecHitsEl.textContent = hecHits;
+  bump(hecHitsEl, true);
   hecAvgEl.textContent = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
+  hecPulse(parseFloat(hecTarget.style.left) + 18, parseFloat(hecTarget.style.top) + 18);
   hecTarget.style.display = 'none';
-  setTimeout(nextHecRound, 200);
+  setTimeout(nextHecRound, 220);
 });
 </script>
 
