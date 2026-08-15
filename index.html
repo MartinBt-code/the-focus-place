@@ -91,7 +91,7 @@
   }
   .btn-primary{background:var(--orange); color:var(--navy);}
   .btn-primary:hover{background:#ff6a3d;}
-  .btn-ghost{border-color:var(--navy-line); color:var(--off-white);}
+  .btn-ghost{background:transparent; border-color:var(--navy-line); color:var(--off-white); font-family:inherit;}
   .btn-ghost:hover{border-color:var(--orange); color:var(--orange);}
 
   /* REACTION TEST WIDGET (signature element) */
@@ -283,21 +283,18 @@
         <h3>Pamäťová sekvencia</h3>
         <p>Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
       </div>
-      <div class="card locked">
-        <span class="tag soon">Čoskoro</span>
-        <span class="lock-icon">🔒</span>
+      <div class="card active" onclick="document.getElementById('testy-koordinacia').scrollIntoView({behavior:'smooth'})">
+        <span class="tag live">● Live</span>
         <h3>Koordinácia rúk a očí</h3>
         <p>Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
       </div>
-      <div class="card locked">
-        <span class="tag soon">Čoskoro</span>
-        <span class="lock-icon">🔒</span>
+      <div class="card active" onclick="document.getElementById('testy-periferne').scrollIntoView({behavior:'smooth'})">
+        <span class="tag live">● Live</span>
         <h3>Periférne videnie</h3>
         <p>Otestuj šírku a rýchlosť svojho zorného poľa.</p>
       </div>
-      <div class="card locked">
-        <span class="tag soon">Čoskoro</span>
-        <span class="lock-icon">🔒</span>
+      <div class="card active" onclick="document.getElementById('testy-pozornost').scrollIntoView({behavior:'smooth'})">
+        <span class="tag live">● Live</span>
         <h3>Udržanie pozornosti</h3>
         <p>Meranie sústredenia počas opakovanej úlohy — pre atlétov aj bežných používateľov.</p>
       </div>
@@ -319,6 +316,65 @@
           <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
         </div>
         <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
+      </div>
+    </div>
+
+    <div id="testy-pozornost" style="margin-top:80px;">
+      <div class="test-card" style="max-width:520px;">
+        <div class="test-label"><span>Live test</span><span>Udržanie pozornosti</span></div>
+        <div id="cptBox" class="rt-box" style="cursor:pointer;">
+          <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+        </div>
+        <div class="rt-stats">
+          <div><div class="num" id="cptScore">0</div><div class="lbl">Skóre</div></div>
+          <div><div class="num" id="cptAcc">—</div><div class="lbl">Presnosť</div></div>
+          <div><div class="num" id="cptAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+        </div>
+        <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
+        <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
+      </div>
+    </div>
+
+    <div id="testy-periferne" style="margin-top:80px;">
+      <div class="test-card" style="max-width:520px;">
+        <div class="test-label"><span>Live test</span><span>Periférne videnie</span></div>
+        <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
+          <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
+        </div>
+        <div id="pvDirections" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;">
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore-vlavo')">↖</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore')">↑</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('hore-vpravo')">↗</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('vpravo')">→</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('vlavo')">←</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole-vlavo')">↙</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole')">↓</button>
+          <button class="btn btn-ghost" style="padding:10px;" onclick="pvAnswer('dole-vpravo')">↘</button>
+        </div>
+        <div class="rt-stats" style="margin-top:16px;">
+          <div><div class="num" id="pvScore">0</div><div class="lbl">Skóre</div></div>
+          <div><div class="num" id="pvAcc">—</div><div class="lbl">Presnosť</div></div>
+          <div><div class="num" id="pvRound">0/12</div><div class="lbl">Kolo</div></div>
+        </div>
+        <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na bodku v strede. Keď sa na okraji mihne bod, klikni na smer, kde sa objavil.</p>
+        <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Spustiť</button>
+      </div>
+    </div>
+
+    <div id="testy-koordinacia" style="margin-top:80px;">
+      <div class="test-card" style="max-width:520px;">
+        <div class="test-label"><span>Live test</span><span>Koordinácia rúk a očí</span></div>
+        <div id="hecBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px;">
+          <div id="hecMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni Spustiť</div>
+          <div id="hecTarget" style="position:absolute; width:36px; height:36px; border-radius:50%; background:var(--orange); display:none; cursor:pointer;"></div>
+        </div>
+        <div class="rt-stats">
+          <div><div class="num" id="hecHits">0</div><div class="lbl">Zásahy</div></div>
+          <div><div class="num" id="hecAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+          <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kolo</div></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Spustiť</button>
       </div>
     </div>
   </div>
@@ -569,6 +625,190 @@ function onTileClick(idx){
     setTimeout(()=>{ memTiles.forEach(t=>{ t.style.background = '#1A2029'; }); }, 500);
   }
 }
+
+// ---- Sustained Attention Test (Go/No-Go) ----
+const cptBox = document.getElementById('cptBox');
+const cptMsg = document.getElementById('cptMsg');
+const cptScoreEl = document.getElementById('cptScore');
+const cptAccEl = document.getElementById('cptAcc');
+const cptAvgEl = document.getElementById('cptAvg');
+
+const CPT_LETTERS = ['A','B','E','K','M','P','R','T','X'];
+const CPT_TARGET = 'X';
+const CPT_ROUNDS = 20;
+let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptRts = [];
+let cptTimer, cptShownAt, cptWaitingResponse = false, cptRunning = false;
+
+function startCPT(){
+  cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptRts = [];
+  updateCptStats();
+  cptRunning = true;
+  nextCptRound();
+}
+
+function updateCptStats(){
+  cptScoreEl.textContent = cptScore;
+  const totalTargets = cptHits + cptMisses;
+  cptAccEl.textContent = totalTargets ? Math.round((cptHits/totalTargets)*100)+'%' : '—';
+  cptAvgEl.textContent = cptRts.length ? Math.round(cptRts.reduce((a,b)=>a+b,0)/cptRts.length) : '—';
+}
+
+function nextCptRound(){
+  if(cptRound >= CPT_ROUNDS){
+    cptRunning = false;
+    cptMsg.textContent = 'Hotovo!';
+    return;
+  }
+  cptRound++;
+  cptWaitingResponse = false;
+  cptMsg.textContent = '';
+  const delay = 500 + Math.random()*700;
+  cptTimer = setTimeout(showCptLetter, delay);
+}
+
+function showCptLetter(){
+  const letter = CPT_LETTERS[Math.floor(Math.random()*CPT_LETTERS.length)];
+  cptMsg.textContent = letter;
+  cptShownAt = performance.now();
+  cptWaitingResponse = true;
+  cptTimer = setTimeout(() => {
+    if(cptWaitingResponse){
+      cptWaitingResponse = false;
+      if(letter === CPT_TARGET) cptMisses++;
+      updateCptStats();
+      cptMsg.textContent = '';
+      setTimeout(nextCptRound, 300);
+    }
+  }, 900);
+}
+
+cptBox.addEventListener('click', () => {
+  if(!cptRunning || !cptWaitingResponse) return;
+  const letter = cptMsg.textContent;
+  clearTimeout(cptTimer);
+  cptWaitingResponse = false;
+  if(letter === CPT_TARGET){
+    cptRts.push(Math.round(performance.now() - cptShownAt));
+    cptHits++; cptScore++;
+  } else {
+    cptScore = Math.max(0, cptScore - 1);
+  }
+  updateCptStats();
+  cptMsg.textContent = '';
+  setTimeout(nextCptRound, 300);
+});
+
+// ---- Peripheral Vision Test ----
+const pvTarget = document.getElementById('pvTarget');
+const pvScoreEl = document.getElementById('pvScore');
+const pvAccEl = document.getElementById('pvAcc');
+const pvRoundEl = document.getElementById('pvRound');
+
+const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
+const PV_POS = {
+  'hore':{top:'6%', left:'50%'},
+  'hore-vpravo':{top:'14%', left:'88%'},
+  'vpravo':{top:'50%', left:'94%'},
+  'dole-vpravo':{top:'86%', left:'88%'},
+  'dole':{top:'94%', left:'50%'},
+  'dole-vlavo':{top:'86%', left:'12%'},
+  'vlavo':{top:'50%', left:'6%'},
+  'hore-vlavo':{top:'14%', left:'12%'}
+};
+const PV_ROUNDS = 12;
+let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false, pvCurrentDir = null, pvTimer, pvAnswered = false;
+
+function startPV(){
+  pvRound = 0; pvScore = 0; pvCorrect = 0;
+  pvScoreEl.textContent = '0';
+  pvAccEl.textContent = '—';
+  pvRoundEl.textContent = '0/' + PV_ROUNDS;
+  pvRunning = true;
+  nextPvRound();
+}
+
+function nextPvRound(){
+  if(pvRound >= PV_ROUNDS){
+    pvRunning = false;
+    return;
+  }
+  pvRound++;
+  pvAnswered = false;
+  pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
+  const delay = 700 + Math.random()*900;
+  pvTimer = setTimeout(showPvTarget, delay);
+}
+
+function showPvTarget(){
+  pvCurrentDir = PV_DIRS[Math.floor(Math.random()*PV_DIRS.length)];
+  const pos = PV_POS[pvCurrentDir];
+  pvTarget.style.top = pos.top;
+  pvTarget.style.left = pos.left;
+  pvTarget.style.transform = 'translate(-50%,-50%)';
+  pvTarget.style.opacity = '1';
+  setTimeout(() => { pvTarget.style.opacity = '0'; }, 180);
+}
+
+function pvAnswer(dir){
+  if(!pvRunning || pvAnswered) return;
+  pvAnswered = true;
+  if(dir === pvCurrentDir){ pvScore++; pvCorrect++; }
+  pvScoreEl.textContent = pvScore;
+  pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
+  setTimeout(nextPvRound, 400);
+}
+
+// ---- Hand-Eye Coordination Test ----
+const hecBox = document.getElementById('hecBox');
+const hecTarget = document.getElementById('hecTarget');
+const hecMsg = document.getElementById('hecMsg');
+const hecHitsEl = document.getElementById('hecHits');
+const hecAvgEl = document.getElementById('hecAvg');
+const hecRoundEl = document.getElementById('hecRound');
+
+const HEC_ROUNDS = 15;
+let hecRound = 0, hecHits = 0, hecTimes = [], hecShownAt, hecRunning = false;
+
+function startHEC(){
+  hecRound = 0; hecHits = 0; hecTimes = [];
+  hecHitsEl.textContent = '0';
+  hecAvgEl.textContent = '—';
+  hecRunning = true;
+  hecMsg.style.display = 'none';
+  nextHecRound();
+}
+
+function nextHecRound(){
+  if(hecRound >= HEC_ROUNDS){
+    hecRunning = false;
+    hecTarget.style.display = 'none';
+    hecMsg.style.display = 'flex';
+    hecMsg.textContent = 'Hotovo!';
+    hecRoundEl.textContent = HEC_ROUNDS + '/' + HEC_ROUNDS;
+    return;
+  }
+  hecRound++;
+  hecRoundEl.textContent = hecRound + '/' + HEC_ROUNDS;
+  const boxRect = hecBox.getBoundingClientRect();
+  const size = 36;
+  const maxX = Math.max(0, boxRect.width - size);
+  const maxY = Math.max(0, boxRect.height - size);
+  hecTarget.style.left = (Math.random()*maxX) + 'px';
+  hecTarget.style.top = (Math.random()*maxY) + 'px';
+  hecTarget.style.display = 'block';
+  hecShownAt = performance.now();
+}
+
+hecTarget.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!hecRunning) return;
+  hecTimes.push(Math.round(performance.now() - hecShownAt));
+  hecHits++;
+  hecHitsEl.textContent = hecHits;
+  hecAvgEl.textContent = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
+  hecTarget.style.display = 'none';
+  setTimeout(nextHecRound, 200);
+});
 </script>
 
 </body>
