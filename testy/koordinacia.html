@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koordinácia rúk a očí — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Koordinácia rúk a očí</span></div>
+    <div id="hecBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:420px;">
+      <div id="hecMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni Spustiť</div>
+      <div id="hecTarget" style="position:absolute; width:36px; height:36px; border-radius:50%; background:var(--orange); display:none; cursor:pointer;"></div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="hecHits">0</div><div class="lbl">Zásahy</div></div>
+      <div><div class="num" id="hecAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+      <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kolo</div></div>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Spustiť</button>
+  </div>
+</main>
+
+<script>
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+const hecBox = document.getElementById('hecBox');
+const hecTarget = document.getElementById('hecTarget');
+const hecMsg = document.getElementById('hecMsg');
+const hecHitsEl = document.getElementById('hecHits');
+const hecAvgEl = document.getElementById('hecAvg');
+const hecRoundEl = document.getElementById('hecRound');
+
+const HEC_ROUNDS = 15;
+let hecRound = 0, hecHits = 0, hecTimes = [], hecShownAt, hecRunning = false;
+
+function startHEC(){
+  hecRound = 0; hecHits = 0; hecTimes = [];
+  hecHitsEl.textContent = '0';
+  hecAvgEl.textContent = '—';
+  hecRunning = true;
+  hecMsg.style.display = 'flex';
+  hecMsg.textContent = 'Priprav sa...';
+  setTimeout(() => {
+    hecMsg.style.display = 'none';
+    nextHecRound();
+  }, 700);
+}
+
+function nextHecRound(){
+  if(hecRound >= HEC_ROUNDS){
+    hecRunning = false;
+    hecTarget.style.display = 'none';
+    hecMsg.style.display = 'flex';
+    hecMsg.textContent = 'Hotovo!';
+    hecRoundEl.textContent = HEC_ROUNDS + '/' + HEC_ROUNDS;
+    return;
+  }
+  hecRound++;
+  hecRoundEl.textContent = hecRound + '/' + HEC_ROUNDS;
+  const boxRect = hecBox.getBoundingClientRect();
+  const size = 36;
+  const maxX = Math.max(0, boxRect.width - size);
+  const maxY = Math.max(0, boxRect.height - size);
+  hecTarget.style.left = (Math.random()*maxX) + 'px';
+  hecTarget.style.top = (Math.random()*maxY) + 'px';
+  hecTarget.style.display = 'block';
+  hecTarget.classList.remove('show');
+  void hecTarget.offsetWidth;
+  hecTarget.classList.add('show');
+  hecShownAt = performance.now();
+}
+
+function hecPulse(x, y){
+  const p = document.createElement('div');
+  p.className = 'hec-pulse';
+  p.style.left = (x - 18) + 'px';
+  p.style.top = (y - 18) + 'px';
+  p.style.width = '36px';
+  p.style.height = '36px';
+  p.style.animation = 'pulseOut .45s ease-out forwards';
+  hecBox.appendChild(p);
+  setTimeout(() => p.remove(), 450);
+}
+
+hecTarget.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!hecRunning) return;
+  hecTimes.push(Math.round(performance.now() - hecShownAt));
+  hecHits++;
+  hecHitsEl.textContent = hecHits;
+  bump(hecHitsEl, true);
+  hecAvgEl.textContent = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
+  hecPulse(parseFloat(hecTarget.style.left) + 18, parseFloat(hecTarget.style.top) + 18);
+  hecTarget.style.display = 'none';
+  setTimeout(nextHecRound, 220);
+});
+</script>
+
+</body>
+</html>

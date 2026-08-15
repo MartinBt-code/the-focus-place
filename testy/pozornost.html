@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Udržanie pozornosti — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Udržanie pozornosti</span></div>
+    <div id="cptBox" class="rt-box" style="cursor:pointer;">
+      <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="cptScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="cptAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="cptAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
+  </div>
+</main>
+
+<script>
+const cptBox = document.getElementById('cptBox');
+const cptMsg = document.getElementById('cptMsg');
+const cptScoreEl = document.getElementById('cptScore');
+const cptAccEl = document.getElementById('cptAcc');
+const cptAvgEl = document.getElementById('cptAvg');
+
+const CPT_LETTERS = ['A','B','E','K','M','P','R','T','X'];
+const CPT_TARGET = 'X';
+const CPT_ROUNDS = 20;
+let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptRts = [];
+let cptTimer, cptShownAt, cptWaitingResponse = false, cptRunning = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function cptFlash(cls){
+  cptBox.classList.add(cls);
+  setTimeout(() => cptBox.classList.remove(cls), 220);
+}
+
+function startCPT(){
+  cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptRts = [];
+  updateCptStats();
+  cptRunning = true;
+  cptMsg.style.opacity = '0';
+  cptMsg.textContent = 'Priprav sa...';
+  cptMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { cptMsg.style.opacity = '1'; });
+  cptTimer = setTimeout(() => {
+    cptMsg.style.fontSize = '64px';
+    nextCptRound();
+  }, 900);
+}
+
+function updateCptStats(){
+  cptScoreEl.textContent = cptScore;
+  const totalTargets = cptHits + cptMisses;
+  cptAccEl.textContent = totalTargets ? Math.round((cptHits/totalTargets)*100)+'%' : '—';
+  cptAvgEl.textContent = cptRts.length ? Math.round(cptRts.reduce((a,b)=>a+b,0)/cptRts.length) : '—';
+}
+
+function nextCptRound(){
+  if(cptRound >= CPT_ROUNDS){
+    cptRunning = false;
+    cptMsg.style.fontSize = '20px';
+    cptMsg.textContent = 'Hotovo!';
+    return;
+  }
+  cptRound++;
+  cptWaitingResponse = false;
+  cptMsg.style.opacity = '0';
+  const delay = 650 + Math.random()*750;
+  cptTimer = setTimeout(showCptLetter, delay);
+}
+
+function showCptLetter(){
+  const letter = CPT_LETTERS[Math.floor(Math.random()*CPT_LETTERS.length)];
+  cptMsg.textContent = letter;
+  cptMsg.style.opacity = '1';
+  cptShownAt = performance.now();
+  cptWaitingResponse = true;
+  cptTimer = setTimeout(() => {
+    if(cptWaitingResponse){
+      cptWaitingResponse = false;
+      if(letter === CPT_TARGET){ cptMisses++; cptFlash('early'); }
+      updateCptStats();
+      cptMsg.style.opacity = '0';
+      setTimeout(nextCptRound, 350);
+    }
+  }, 1000);
+}
+
+cptBox.addEventListener('click', () => {
+  if(!cptRunning || !cptWaitingResponse) return;
+  const letter = cptMsg.textContent;
+  clearTimeout(cptTimer);
+  cptWaitingResponse = false;
+  if(letter === CPT_TARGET){
+    cptRts.push(Math.round(performance.now() - cptShownAt));
+    cptHits++; cptScore++;
+    cptFlash('go');
+    bump(cptScoreEl, true);
+  } else {
+    cptScore = Math.max(0, cptScore - 1);
+    cptFlash('early');
+    bump(cptScoreEl, false);
+  }
+  updateCptStats();
+  cptMsg.style.opacity = '0';
+  setTimeout(nextCptRound, 350);
+});
+</script>
+
+</body>
+</html>

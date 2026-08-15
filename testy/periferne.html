@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periférne videnie — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Periférne videnie</span></div>
+    <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
+      <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
+    </div>
+    <div id="pvDirections" class="pv-compass">
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswer('hore-vlavo')">↖</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswer('hore')">↑</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswer('hore-vpravo')">↗</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswer('vlavo')">←</button>
+      <span class="pv-btn center">●</span>
+      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswer('vpravo')">→</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswer('dole-vlavo')">↙</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswer('dole')">↓</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
+    </div>
+    <div class="rt-stats" style="margin-top:16px;">
+      <div><div class="num" id="pvScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="pvAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="pvRound">0/12</div><div class="lbl">Kolo</div></div>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na bodku v strede. Keď sa na okraji mihne bod, klikni na smer, kde sa objavil.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Spustiť</button>
+  </div>
+</main>
+
+<script>
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+const pvTarget = document.getElementById('pvTarget');
+const pvScoreEl = document.getElementById('pvScore');
+const pvAccEl = document.getElementById('pvAcc');
+const pvRoundEl = document.getElementById('pvRound');
+const pvButtons = {};
+document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
+
+const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
+const PV_POS = {
+  'hore':{top:'6%', left:'50%'},
+  'hore-vpravo':{top:'14%', left:'88%'},
+  'vpravo':{top:'50%', left:'94%'},
+  'dole-vpravo':{top:'86%', left:'88%'},
+  'dole':{top:'94%', left:'50%'},
+  'dole-vlavo':{top:'86%', left:'12%'},
+  'vlavo':{top:'50%', left:'6%'},
+  'hore-vlavo':{top:'14%', left:'12%'}
+};
+const PV_ROUNDS = 12;
+let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false, pvCurrentDir = null, pvTimer, pvAnswered = false;
+
+function startPV(){
+  pvRound = 0; pvScore = 0; pvCorrect = 0;
+  pvScoreEl.textContent = '0';
+  pvAccEl.textContent = '—';
+  pvRoundEl.textContent = '0/' + PV_ROUNDS;
+  pvRunning = true;
+  pvTimer = setTimeout(nextPvRound, 500);
+}
+
+function nextPvRound(){
+  if(pvRound >= PV_ROUNDS){
+    pvRunning = false;
+    return;
+  }
+  pvRound++;
+  pvAnswered = false;
+  pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
+  const delay = 800 + Math.random()*900;
+  pvTimer = setTimeout(showPvTarget, delay);
+}
+
+function showPvTarget(){
+  pvCurrentDir = PV_DIRS[Math.floor(Math.random()*PV_DIRS.length)];
+  const pos = PV_POS[pvCurrentDir];
+  pvTarget.style.top = pos.top;
+  pvTarget.style.left = pos.left;
+  pvTarget.style.transform = 'translate(-50%,-50%)';
+  pvTarget.classList.remove('show');
+  void pvTarget.offsetWidth;
+  pvTarget.classList.add('show');
+  pvTarget.style.opacity = '1';
+  setTimeout(() => { pvTarget.style.opacity = '0'; }, 320);
+}
+
+function pvAnswer(dir){
+  if(!pvRunning || pvAnswered) return;
+  pvAnswered = true;
+  const correct = dir === pvCurrentDir;
+  const clicked = pvButtons[dir];
+  if(correct){
+    pvScore++; pvCorrect++;
+    clicked.classList.add('correct');
+  } else {
+    clicked.classList.add('wrong');
+    if(pvButtons[pvCurrentDir]) pvButtons[pvCurrentDir].classList.add('correct');
+  }
+  setTimeout(() => { Object.values(pvButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
+  pvScoreEl.textContent = pvScore;
+  bump(pvScoreEl, correct);
+  pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
+  setTimeout(nextPvRound, 500);
+}
+</script>
+
+</body>
+</html>

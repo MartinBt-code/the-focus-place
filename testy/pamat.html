@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pamäťová sekvencia — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Pamäťová sekvencia</span></div>
+    <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
+    <div class="rt-stats">
+      <div><div class="num" id="memLevel">0</div><div class="lbl">Úroveň</div></div>
+      <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
+  </div>
+</main>
+
+<script>
+const memGrid = document.getElementById('memGrid');
+const memLevelEl = document.getElementById('memLevel');
+const memBestEl = document.getElementById('memBest');
+let memTiles = [];
+let sequence = [];
+let userStep = 0;
+let memLevel = 0;
+let memBest = 0;
+let accepting = false;
+
+for(let i=0;i<9;i++){
+  const t = document.createElement('div');
+  t.style.cssText = 'aspect-ratio:1;background:#1A2029;border:2px solid var(--navy-line);border-radius:4px;cursor:pointer;transition:background .15s;';
+  t.dataset.idx = i;
+  t.addEventListener('click', () => onTileClick(i));
+  memGrid.appendChild(t);
+  memTiles.push(t);
+}
+
+function startMemoryGame(){
+  sequence = [];
+  memLevel = 0;
+  memLevelEl.textContent = memLevel;
+  nextRound();
+}
+
+function nextRound(){
+  memLevel++;
+  memLevelEl.textContent = memLevel;
+  userStep = 0;
+  sequence.push(Math.floor(Math.random()*9));
+  accepting = false;
+  playSequence();
+}
+
+function playSequence(){
+  let i = 0;
+  const interval = setInterval(() => {
+    flashTile(sequence[i]);
+    i++;
+    if(i >= sequence.length){
+      clearInterval(interval);
+      setTimeout(()=>{ accepting = true; }, 500);
+    }
+  }, 650);
+}
+
+function flashTile(idx){
+  const t = memTiles[idx];
+  t.style.background = 'var(--orange)';
+  setTimeout(()=>{ t.style.background = '#1A2029'; }, 350);
+}
+
+function onTileClick(idx){
+  if(!accepting) return;
+  flashTile(idx);
+  if(idx === sequence[userStep]){
+    userStep++;
+    if(userStep === sequence.length){
+      accepting = false;
+      if(memLevel > memBest){ memBest = memLevel; memBestEl.textContent = memBest; }
+      setTimeout(nextRound, 700);
+    }
+  } else {
+    accepting = false;
+    if(memLevel-1 > memBest){ memBest = memLevel-1; memBestEl.textContent = memBest; }
+    memTiles.forEach(t=>{ t.style.background = '#C0392B'; });
+    setTimeout(()=>{ memTiles.forEach(t=>{ t.style.background = '#1A2029'; }); }, 500);
+  }
+}
+</script>
+
+</body>
+</html>
