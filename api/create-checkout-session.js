@@ -64,6 +64,6 @@ module.exports = async (req, res) => {
     res.status(200).json({ url: session.url });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Nepodarilo sa vytvoriť platbu.' });
+    res.status(500).json({ error: 'Nepodarilo sa vytvoriť platbu.', debug: err.message });
   }
 };
