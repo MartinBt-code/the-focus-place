@@ -31,17 +31,9 @@ module.exports = async (req, res) => {
         },
         {
           key: 'zameranie',
-          label: { type: 'custom', custom: 'Pracovné zameranie' },
-          type: 'dropdown',
-          dropdown: {
-            options: [
-              { label: 'Basketbal', value: 'basketbal' },
-              { label: 'Kondičné trénerstvo', value: 'kondicnetrenerstvo' },
-              { label: 'Fyzio', value: 'fyzio' },
-              { label: 'Kondičný tréning - futbal', value: 'kondicnytreningfutbal' },
-              { label: 'Iné', value: 'ine' },
-            ],
-          },
+          label: { type: 'custom', custom: 'Pracovné zameranie (napr. basketbal, fyzio)' },
+          type: 'text',
+          text: { maximum_length: 100 },
         },
       ],
       line_items: [
@@ -57,6 +49,12 @@ module.exports = async (req, res) => {
           quantity: 1,
         },
       ],
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: 'Workshop: Vizuálny a kognitívny tréning — 3. 10. 2026, Košice',
+        },
+      },
       success_url: `${origin}/workshop/uspech.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/workshop/zrusene.html`,
     });
