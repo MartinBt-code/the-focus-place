@@ -218,6 +218,12 @@ section{padding:100px 0;}
   display:inline-block; font-family:'Space Mono'; font-size:10px; background:#ffffff10; color:var(--gray);
   padding:3px 8px; border-radius:2px; text-transform:uppercase; letter-spacing:1px; margin-top:10px;
 }
+.badge-live{
+  display:inline-block; font-family:'Space Mono'; font-size:10px; background:var(--orange-dim); color:var(--orange);
+  padding:3px 8px; border-radius:2px; text-transform:uppercase; letter-spacing:1px; margin-top:10px;
+}
+a.product-card{transition:.2s;}
+a.product-card:hover{border-color:var(--orange); transform:translateY(-4px);}
 
 /* PREMIUM */
 .pricing-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop: Vizuálny a kognitívny tréning — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="index.html#top"><img src="assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html#testy">Testy</a>
+      <a href="index.html#videa">Videá</a>
+      <a href="index.html#eshop">E-shop</a>
+      <a href="index.html#premium">Premium</a>
+    </div>
+    <a href="index.html#premium" class="nav-cta">Staň sa členom</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Workshop · 3. 10. 2026 · Košice</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Vizuálny a kognitívny<br><em>tréning</em>.</h1>
+    <p class="lead" style="max-width:600px;">Praktický workshop pre trénerov, kondičných trénerov a fyzioterapeutov o vizuálnom a kognitívnom tréningu vo výkonnostnom športe.</p>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:start;">
+    <div>
+      <div class="test-card" style="margin-bottom:32px;">
+        <div class="rt-stats" style="margin-top:0;">
+          <div><div class="num" style="font-size:19px;">3. 10. 2026</div><div class="lbl">Termín</div></div>
+          <div><div class="num" style="font-size:19px;">Košice</div><div class="lbl">Miesto</div></div>
+          <div><div class="num" style="font-size:19px;">Neobmedzená</div><div class="lbl">Kapacita</div></div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:14px;">Čo ťa čaká</h3>
+      <ul style="list-style:none;">
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Praktické cvičenia na zrakovú a kognitívnu záťaž</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Prepojenie s reakčným a koordinačným tréningom</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Aplikácia pre basketbal, futbal, fyzioterapiu aj kondičnú prípravu</li>
+        <li style="padding:12px 0 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Materiály a certifikát o účasti</li>
+      </ul>
+    </div>
+
+    <div class="test-card">
+      <div class="test-label"><span>Prihláška</span><span>Vizuálny a kognitívny tréning</span></div>
+      <div style="margin-bottom:22px;">
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <div class="num" id="wsPrice" style="font-size:44px;">89 €</div>
+        </div>
+        <div class="lbl" id="wsPriceNote">Early bird cena do 31. 8. 2026, potom 99 €</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="checkoutBtn" onclick="startCheckout()">Prihlásiť sa a zaplatiť</button>
+      <p class="mono" style="color:var(--gray); font-size:11px; margin-top:14px; line-height:1.6;">Platba prebieha bezpečne cez Stripe. Po kliknutí zadáš meno, telefón, pracovné zameranie a platobné údaje na zabezpečenej stránke Stripe.</p>
+      <p id="checkoutError" style="color:#E74C3C; font-size:13px; margin-top:10px; display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="index.html#top"><img src="assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. Všetky práva vyhradené.</span>
+  </div>
+</footer>
+
+<script>
+const EARLY_BIRD_DEADLINE = new Date('2026-09-01T00:00:00+02:00');
+if (new Date() >= EARLY_BIRD_DEADLINE) {
+  document.getElementById('wsPrice').textContent = '99 €';
+  document.getElementById('wsPriceNote').textContent = 'Plná cena';
+}
+
+async function startCheckout(){
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Presmerúvam na platbu...';
+  try{
+    const res = await fetch('/api/create-checkout-session', { method: 'POST' });
+    const data = await res.json();
+    if(res.ok && data.url){
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Neznáma chyba');
+    }
+  } catch(err){
+    errEl.textContent = 'Nepodarilo sa spustiť platbu. Skús to prosím znova, alebo nás kontaktuj.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Prihlásiť sa a zaplatiť';
+  }
+}
+</script>
+
+</body>
+</html>
