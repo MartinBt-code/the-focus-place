@@ -23,6 +23,8 @@ module.exports = async (req, res) => {
       mode: 'payment',
       payment_method_types: ['card'],
       phone_number_collection: { enabled: true },
+      billing_address_collection: 'required',
+      tax_id_collection: { enabled: true },
       custom_fields: [
         {
           key: 'meno',
@@ -31,7 +33,7 @@ module.exports = async (req, res) => {
         },
         {
           key: 'zameranie',
-          label: { type: 'custom', custom: 'Pracovné zameranie (napr. basketbal, fyzio)' },
+          label: { type: 'custom', custom: 'Zameranie (napr. kondičný tréner, fyzio)' },
           type: 'text',
           text: { maximum_length: 100 },
         },
