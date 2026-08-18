@@ -36,9 +36,9 @@ module.exports = async (req, res) => {
           dropdown: {
             options: [
               { label: 'Basketbal', value: 'basketbal' },
-              { label: 'Kondičné trénerstvo', value: 'kondicne_trenerstvo' },
+              { label: 'Kondičné trénerstvo', value: 'kondicnetrenerstvo' },
               { label: 'Fyzio', value: 'fyzio' },
-              { label: 'Kondičný tréning - futbal', value: 'kondicny_trening_futbal' },
+              { label: 'Kondičný tréning - futbal', value: 'kondicnytreningfutbal' },
               { label: 'Iné', value: 'ine' },
             ],
           },
@@ -64,6 +64,6 @@ module.exports = async (req, res) => {
     res.status(200).json({ url: session.url });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Nepodarilo sa vytvoriť platbu.', debug: err.message });
+    res.status(500).json({ error: 'Nepodarilo sa vytvoriť platbu.' });
   }
 };
