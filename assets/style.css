@@ -108,6 +108,12 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
 .event-banner .info h3{font-size:20px; margin:6px 0 4px;}
 .event-banner .info p{color:var(--gray); font-size:14px; font-family:'Space Mono';}
 
+/* INSTAGRAM WIDGET WRAPPER */
+#instagram-embed{
+  background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:6px;
+  padding:20px; overflow:hidden;
+}
+
 /* REACTION TEST WIDGET (signature element) */
 .test-card{
   background:var(--navy-panel);
