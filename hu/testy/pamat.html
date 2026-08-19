@@ -26,15 +26,32 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Élő teszt</span><span>Memóriasorozat</span></div>
-    <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
-    <div class="rt-stats">
-      <div><div class="num" id="memLevel">0</div><div class="lbl">Szint</div></div>
-      <div><div class="num" id="memBest">0</div><div class="lbl">Legjobb</div></div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Memóriasorozat</span></div>
+      <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="memLevel">0</div><div class="lbl">Szint</div></div>
+        <div><div class="num" id="memBest">0</div><div class="lbl">Legjobb</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Jegyezd meg és ismételd meg a növekvő mezősorozatot. Hány szintig jutsz el?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Indítás</button>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Jegyezd meg és ismételd meg a növekvő mezősorozatot. Hány szintig jutsz el?</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Indítás</button>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">A munkamemória lehetővé teszi, hogy rövid ideig megjegyezz és feldolgozz információkat — játékjeleket, taktikai utasításokat, lépéssorozatokat. Minél jobban fejleszted, annál gyorsabban tanulsz meg új kombinációkat, és annál kevesebb hibát vétesz nyomás alatt.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A rövid távú memória kapacitását és pontosságát — hány lépést tudsz megjegyezni egy sorozatból, és helyes sorrendben megismételni.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Sportolóknak a játékrendszerek elsajátításában, edzőknek a kognitív felkészültség felmérésében, és mindenkinek, aki szeretné fejleszteni a memóriáját.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 

@@ -26,15 +26,32 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Pamäťová sekvencia</span></div>
-    <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
-    <div class="rt-stats">
-      <div><div class="num" id="memLevel">0</div><div class="lbl">Úroveň</div></div>
-      <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Pamäťová sekvencia</span></div>
+      <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="memLevel">0</div><div class="lbl">Úroveň</div></div>
+        <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Pracovná pamäť ti umožňuje na krátky čas uchovať a spracovať informácie — herné signály, taktické pokyny, poradie krokov. Čím lepšie ju trénuješ, tým rýchlejšie sa učíš nové kombinácie a menej chybuješ pod tlakom.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Kapacitu a presnosť krátkodobej pamäte — koľko krokov v sekvencii si vieš zapamätať a v správnom poradí zopakovať.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom pri osvojovaní herných systémov, trénerom pri hodnotení kognitívnej pripravenosti aj každému, kto si chce potrénovať pamäť.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 

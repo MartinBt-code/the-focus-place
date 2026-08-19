@@ -26,18 +26,35 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Udržanie pozornosti</span></div>
-    <div id="cptBox" class="rt-box" style="cursor:pointer;">
-      <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Udržanie pozornosti</span></div>
+      <div id="cptBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="cptScore">0</div><div class="lbl">Skóre</div></div>
+        <div><div class="num" id="cptAcc">—</div><div class="lbl">Presnosť</div></div>
+        <div><div class="num" id="cptAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
     </div>
-    <div class="rt-stats">
-      <div><div class="num" id="cptScore">0</div><div class="lbl">Skóre</div></div>
-      <div><div class="num" id="cptAcc">—</div><div class="lbl">Presnosť</div></div>
-      <div><div class="num" id="cptAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Udržať pozornosť pri opakujúcej sa, na prvý pohľad nudnej úlohe je jedna z najťažších kognitívnych zručností. Práve vtedy sa stávajú chyby — nesprávna reakcia na signál, strata koncentrácie v záverečných minútach zápasu.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Schopnosť rozlíšiť dôležitý podnet od bežného šumu a udržať sústredenie počas dlhšej opakovanej úlohy (tzv. Go/No-Go test).</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom vo vytrvalostných a tímových športoch, ľuďom pracujúcim s vysokou mierou monotónnosti aj deťom pri tréningu pozornosti.</p>
+        </div>
+      </div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
   </div>
 </main>
 

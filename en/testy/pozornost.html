@@ -26,18 +26,35 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Sustained attention</span></div>
-    <div id="cptBox" class="rt-box" style="cursor:pointer;">
-      <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Sustained attention</span></div>
+      <div id="cptBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="cptScore">0</div><div class="lbl">Score</div></div>
+        <div><div class="num" id="cptAcc">—</div><div class="lbl">Accuracy</div></div>
+        <div><div class="num" id="cptAvg">—</div><div class="lbl">Average (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the box only when <strong style="color:var(--orange);">X</strong> appears. Don't click for other letters.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Start</button>
     </div>
-    <div class="rt-stats">
-      <div><div class="num" id="cptScore">0</div><div class="lbl">Score</div></div>
-      <div><div class="num" id="cptAcc">—</div><div class="lbl">Accuracy</div></div>
-      <div><div class="num" id="cptAvg">—</div><div class="lbl">Average (ms)</div></div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">Staying focused on a repetitive, seemingly boring task is one of the hardest cognitive skills. That's exactly when mistakes happen — a wrong reaction to a signal, losing concentration in the final minutes of a game.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>The ability to distinguish an important signal from background noise and stay focused during a longer repeated task (a Go/No-Go test).</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes in endurance and team sports, people working highly monotonous jobs, and children training their attention.</p>
+        </div>
+      </div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the box only when <strong style="color:var(--orange);">X</strong> appears. Don't click for other letters.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Start</button>
   </div>
 </main>
 

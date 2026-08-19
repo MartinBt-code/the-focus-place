@@ -26,15 +26,32 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Memory sequence</span></div>
-    <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
-    <div class="rt-stats">
-      <div><div class="num" id="memLevel">0</div><div class="lbl">Level</div></div>
-      <div><div class="num" id="memBest">0</div><div class="lbl">Best</div></div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Memory sequence</span></div>
+      <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="memLevel">0</div><div class="lbl">Level</div></div>
+        <div><div class="num" id="memBest">0</div><div class="lbl">Best</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Memorize and repeat a growing sequence of tiles. How many levels can you reach?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Start</button>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Memorize and repeat a growing sequence of tiles. How many levels can you reach?</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Start</button>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">Working memory lets you briefly hold and process information — game signals, tactical instructions, sequences of steps. The better you train it, the faster you learn new combinations and the fewer mistakes you make under pressure.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>The capacity and accuracy of short-term memory — how many steps in a sequence you can remember and repeat in the correct order.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes learning game systems, coaches assessing cognitive readiness, and anyone who wants to train their memory.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 

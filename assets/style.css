@@ -281,7 +281,23 @@ footer .mono{color:var(--gray); font-size:12px;}
   display:flex; align-items:center; justify-content:center;
   padding:60px 24px;
 }
+.test-page-inner{max-width:640px; width:100%; display:flex; flex-direction:column; gap:28px;}
 .test-card-xl{max-width:640px; width:100%;}
+.test-info{
+  background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:6px;
+  padding:28px 32px;
+}
+.test-info h3{font-size:17px; margin-bottom:10px;}
+.test-info > p.lead-text{color:var(--gray); font-size:14px; line-height:1.6; margin-bottom:22px;}
+.test-info-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+.test-info-grid strong{
+  display:block; font-family:'Space Mono'; font-size:11px; text-transform:uppercase;
+  letter-spacing:1px; color:var(--orange); margin-bottom:6px;
+}
+.test-info-grid p{color:var(--gray); font-size:13px; line-height:1.55;}
+@media(max-width:600px){
+  .test-info-grid{grid-template-columns:1fr;}
+}
 .test-card-xl .rt-box{height:340px;}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--gray); font-family:'Space Mono'; font-size:13px; text-transform:uppercase; letter-spacing:1px; transition:color .15s;}
 .back-link:hover{color:var(--orange);}

@@ -26,18 +26,35 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Élő teszt</span><span>Figyelem fenntartása</span></div>
-    <div id="cptBox" class="rt-box" style="cursor:pointer;">
-      <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Figyelem fenntartása</span></div>
+      <div id="cptBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="cptScore">0</div><div class="lbl">Pontszám</div></div>
+        <div><div class="num" id="cptAcc">—</div><div class="lbl">Pontosság</div></div>
+        <div><div class="num" id="cptAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőbe, ha megjelenik az <strong style="color:var(--orange);">X</strong>. Más betűknél ne kattints.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Indítás</button>
     </div>
-    <div class="rt-stats">
-      <div><div class="num" id="cptScore">0</div><div class="lbl">Pontszám</div></div>
-      <div><div class="num" id="cptAcc">—</div><div class="lbl">Pontosság</div></div>
-      <div><div class="num" id="cptAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">Egy ismétlődő, elsőre unalmasnak tűnő feladatnál koncentráltnak maradni az egyik legnehezebb kognitív képesség. Pont ilyenkor történnek a hibák — rossz reakció egy jelzésre, koncentrációvesztés a mérkőzés utolsó perceiben.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A képességet, hogy megkülönböztesd a fontos jelzést a háttérzajtól, és fenntartsd a koncentrációt egy hosszabb, ismétlődő feladat közben (ún. Go/No-Go teszt).</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Állóképességi és csapatsportokban versenyző sportolóknak, monoton munkát végzőknek, valamint gyerekeknek a figyelem fejlesztésében.</p>
+        </div>
+      </div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőbe, ha megjelenik az <strong style="color:var(--orange);">X</strong>. Más betűknél ne kattints.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Indítás</button>
   </div>
 </main>
 

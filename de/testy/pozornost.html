@@ -26,18 +26,35 @@
 </nav>
 
 <main class="test-page">
-  <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live-Test</span><span>Aufmerksamkeit halten</span></div>
-    <div id="cptBox" class="rt-box" style="cursor:pointer;">
-      <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live-Test</span><span>Aufmerksamkeit halten</span></div>
+      <div id="cptBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="cptScore">0</div><div class="lbl">Punkte</div></div>
+        <div><div class="num" id="cptAcc">—</div><div class="lbl">Genauigkeit</div></div>
+        <div><div class="num" id="cptAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klicke nur, wenn <strong style="color:var(--orange);">X</strong> erscheint. Bei anderen Buchstaben nicht klicken.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Starten</button>
     </div>
-    <div class="rt-stats">
-      <div><div class="num" id="cptScore">0</div><div class="lbl">Punkte</div></div>
-      <div><div class="num" id="cptAcc">—</div><div class="lbl">Genauigkeit</div></div>
-      <div><div class="num" id="cptAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Bei einer sich wiederholenden, scheinbar langweiligen Aufgabe konzentriert zu bleiben, ist eine der schwierigsten kognitiven Fähigkeiten. Genau dann passieren Fehler — eine falsche Reaktion auf ein Signal, Konzentrationsverlust in den letzten Minuten eines Spiels.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Fähigkeit, ein wichtiges Signal von Hintergrundrauschen zu unterscheiden und die Konzentration über eine längere, sich wiederholende Aufgabe zu halten (ein Go/No-Go-Test).</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Sportlern in Ausdauer- und Mannschaftssportarten, Menschen in stark monotonen Tätigkeiten und Kindern beim Aufmerksamkeitstraining.</p>
+        </div>
+      </div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klicke nur, wenn <strong style="color:var(--orange);">X</strong> erscheint. Bei anderen Buchstaben nicht klicken.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Starten</button>
   </div>
 </main>
 
