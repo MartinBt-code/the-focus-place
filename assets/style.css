@@ -47,6 +47,19 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
   font-family:'Space Mono'; font-weight:700; font-size:12px; text-transform:uppercase;
   letter-spacing:1px; border-radius:2px;
 }
+.lang-switch{
+  display:flex; align-items:center; gap:2px; font-family:'Space Mono'; font-size:11px;
+  letter-spacing:1px; margin-left:8px;
+}
+.lang-switch a{
+  color:var(--gray); padding:4px 6px; border-radius:2px; transition:.15s;
+}
+.lang-switch a:hover{color:var(--off-white);}
+.lang-switch a.active{color:var(--orange); font-weight:700;}
+.lang-switch span{color:var(--navy-line);}
+@media(max-width:860px){
+  .lang-switch{margin-left:0;}
+}
 
 /* HERO */
 .hero{

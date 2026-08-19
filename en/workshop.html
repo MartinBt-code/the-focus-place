@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop: Visual and Cognitive Training — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html#testy">Tests</a>
+      <a href="index.html#videa">Videos</a>
+      <a href="index.html#eshop">Shop</a>
+      <a href="index.html#premium">Premium</a>
+    </div>
+    <div class="lang-switch">
+      <a href="/workshop.html">SK</a><span>/</span>
+      <a href="/en/workshop.html" class="active">EN</a><span>/</span>
+      <a href="/de/workshop.html">DE</a><span>/</span>
+      <a href="/hu/workshop.html">HU</a>
+    </div>
+    <a href="index.html#premium" class="nav-cta">Become a member</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Workshop · Oct 3, 2026 · Košice</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Visual and cognitive<br><em>training</em>.</h1>
+    <p class="lead" style="max-width:600px;">A hands-on workshop for coaches, strength coaches, and physiotherapists on visual and cognitive training in performance sport.</p>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:start;">
+    <div>
+      <div class="test-card" style="margin-bottom:32px;">
+        <div class="rt-stats" style="margin-top:0;">
+          <div><div class="num" style="font-size:19px;">Oct 3, 2026</div><div class="lbl">Date</div></div>
+          <div><div class="num" style="font-size:19px;"><a href="https://getresults.sk/" target="_blank" rel="noopener" style="color:inherit; border-bottom:1px dashed var(--gray);">Košice</a></div><div class="lbl">Location</div></div>
+          <div><div class="num" style="font-size:19px;">Unlimited</div><div class="lbl">Capacity</div></div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:14px;">What to expect</h3>
+      <ul style="list-style:none;">
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Hands-on exercises for visual and cognitive load</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Connection to reaction and coordination training</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Applications for basketball, football, physiotherapy, and strength conditioning</li>
+        <li style="padding:12px 0 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Materials and a certificate of attendance</li>
+      </ul>
+    </div>
+
+    <div class="test-card">
+      <div class="test-label"><span>Registration</span><span>Visual and Cognitive Training</span></div>
+      <div style="margin-bottom:22px;">
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <div class="num" id="wsPrice" style="font-size:44px;">89 €</div>
+        </div>
+        <div class="lbl" id="wsPriceNote">Early bird price until Aug 31, 2026, then 99 €</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="checkoutBtn" onclick="startCheckout()">Register and pay</button>
+      <p class="mono" style="color:var(--gray); font-size:11px; margin-top:14px; line-height:1.6;">Payment is processed securely via Stripe. After clicking, you'll enter your name, phone, field, and payment details on Stripe's secure page.</p>
+      <p id="checkoutError" style="color:#E74C3C; font-size:13px; margin-top:10px; display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="index.html#top"><img src="../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+const EARLY_BIRD_DEADLINE = new Date('2026-09-01T00:00:00+02:00');
+if (new Date() >= EARLY_BIRD_DEADLINE) {
+  document.getElementById('wsPrice').textContent = '99 €';
+  document.getElementById('wsPriceNote').textContent = 'Full price';
+}
+
+async function startCheckout(){
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to payment...';
+  try{
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang: 'en' }),
+    });
+    const data = await res.json();
+    if(res.ok && data.url){
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch(err){
+    errEl.textContent = 'Could not start the payment. Please try again, or contact us.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Register and pay';
+  }
+}
+</script>
+
+</body>
+</html>

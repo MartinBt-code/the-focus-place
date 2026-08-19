@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="hu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Koordinácia rúk a očí — the Focus Place</title>
+<title>Kéz-szem koordináció — the Focus Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 
 <nav>
   <div class="wrap">
-    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
     <div style="display:flex; align-items:center; gap:20px;">
-      <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+      <a href="../index.html#testy" class="back-link">← Vissza a tesztekhez</a>
       <div class="lang-switch">
-        <a href="/testy/koordinacia.html" class="active">SK</a><span>/</span>
+        <a href="/testy/koordinacia.html">SK</a><span>/</span>
         <a href="/en/testy/koordinacia.html">EN</a><span>/</span>
         <a href="/de/testy/koordinacia.html">DE</a><span>/</span>
-        <a href="/hu/testy/koordinacia.html">HU</a>
+        <a href="/hu/testy/koordinacia.html" class="active">HU</a>
       </div>
     </div>
   </div>
@@ -27,18 +27,18 @@
 
 <main class="test-page">
   <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Koordinácia rúk a očí</span></div>
+    <div class="test-label"><span>Élő teszt</span><span>Kéz-szem koordináció</span></div>
     <div id="hecBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:420px;">
-      <div id="hecMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni Spustiť</div>
+      <div id="hecMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Kattints az Indításra</div>
       <div id="hecTarget" style="position:absolute; width:36px; height:36px; border-radius:50%; background:var(--orange); display:none; cursor:pointer;"></div>
     </div>
     <div class="rt-stats">
-      <div><div class="num" id="hecHits">0</div><div class="lbl">Zásahy</div></div>
-      <div><div class="num" id="hecAvg">—</div><div class="lbl">Priemer (ms)</div></div>
-      <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kolo</div></div>
+      <div><div class="num" id="hecHits">0</div><div class="lbl">Találatok</div></div>
+      <div><div class="num" id="hecAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kör</div></div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pontosság- és reakcióidő-teszt mozgó célpontokon.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Indítás</button>
   </div>
 </main>
 
@@ -66,7 +66,7 @@ function startHEC(){
   hecAvgEl.textContent = '—';
   hecRunning = true;
   hecMsg.style.display = 'flex';
-  hecMsg.textContent = 'Priprav sa...';
+  hecMsg.textContent = 'Készülj...';
   setTimeout(() => {
     hecMsg.style.display = 'none';
     nextHecRound();
@@ -78,7 +78,7 @@ function nextHecRound(){
     hecRunning = false;
     hecTarget.style.display = 'none';
     hecMsg.style.display = 'flex';
-    hecMsg.textContent = 'Hotovo!';
+    hecMsg.textContent = 'Kész!';
     hecRoundEl.textContent = HEC_ROUNDS + '/' + HEC_ROUNDS;
     return;
   }

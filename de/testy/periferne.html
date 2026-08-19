@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Periférne videnie — the Focus Place</title>
+<title>Peripheres Sehen — the Focus Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 
 <nav>
   <div class="wrap">
-    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
     <div style="display:flex; align-items:center; gap:20px;">
-      <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+      <a href="../index.html#testy" class="back-link">← Zurück zu den Tests</a>
       <div class="lang-switch">
-        <a href="/testy/periferne.html" class="active">SK</a><span>/</span>
+        <a href="/testy/periferne.html">SK</a><span>/</span>
         <a href="/en/testy/periferne.html">EN</a><span>/</span>
-        <a href="/de/testy/periferne.html">DE</a><span>/</span>
+        <a href="/de/testy/periferne.html" class="active">DE</a><span>/</span>
         <a href="/hu/testy/periferne.html">HU</a>
       </div>
     </div>
@@ -27,7 +27,7 @@
 
 <main class="test-page">
   <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Periférne videnie</span></div>
+    <div class="test-label"><span>Live-Test</span><span>Peripheres Sehen</span></div>
     <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
       <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
       <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
@@ -44,12 +44,12 @@
       <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
     </div>
     <div class="rt-stats" style="margin-top:16px;">
-      <div><div class="num" id="pvScore">0</div><div class="lbl">Skóre</div></div>
-      <div><div class="num" id="pvAcc">—</div><div class="lbl">Presnosť</div></div>
-      <div><div class="num" id="pvRound">0/12</div><div class="lbl">Kolo</div></div>
+      <div><div class="num" id="pvScore">0</div><div class="lbl">Punkte</div></div>
+      <div><div class="num" id="pvAcc">—</div><div class="lbl">Genauigkeit</div></div>
+      <div><div class="num" id="pvRound">0/12</div><div class="lbl">Runde</div></div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na bodku v strede. Keď sa na okraji mihne bod, klikni na smer, kde sa objavil.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Schau auf den Punkt in der Mitte. Wenn am Rand ein Punkt aufblitzt, klicke auf die Richtung, in der er erschienen ist.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Starten</button>
   </div>
 </main>
 

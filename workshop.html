@@ -19,6 +19,12 @@
       <a href="index.html#eshop">E-shop</a>
       <a href="index.html#premium">Premium</a>
     </div>
+    <div class="lang-switch">
+      <a href="/workshop.html" class="active">SK</a><span>/</span>
+      <a href="/en/workshop.html">EN</a><span>/</span>
+      <a href="/de/workshop.html">DE</a><span>/</span>
+      <a href="/hu/workshop.html">HU</a>
+    </div>
     <a href="index.html#premium" class="nav-cta">Staň sa členom</a>
   </div>
 </nav>
@@ -86,7 +92,11 @@ async function startCheckout(){
   btn.disabled = true;
   btn.textContent = 'Presmerúvam na platbu...';
   try{
-    const res = await fetch('/api/create-checkout-session', { method: 'POST' });
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang: 'sk' }),
+    });
     const data = await res.json();
     if(res.ok && data.url){
       window.location.href = data.url;

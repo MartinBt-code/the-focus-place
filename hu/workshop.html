@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop: Vizuális és kognitív tréning — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html#testy">Tesztek</a>
+      <a href="index.html#videa">Videók</a>
+      <a href="index.html#eshop">Webshop</a>
+      <a href="index.html#premium">Prémium</a>
+    </div>
+    <div class="lang-switch">
+      <a href="/workshop.html">SK</a><span>/</span>
+      <a href="/en/workshop.html">EN</a><span>/</span>
+      <a href="/de/workshop.html">DE</a><span>/</span>
+      <a href="/hu/workshop.html" class="active">HU</a>
+    </div>
+    <a href="index.html#premium" class="nav-cta">Legyél tag</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Workshop · 2026.10.03. · Kassa</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Vizuális és kognitív<br><em>tréning</em>.</h1>
+    <p class="lead" style="max-width:600px;">Gyakorlati workshop edzőknek, erőnléti edzőknek és gyógytornászoknak a vizuális és kognitív tréningről a versenysportban.</p>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:start;">
+    <div>
+      <div class="test-card" style="margin-bottom:32px;">
+        <div class="rt-stats" style="margin-top:0;">
+          <div><div class="num" style="font-size:19px;">2026.10.03.</div><div class="lbl">Időpont</div></div>
+          <div><div class="num" style="font-size:19px;"><a href="https://getresults.sk/" target="_blank" rel="noopener" style="color:inherit; border-bottom:1px dashed var(--gray);">Kassa</a></div><div class="lbl">Helyszín</div></div>
+          <div><div class="num" style="font-size:19px;">Korlátlan</div><div class="lbl">Létszám</div></div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:14px;">Mire számíthatsz</h3>
+      <ul style="list-style:none;">
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Gyakorlati gyakorlatok a vizuális és kognitív terhelésre</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Kapcsolódás a reakció- és koordinációs tréninghez</li>
+        <li style="padding:12px 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Alkalmazás kosárlabdához, futballhoz, gyógytornához és erőnléti felkészüléshez</li>
+        <li style="padding:12px 0 0; border-top:1px solid var(--navy-line); color:var(--gray);">— Segédanyagok és részvételi igazolás</li>
+      </ul>
+    </div>
+
+    <div class="test-card">
+      <div class="test-label"><span>Jelentkezés</span><span>Vizuális és kognitív tréning</span></div>
+      <div style="margin-bottom:22px;">
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <div class="num" id="wsPrice" style="font-size:44px;">89 €</div>
+        </div>
+        <div class="lbl" id="wsPriceNote">Korai jelentkezési ár 2026.08.31-ig, utána 99 €</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="checkoutBtn" onclick="startCheckout()">Jelentkezés és fizetés</button>
+      <p class="mono" style="color:var(--gray); font-size:11px; margin-top:14px; line-height:1.6;">A fizetés biztonságosan zajlik a Stripe rendszerén keresztül. Kattintás után add meg a neved, telefonszámod, szakterületed és a fizetési adatokat a Stripe biztonságos oldalán.</p>
+      <p id="checkoutError" style="color:#E74C3C; font-size:13px; margin-top:10px; display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="index.html#top"><img src="../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. Minden jog fenntartva.</span>
+  </div>
+</footer>
+
+<script>
+const EARLY_BIRD_DEADLINE = new Date('2026-09-01T00:00:00+02:00');
+if (new Date() >= EARLY_BIRD_DEADLINE) {
+  document.getElementById('wsPrice').textContent = '99 €';
+  document.getElementById('wsPriceNote').textContent = 'Teljes ár';
+}
+
+async function startCheckout(){
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Átirányítás a fizetéshez...';
+  try{
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang: 'hu' }),
+    });
+    const data = await res.json();
+    if(res.ok && data.url){
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Ismeretlen hiba');
+    }
+  } catch(err){
+    errEl.textContent = 'Nem sikerült elindítani a fizetést. Kérjük, próbáld újra, vagy vedd fel velünk a kapcsolatot.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Jelentkezés és fizetés';
+  }
+}
+</script>
+
+</body>
+</html>

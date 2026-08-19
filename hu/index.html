@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the Focus Place — Teszteld a határaidat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="#testy">Tesztek</a>
+      <a href="#videa">Videók</a>
+      <a href="#eshop">Webshop</a>
+      <a href="#premium">Prémium</a>
+      <a href="workshop.html">Workshop</a>
+    </div>
+    <div class="lang-switch">
+      <a href="/index.html">SK</a><span>/</span>
+      <a href="/en/index.html">EN</a><span>/</span>
+      <a href="/de/index.html">DE</a><span>/</span>
+      <a href="/hu/index.html" class="active">HU</a>
+    </div>
+    <a href="#premium" class="nav-cta">Legyél tag</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+        <img src="../assets/thePlace_icon_color.png" alt="" style="height:20px; width:auto;">
+        <span class="eyebrow" style="margin-bottom:0;">Focus in motion</span>
+      </div>
+      <h1>Találd ki, hol<br>vannak a <em>határaid</em>.</h1>
+      <p class="lead">Reakcióidő, memória, koordináció — pontosan mért tesztek, oktatóvideók és edzésprogramok egy helyen.</p>
+      <div class="btn-row">
+        <a href="#testy" class="btn btn-primary">Teszt indítása</a>
+        <a href="#videa" class="btn btn-ghost">Videók megtekintése</a>
+      </div>
+    </div>
+
+    <div class="test-card" id="reakcny-test">
+      <div class="test-label"><span>Élő teszt</span><span>Reakcióidő</span></div>
+      <div id="rtBox" class="rt-box">
+        <div class="rt-msg" id="rtMsg">Kattints az induláshoz</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="rtLast">—</div><div class="lbl">Utolsó (ms)</div></div>
+        <div><div class="num" id="rtBest">—</div><div class="lbl">Legjobb (ms)</div></div>
+        <div><div class="num" id="rtAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="testy">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">01 · Tesztek</span>
+        <h2>Teszteld magad</h2>
+      </div>
+      <p>Öt teszt aktív most. További sport- és kognitív teszteket folyamatosan adunk hozzá.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card active" onclick="document.getElementById('reakcny-test').scrollIntoView({behavior:'smooth'})">
+        <span class="tag live">● Élő</span>
+        <h3>Reakcióidő</h3>
+        <p>Kattints abban a pillanatban, amikor a mező zöldre vált. Az idődet ezredmásodpercben mérjük.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/pamat.html'">
+        <span class="tag live">● Élő</span>
+        <h3>Memóriasorozat</h3>
+        <p>Jegyezd meg és ismételd meg a növekvő mezősorozatot. Hány szintig jutsz el?</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/koordinacia.html'">
+        <span class="tag live">● Élő</span>
+        <h3>Kéz-szem koordináció</h3>
+        <p>Pontosság- és reakcióidő-teszt mozgó célpontokon.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/periferne.html'">
+        <span class="tag live">● Élő</span>
+        <h3>Periférikus látás</h3>
+        <p>Teszteld a látótered szélességét és sebességét.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/pozornost.html'">
+        <span class="tag live">● Élő</span>
+        <h3>Figyelem fenntartása</h3>
+        <p>A koncentráció mérése ismétlődő feladat közben — sportolóknak és hétköznapi felhasználóknak egyaránt.</p>
+      </div>
+      <div class="card locked">
+        <span class="tag soon">Hamarosan</span>
+        <span class="lock-icon">🔒</span>
+        <h3>Sportagilitás</h3>
+        <p>Kombinált irányváltás-sebességi teszt — edzőkkel közösen fejlesztjük.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="videa" style="background:var(--navy-panel);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">02 · Oktatás</span>
+        <h2>Videótartalom</h2>
+      </div>
+      <p>Technika, regeneráció és edzésmódszerek lépésről lépésre elmagyarázva.</p>
+    </div>
+    <div class="filter-row">
+      <span class="filter-pill active">Mind</span>
+      <span class="filter-pill">Erőedzés</span>
+      <span class="filter-pill">Kosárlabda</span>
+      <span class="filter-pill">Regeneráció</span>
+    </div>
+    <div class="grid-3">
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Hamarosan</span></div>
+        <div class="body">
+          <h3>Trap bar felhúzás — helyes technika</h3>
+          <span class="meta">Erőedzés · 4:32</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Hamarosan</span></div>
+        <div class="body">
+          <h3>Bemelegítés meccs előtt</h3>
+          <span class="meta">Kosárlabda · 3:10</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Hamarosan</span></div>
+        <div class="body">
+          <h3>Regeneráció nagy terhelés után</h3>
+          <span class="meta">Regeneráció · 5:47</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="eshop">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">03 · Webshop</span>
+        <h2>Programok és termékek</h2>
+      </div>
+      <p>Edzéstervek és konzultációk. A fizetés a Stripe rendszeren keresztül lesz elérhető.</p>
+    </div>
+    <div class="grid-3">
+      <div class="product-card">
+        <div class="product-thumb">01</div>
+        <div class="body">
+          <h3>Edzésterv — Robbanékonyság</h3>
+          <div class="price">29 €</div>
+          <span class="badge-soon">Hamarosan elérhető</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">02</div>
+        <div class="body">
+          <h3>1:1 online konzultáció</h3>
+          <div class="price">45 € / óra</div>
+          <span class="badge-soon">Hamarosan elérhető</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">03</div>
+        <div class="body">
+          <h3>Tesztcsomag klubok számára</h3>
+          <div class="price">kérésre</div>
+          <span class="badge-soon">Hamarosan elérhető</span>
+        </div>
+      </div>
+      <a class="product-card" href="workshop.html" style="display:block; cursor:pointer;">
+        <div class="product-thumb">04</div>
+        <div class="body">
+          <h3>Workshop: Vizuális és kognitív tréning</h3>
+          <div class="price">89 €-tól · 2026.10.03. · Kassa</div>
+          <span class="badge-live">● Élő — jelentkezés</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="premium" style="background:var(--navy-panel);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">04 · Tagság</span>
+        <h2>Menj mélyebbre</h2>
+      </div>
+      <p>Oldd fel a teljes eredménytörténetet, az összehasonlítást másokkal és az exkluzív videótartalmat.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Free</h3>
+        <div class="price">0 <span>€/hó</span></div>
+        <ul>
+          <li>Alaptesztek</li>
+          <li>Legutóbbi eredmény</li>
+          <li>Nyilvános videók</li>
+        </ul>
+        <a class="btn btn-ghost" style="text-align:center;">Jelenlegi csomag</a>
+      </div>
+      <div class="price-card featured">
+        <h3>Pro</h3>
+        <div class="price">7,90 <span>€/hó</span></div>
+        <ul>
+          <li>Minden teszt, a jövőbelieket is beleértve</li>
+          <li>Eredménytörténet és grafikonok</li>
+          <li>Teljes videótár</li>
+          <li>10% kedvezmény a webshopban</li>
+        </ul>
+        <a class="btn btn-primary" style="text-align:center;">Hamarosan</a>
+      </div>
+      <div class="price-card">
+        <h3>Elite</h3>
+        <div class="price">19 <span>€/hó</span></div>
+        <ul>
+          <li>Minden a Pro csomagból</li>
+          <li>Havi 1:1 konzultáció</li>
+          <li>Egyéni edzésterv</li>
+          <li>Prioritásos támogatás</li>
+        </ul>
+        <a class="btn btn-ghost" style="text-align:center;">Hamarosan</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;">
+    <span class="mono">© 2026 the Focus Place. Minden jog fenntartva.</span>
+  </div>
+</footer>
+
+<script>
+const rtBox = document.getElementById('rtBox');
+const rtMsg = document.getElementById('rtMsg');
+const rtLast = document.getElementById('rtLast');
+const rtBest = document.getElementById('rtBest');
+const rtAvg = document.getElementById('rtAvg');
+
+let rtState = 'idle';
+let rtTimeout, rtStart;
+let rtResults = [];
+
+rtBox.addEventListener('click', () => {
+  if(rtState === 'idle'){
+    rtState = 'waiting';
+    rtBox.classList.remove('go','early');
+    rtMsg.textContent = 'Várj a zöldre...';
+    const delay = 1000 + Math.random()*2500;
+    rtTimeout = setTimeout(() => {
+      rtState = 'go';
+      rtBox.classList.add('go');
+      rtMsg.textContent = 'KATTINTS!';
+      rtStart = performance.now();
+    }, delay);
+  } else if(rtState === 'waiting'){
+    clearTimeout(rtTimeout);
+    rtState = 'idle';
+    rtBox.classList.add('early');
+    rtMsg.textContent = 'Túl korán! Kattints az újrakezdéshez.';
+    setTimeout(()=>{ rtBox.classList.remove('early'); rtMsg.textContent='Kattints az induláshoz'; }, 1200);
+  } else if(rtState === 'go'){
+    const time = Math.round(performance.now() - rtStart);
+    rtResults.push(time);
+    rtLast.textContent = time;
+    rtBest.textContent = Math.min(...rtResults);
+    rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+    rtState = 'idle';
+    rtBox.classList.remove('go');
+    rtMsg.textContent = 'Kattints a következő próbához';
+  }
+});
+
+</script>
+
+</body>
+</html>

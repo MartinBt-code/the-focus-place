@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="hu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pamäťová sekvencia — the Focus Place</title>
+<title>Memóriasorozat — the Focus Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 
 <nav>
   <div class="wrap">
-    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
     <div style="display:flex; align-items:center; gap:20px;">
-      <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+      <a href="../index.html#testy" class="back-link">← Vissza a tesztekhez</a>
       <div class="lang-switch">
-        <a href="/testy/pamat.html" class="active">SK</a><span>/</span>
+        <a href="/testy/pamat.html">SK</a><span>/</span>
         <a href="/en/testy/pamat.html">EN</a><span>/</span>
         <a href="/de/testy/pamat.html">DE</a><span>/</span>
-        <a href="/hu/testy/pamat.html">HU</a>
+        <a href="/hu/testy/pamat.html" class="active">HU</a>
       </div>
     </div>
   </div>
@@ -27,14 +27,14 @@
 
 <main class="test-page">
   <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Pamäťová sekvencia</span></div>
+    <div class="test-label"><span>Élő teszt</span><span>Memóriasorozat</span></div>
     <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
     <div class="rt-stats">
-      <div><div class="num" id="memLevel">0</div><div class="lbl">Úroveň</div></div>
-      <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
+      <div><div class="num" id="memLevel">0</div><div class="lbl">Szint</div></div>
+      <div><div class="num" id="memBest">0</div><div class="lbl">Legjobb</div></div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Jegyezd meg és ismételd meg a növekvő mezősorozatot. Hány szintig jutsz el?</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Indítás</button>
   </div>
 </main>
 

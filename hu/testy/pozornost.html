@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="hu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Udržanie pozornosti — the Focus Place</title>
+<title>Figyelem fenntartása — the Focus Place</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 
 <nav>
   <div class="wrap">
-    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
     <div style="display:flex; align-items:center; gap:20px;">
-      <a href="../index.html#testy" class="back-link">← Späť na testy</a>
+      <a href="../index.html#testy" class="back-link">← Vissza a tesztekhez</a>
       <div class="lang-switch">
-        <a href="/testy/pozornost.html" class="active">SK</a><span>/</span>
+        <a href="/testy/pozornost.html">SK</a><span>/</span>
         <a href="/en/testy/pozornost.html">EN</a><span>/</span>
         <a href="/de/testy/pozornost.html">DE</a><span>/</span>
-        <a href="/hu/testy/pozornost.html">HU</a>
+        <a href="/hu/testy/pozornost.html" class="active">HU</a>
       </div>
     </div>
   </div>
@@ -27,17 +27,17 @@
 
 <main class="test-page">
   <div class="test-card test-card-xl">
-    <div class="test-label"><span>Live test</span><span>Udržanie pozornosti</span></div>
+    <div class="test-label"><span>Élő teszt</span><span>Figyelem fenntartása</span></div>
     <div id="cptBox" class="rt-box" style="cursor:pointer;">
       <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
     </div>
     <div class="rt-stats">
-      <div><div class="num" id="cptScore">0</div><div class="lbl">Skóre</div></div>
-      <div><div class="num" id="cptAcc">—</div><div class="lbl">Presnosť</div></div>
-      <div><div class="num" id="cptAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+      <div><div class="num" id="cptScore">0</div><div class="lbl">Pontszám</div></div>
+      <div><div class="num" id="cptAcc">—</div><div class="lbl">Pontosság</div></div>
+      <div><div class="num" id="cptAvg">—</div><div class="lbl">Átlag (ms)</div></div>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőbe, ha megjelenik az <strong style="color:var(--orange);">X</strong>. Más betűknél ne kattints.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Indítás</button>
   </div>
 </main>
 
@@ -71,7 +71,7 @@ function startCPT(){
   updateCptStats();
   cptRunning = true;
   cptMsg.style.opacity = '0';
-  cptMsg.textContent = 'Priprav sa...';
+  cptMsg.textContent = 'Készülj...';
   cptMsg.style.fontSize = '18px';
   requestAnimationFrame(() => { cptMsg.style.opacity = '1'; });
   cptTimer = setTimeout(() => {
@@ -91,7 +91,7 @@ function nextCptRound(){
   if(cptRound >= CPT_ROUNDS){
     cptRunning = false;
     cptMsg.style.fontSize = '20px';
-    cptMsg.textContent = 'Hotovo!';
+    cptMsg.textContent = 'Kész!';
     return;
   }
   cptRound++;

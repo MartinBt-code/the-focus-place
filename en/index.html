@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the Focus Place — Test your limits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="#testy">Tests</a>
+      <a href="#videa">Videos</a>
+      <a href="#eshop">Shop</a>
+      <a href="#premium">Premium</a>
+      <a href="workshop.html">Workshop</a>
+    </div>
+    <div class="lang-switch">
+      <a href="/index.html">SK</a><span>/</span>
+      <a href="/en/index.html" class="active">EN</a><span>/</span>
+      <a href="/de/index.html">DE</a><span>/</span>
+      <a href="/hu/index.html">HU</a>
+    </div>
+    <a href="#premium" class="nav-cta">Become a member</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+        <img src="../assets/thePlace_icon_color.png" alt="" style="height:20px; width:auto;">
+        <span class="eyebrow" style="margin-bottom:0;">Focus in motion</span>
+      </div>
+      <h1>Find out where<br>your <em>limits</em> are.</h1>
+      <p class="lead">Reaction speed, memory, coordination — precisely measured tests, educational video content, and training programs in one place.</p>
+      <div class="btn-row">
+        <a href="#testy" class="btn btn-primary">Start test</a>
+        <a href="#videa" class="btn btn-ghost">Watch videos</a>
+      </div>
+    </div>
+
+    <div class="test-card" id="reakcny-test">
+      <div class="test-label"><span>Live test</span><span>Reaction time</span></div>
+      <div id="rtBox" class="rt-box">
+        <div class="rt-msg" id="rtMsg">Click to start</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="rtLast">—</div><div class="lbl">Last (ms)</div></div>
+        <div><div class="num" id="rtBest">—</div><div class="lbl">Best (ms)</div></div>
+        <div><div class="num" id="rtAvg">—</div><div class="lbl">Average (ms)</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="testy">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">01 · Tests</span>
+        <h2>Test yourself</h2>
+      </div>
+      <p>Five tests are live right now. More sport and cognitive tests are added continuously.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card active" onclick="document.getElementById('reakcny-test').scrollIntoView({behavior:'smooth'})">
+        <span class="tag live">● Live</span>
+        <h3>Reaction time</h3>
+        <p>Click the moment the area turns green. Your time is measured in milliseconds.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/pamat.html'">
+        <span class="tag live">● Live</span>
+        <h3>Memory sequence</h3>
+        <p>Memorize and repeat a growing sequence of tiles. How many levels can you reach?</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/koordinacia.html'">
+        <span class="tag live">● Live</span>
+        <h3>Hand-eye coordination</h3>
+        <p>Accuracy and reaction speed test on moving targets.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/periferne.html'">
+        <span class="tag live">● Live</span>
+        <h3>Peripheral vision</h3>
+        <p>Test the width and speed of your field of vision.</p>
+      </div>
+      <div class="card active" onclick="location.href='testy/pozornost.html'">
+        <span class="tag live">● Live</span>
+        <h3>Sustained attention</h3>
+        <p>Measuring focus during a repeated task — for athletes and everyday users alike.</p>
+      </div>
+      <div class="card locked">
+        <span class="tag soon">Coming soon</span>
+        <span class="lock-icon">🔒</span>
+        <h3>Sports agility</h3>
+        <p>Combined test of directional change speed — being developed together with coaches.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="videa" style="background:var(--navy-panel);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">02 · Education</span>
+        <h2>Video content</h2>
+      </div>
+      <p>Technique, recovery, and training methods explained step by step.</p>
+    </div>
+    <div class="filter-row">
+      <span class="filter-pill active">All</span>
+      <span class="filter-pill">Strength training</span>
+      <span class="filter-pill">Basketball</span>
+      <span class="filter-pill">Recovery</span>
+    </div>
+    <div class="grid-3">
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Coming soon</span></div>
+        <div class="body">
+          <h3>Trap bar deadlift — proper technique</h3>
+          <span class="meta">Strength training · 4:32</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Coming soon</span></div>
+        <div class="body">
+          <h3>Warm-up before a game</h3>
+          <span class="meta">Basketball · 3:10</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="play-btn">▶</div><span class="badge">Coming soon</span></div>
+        <div class="body">
+          <h3>Recovery after high load</h3>
+          <span class="meta">Recovery · 5:47</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="eshop">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">03 · Shop</span>
+        <h2>Programs and products</h2>
+      </div>
+      <p>Training plans and consultations. Payments will be connected via Stripe.</p>
+    </div>
+    <div class="grid-3">
+      <div class="product-card">
+        <div class="product-thumb">01</div>
+        <div class="body">
+          <h3>Training plan — Explosiveness</h3>
+          <div class="price">29 €</div>
+          <span class="badge-soon">Coming soon</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">02</div>
+        <div class="body">
+          <h3>1:1 online consultation</h3>
+          <div class="price">45 € / hr</div>
+          <span class="badge-soon">Coming soon</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">03</div>
+        <div class="body">
+          <h3>Test package for clubs</h3>
+          <div class="price">on request</div>
+          <span class="badge-soon">Coming soon</span>
+        </div>
+      </div>
+      <a class="product-card" href="workshop.html" style="display:block; cursor:pointer;">
+        <div class="product-thumb">04</div>
+        <div class="body">
+          <h3>Workshop: Visual and cognitive training</h3>
+          <div class="price">from 89 € · Oct 3, 2026 · Košice</div>
+          <span class="badge-live">● Live — sign up</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="premium" style="background:var(--navy-panel);">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">04 · Membership</span>
+        <h2>Go deeper</h2>
+      </div>
+      <p>Unlock full result history, comparisons with others, and exclusive video content.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Free</h3>
+        <div class="price">0 <span>€/mo.</span></div>
+        <ul>
+          <li>Basic tests</li>
+          <li>Latest result</li>
+          <li>Public videos</li>
+        </ul>
+        <a class="btn btn-ghost" style="text-align:center;">Current plan</a>
+      </div>
+      <div class="price-card featured">
+        <h3>Pro</h3>
+        <div class="price">7.90 <span>€/mo.</span></div>
+        <ul>
+          <li>All tests, including upcoming ones</li>
+          <li>Result history and charts</li>
+          <li>Full video library</li>
+          <li>10% shop discount</li>
+        </ul>
+        <a class="btn btn-primary" style="text-align:center;">Coming soon</a>
+      </div>
+      <div class="price-card">
+        <h3>Elite</h3>
+        <div class="price">19 <span>€/mo.</span></div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Monthly 1:1 consultation</li>
+          <li>Individual training plan</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="btn btn-ghost" style="text-align:center;">Coming soon</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;">
+    <span class="mono">© 2026 the Focus Place. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+const rtBox = document.getElementById('rtBox');
+const rtMsg = document.getElementById('rtMsg');
+const rtLast = document.getElementById('rtLast');
+const rtBest = document.getElementById('rtBest');
+const rtAvg = document.getElementById('rtAvg');
+
+let rtState = 'idle';
+let rtTimeout, rtStart;
+let rtResults = [];
+
+rtBox.addEventListener('click', () => {
+  if(rtState === 'idle'){
+    rtState = 'waiting';
+    rtBox.classList.remove('go','early');
+    rtMsg.textContent = 'Wait for green...';
+    const delay = 1000 + Math.random()*2500;
+    rtTimeout = setTimeout(() => {
+      rtState = 'go';
+      rtBox.classList.add('go');
+      rtMsg.textContent = 'CLICK!';
+      rtStart = performance.now();
+    }, delay);
+  } else if(rtState === 'waiting'){
+    clearTimeout(rtTimeout);
+    rtState = 'idle';
+    rtBox.classList.add('early');
+    rtMsg.textContent = 'Too early! Click to restart.';
+    setTimeout(()=>{ rtBox.classList.remove('early'); rtMsg.textContent='Click to start'; }, 1200);
+  } else if(rtState === 'go'){
+    const time = Math.round(performance.now() - rtStart);
+    rtResults.push(time);
+    rtLast.textContent = time;
+    rtBest.textContent = Math.min(...rtResults);
+    rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+    rtState = 'idle';
+    rtBox.classList.remove('go');
+    rtMsg.textContent = 'Click for next attempt';
+  }
+});
+
+</script>
+
+</body>
+</html>
