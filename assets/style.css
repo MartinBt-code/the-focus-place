@@ -98,6 +98,16 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
 .btn-ghost{background:transparent; border-color:var(--navy-line); color:var(--off-white); font-family:inherit;}
 .btn-ghost:hover{border-color:var(--orange); color:var(--orange);}
 
+/* EVENTS BANNER */
+.event-banner{
+  display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  background:var(--navy-panel); border:1px solid var(--orange); border-radius:6px;
+  padding:24px 28px; transition:.2s;
+}
+.event-banner:hover{transform:translateY(-2px); border-color:#ff6a3d;}
+.event-banner .info h3{font-size:20px; margin:6px 0 4px;}
+.event-banner .info p{color:var(--gray); font-size:14px; font-family:'Space Mono';}
+
 /* REACTION TEST WIDGET (signature element) */
 .test-card{
   background:var(--navy-panel);
