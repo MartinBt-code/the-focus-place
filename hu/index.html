@@ -345,11 +345,16 @@ rtBox.addEventListener('click', () => {
     rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
     rtState = 'idle';
     rtBox.classList.remove('go');
-    rtMsg.textContent = 'Kattints a következő próbához';
-    const [tier, text] = rateReaction(time);
-    rtResultTier.textContent = tier;
-    rtResultText.textContent = text;
-    rtResult.style.display = 'block';
+    if(rtResults.length < 5){
+      rtMsg.textContent = `Kattints a következő próbához (${rtResults.length}/5 az értékeléshez)`;
+    } else {
+      rtMsg.textContent = 'Kattints a következő próbához';
+      const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+      const [tier, text] = rateReaction(avg);
+      rtResultTier.textContent = tier;
+      rtResultText.textContent = text;
+      rtResult.style.display = 'block';
+    }
   }
 });
 

@@ -346,11 +346,16 @@ rtBox.addEventListener('click', () => {
     rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
     rtState = 'idle';
     rtBox.classList.remove('go');
-    rtMsg.textContent = 'Klikni pre ďalší pokus';
-    const [tier, text] = rateReaction(time);
-    rtResultTier.textContent = tier;
-    rtResultText.textContent = text;
-    rtResult.style.display = 'block';
+    if(rtResults.length < 5){
+      rtMsg.textContent = `Klikni pre ďalší pokus (${rtResults.length}/5 do vyhodnotenia)`;
+    } else {
+      rtMsg.textContent = 'Klikni pre ďalší pokus';
+      const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+      const [tier, text] = rateReaction(avg);
+      rtResultTier.textContent = tier;
+      rtResultText.textContent = text;
+      rtResult.style.display = 'block';
+    }
   }
 });
 
