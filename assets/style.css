@@ -305,6 +305,28 @@ footer .mono{color:var(--gray); font-size:12px;}
   width:88px; height:88px; border-radius:50%; object-fit:cover; flex-shrink:0;
   border:2px solid var(--orange);
 }
+.testimonial-card{
+  display:flex; align-items:flex-start; gap:24px; background:var(--navy-panel);
+  border:1px solid var(--navy-line); border-radius:6px; padding:28px;
+}
+.testimonial-photo{
+  width:72px; height:72px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  border:2px solid var(--orange);
+}
+.testimonial-card .quote{
+  font-size:15px; line-height:1.65; color:var(--off-white); margin-bottom:14px;
+  position:relative; padding-left:26px;
+}
+.testimonial-card .quote::before{
+  content:'“'; position:absolute; left:-4px; top:-8px; font-family:'Anton'; font-size:40px; color:var(--orange);
+}
+.testimonial-card .author{font-family:'Space Mono'; font-size:13px; color:var(--off-white); font-weight:700;}
+.testimonial-card .author span{color:var(--gray); font-weight:400;}
+@media(max-width:600px){
+  .testimonial-card{flex-direction:column; align-items:center; text-align:center;}
+  .testimonial-card .quote{padding-left:0;}
+  .testimonial-card .quote::before{position:static; display:block; margin-bottom:-10px;}
+}
 @media(max-width:600px){
   .ambassador-card{flex-direction:column; text-align:center;}
 }

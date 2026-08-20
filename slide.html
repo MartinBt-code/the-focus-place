@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#11181D; --navy-line:#2B333C; --orange:#FEC62F; --off-white:#F2F0EB; --gray:#8891A0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{width:1080px; height:1350px; overflow:hidden; font-family:'Inter',sans-serif; background:var(--navy);}
+  .poster{position:relative; width:1080px; height:1350px; background:var(--navy); overflow:hidden;}
+  .bg{position:absolute; inset:0; z-index:0;}
+  .bg img{
+    width:100%; height:100%; object-fit:cover; object-position:__POS__;
+    filter:grayscale(1) contrast(1.1) brightness(1.02);
+  }
+  .bg .fade{
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(17,24,29,.15) 0%, rgba(17,24,29,.2) 45%, rgba(17,24,29,.92) 78%, var(--navy) 100%),
+      linear-gradient(0deg, rgba(17,24,29,.35) 0%, rgba(17,24,29,0) 30%);
+  }
+  .top{position:relative; z-index:2; padding:64px 64px 0; display:flex; align-items:center; gap:16px;}
+  .eyebrow{
+    font-family:'Space Mono'; font-weight:700; font-size:20px; color:var(--navy);
+    background:var(--off-white); display:inline-block; padding:7px 16px; letter-spacing:1.5px;
+    text-transform:uppercase;
+  }
+  .date{font-family:'Space Mono'; font-weight:700; font-size:20px; color:var(--orange); letter-spacing:1px;}
+  .tagline{position:absolute; z-index:2; left:64px; right:64px; bottom:170px;}
+  .tagline div{
+    font-family:'Anton'; text-transform:uppercase; font-size:66px; line-height:1.08;
+    display:inline-block; padding:4px 16px; margin-bottom:8px;
+  }
+  .tagline .l1{background:var(--off-white); color:var(--navy);}
+  .tagline .l2{background:var(--orange); color:var(--navy);}
+  .footer{
+    position:absolute; z-index:2; left:64px; right:64px; bottom:56px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .footer img{height:36px; width:auto;}
+  .footer .url{font-family:'Space Mono'; font-size:18px; color:var(--orange); font-weight:700; letter-spacing:0.5px;}
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="bg">
+    <img src="assets/workshop/__PHOTO__" alt="">
+    <div class="fade"></div>
+  </div>
+  <div class="top">
+    <span class="eyebrow">Workshop</span>
+    <span class="date">3. 10. 2026</span>
+  </div>
+  <div class="tagline">
+    <div class="l1">__LINE1__</div><br>
+    <div class="l2">__LINE2__</div>
+  </div>
+  <div class="footer">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+    <span class="url">FOCUSPLACE.SITE</span>
+  </div>
+</div>
+</body>
+</html>
