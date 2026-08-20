@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="assets/thePlace_icon_color.png">
+<title>Kondičný tréning (test) — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="index.html#top"><img src="assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html#testy">Testy</a>
+      <a href="index.html#instagram">Instagram</a>
+      <a href="index.html#eshop">E-shop</a>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Testovacia objednávka</span><span>Kondičný tréning</span></div>
+      <div style="margin-bottom:22px;">
+        <div class="num" style="font-size:44px;">1 €</div>
+        <div class="lbl">Táto objednávka slúži na overenie platobného procesu</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="checkoutBtn" onclick="startCheckout()">Kúpiť za 1 €</button>
+      <p class="mono" style="color:var(--gray); font-size:11px; margin-top:14px; line-height:1.6;">Platba prebieha bezpečne cez Stripe. Po zaplatení dostaneš emailom potvrdenie a faktúru.</p>
+      <p id="checkoutError" style="color:#E74C3C; font-size:13px; margin-top:10px; display:none;"></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;">
+    <span class="mono">© 2026 the Focus Place. Všetky práva vyhradené.</span>
+  </div>
+</footer>
+
+<script>
+async function startCheckout(){
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Presmerúvam na platbu...';
+  try{
+    const res = await fetch('/api/create-product-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: 'kondicny-trening', lang: 'sk' }),
+    });
+    const data = await res.json();
+    if(res.ok && data.url){
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Neznáma chyba');
+    }
+  } catch(err){
+    errEl.textContent = 'Nepodarilo sa spustiť platbu. Skús to prosím znova.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Kúpiť za 1 €';
+  }
+}
+</script>
+
+</body>
+</html>
