@@ -50,6 +50,10 @@
       <div><div class="num" id="pvAcc">—</div><div class="lbl">Pontosság</div></div>
       <div><div class="num" id="pvRound">0/12</div><div class="lbl">Kör</div></div>
     </div>
+    <div class="result-banner" id="pvResult" style="display:none;">
+      <div class="result-tier" id="pvResultTier"></div>
+      <p id="pvResultText"></p>
+    </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nézd a középső pontot. Amikor a szélén felvillan egy pont, kattints arra az irányra, ahol megjelent.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Indítás</button>
     </div>
@@ -83,6 +87,17 @@ const pvTarget = document.getElementById('pvTarget');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
+const pvResult = document.getElementById('pvResult');
+const pvResultTier = document.getElementById('pvResultTier');
+const pvResultText = document.getElementById('pvResultText');
+
+function ratePeripheral(acc){
+  if(acc >= 90) return ['Kivételes periférikus látás', 'Csúcseredmény — tapasztalt csapatsportolók szintjének felel meg.'];
+  if(acc >= 75) return ['Jó periférikus látás', 'Átlag feletti eredmény — a tipikus átlag 60–75% körül van.'];
+  if(acc >= 60) return ['Átlagos periférikus látás', 'Egy tipikus felnőtt eredményének felel meg.'];
+  return ['Átlag alatti periférikus látás', 'Van hova fejlődni — próbáld újra, és nézz folyamatosan a középső pontra.'];
+}
+
 const pvButtons = {};
 document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
 
@@ -112,6 +127,11 @@ function startPV(){
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
+    const [tier, text] = ratePeripheral(acc);
+    pvResultTier.textContent = tier;
+    pvResultText.textContent = text;
+    pvResult.style.display = 'block';
     return;
   }
   pvRound++;

@@ -56,6 +56,10 @@
           <div><div class="num" id="rtBest">—</div><div class="lbl">Beste (ms)</div></div>
           <div><div class="num" id="rtAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
         </div>
+        <div class="result-banner" id="rtResult" style="display:none;">
+          <div class="result-tier" id="rtResultTier"></div>
+          <p id="rtResultText"></p>
+        </div>
       </div>
 
       <div class="test-info" style="margin-top:24px;">
@@ -299,10 +303,21 @@ const rtMsg = document.getElementById('rtMsg');
 const rtLast = document.getElementById('rtLast');
 const rtBest = document.getElementById('rtBest');
 const rtAvg = document.getElementById('rtAvg');
+const rtResult = document.getElementById('rtResult');
+const rtResultTier = document.getElementById('rtResultTier');
+const rtResultText = document.getElementById('rtResultText');
 
 let rtState = 'idle';
 let rtTimeout, rtStart;
 let rtResults = [];
+
+function rateReaction(ms){
+  if(ms < 180) return ['Weltklasse-Niveau', 'Das entspricht den Reaktionszeiten professioneller E-Sport-Spieler und Spitzenathleten (150–180 ms).'];
+  if(ms < 220) return ['Ausgezeichnete Reaktion', 'Überdurchschnittliches Ergebnis — nahe am Niveau trainierter Athleten.'];
+  if(ms < 270) return ['Durchschnittliche Reaktion', 'Entspricht einem typischen gesunden Erwachsenen — der Durchschnitt liegt bei etwa 250 ms.'];
+  if(ms < 320) return ['Leicht unterdurchschnittlich', 'Verbesserungspotenzial — regelmäßiges Reaktionstraining hilft.'];
+  return ['Langsamere Reaktion', 'Die Reaktionszeit lässt sich durch regelmäßiges Training verbessern — versuch es in ein paar Tagen erneut.'];
+}
 
 rtBox.addEventListener('click', () => {
   if(rtState === 'idle'){
@@ -331,6 +346,10 @@ rtBox.addEventListener('click', () => {
     rtState = 'idle';
     rtBox.classList.remove('go');
     rtMsg.textContent = 'Klicke für den nächsten Versuch';
+    const [tier, text] = rateReaction(Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length));
+    rtResultTier.textContent = tier;
+    rtResultText.textContent = text;
+    rtResult.style.display = 'block';
   }
 });
 

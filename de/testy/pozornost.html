@@ -38,6 +38,10 @@
         <div><div class="num" id="cptAcc">—</div><div class="lbl">Genauigkeit</div></div>
         <div><div class="num" id="cptAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
       </div>
+      <div class="result-banner" id="cptResult" style="display:none;">
+        <div class="result-tier" id="cptResultTier"></div>
+        <p id="cptResultText"></p>
+      </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klicke nur, wenn <strong style="color:var(--orange);">X</strong> erscheint. Bei anderen Buchstaben nicht klicken.</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Starten</button>
     </div>
@@ -65,6 +69,16 @@ const cptMsg = document.getElementById('cptMsg');
 const cptScoreEl = document.getElementById('cptScore');
 const cptAccEl = document.getElementById('cptAcc');
 const cptAvgEl = document.getElementById('cptAvg');
+const cptResult = document.getElementById('cptResult');
+const cptResultTier = document.getElementById('cptResultTier');
+const cptResultText = document.getElementById('cptResultText');
+
+function rateAttention(acc){
+  if(acc >= 95) return ['Außergewöhnliche Aufmerksamkeit', 'Das entspricht Ergebnissen von trainierten Athleten und Piloten — der typische Durchschnitt liegt bei 80–90 %.'];
+  if(acc >= 85) return ['Ausgezeichnete Aufmerksamkeit', 'Überdurchschnittliches Ergebnis — kaum jemand hält diese Genauigkeit über den ganzen Test.'];
+  if(acc >= 70) return ['Durchschnittliche Aufmerksamkeit', 'Entspricht einem typischen Erwachsenenergebnis — der Durchschnitt liegt bei etwa 80 %.'];
+  return ['Unterdurchschnittliche Aufmerksamkeit', 'Die Konzentration schwankt — regelmäßiges Üben ähnlicher Aufgaben kann helfen.'];
+}
 
 const CPT_LETTERS = ['A','B','E','K','M','P','R','T','X'];
 const CPT_TARGET = 'X';
@@ -110,6 +124,14 @@ function nextCptRound(){
     cptRunning = false;
     cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Fertig!';
+    const totalTargets = cptHits + cptMisses;
+    if(totalTargets > 0){
+      const acc = Math.round((cptHits/totalTargets)*100);
+      const [tier, text] = rateAttention(acc);
+      cptResultTier.textContent = tier;
+      cptResultText.textContent = text;
+      cptResult.style.display = 'block';
+    }
     return;
   }
   cptRound++;

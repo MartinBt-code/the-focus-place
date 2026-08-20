@@ -56,6 +56,10 @@
           <div><div class="num" id="rtBest">—</div><div class="lbl">Legjobb (ms)</div></div>
           <div><div class="num" id="rtAvg">—</div><div class="lbl">Átlag (ms)</div></div>
         </div>
+        <div class="result-banner" id="rtResult" style="display:none;">
+          <div class="result-tier" id="rtResultTier"></div>
+          <p id="rtResultText"></p>
+        </div>
       </div>
 
       <div class="test-info" style="margin-top:24px;">
@@ -299,10 +303,21 @@ const rtMsg = document.getElementById('rtMsg');
 const rtLast = document.getElementById('rtLast');
 const rtBest = document.getElementById('rtBest');
 const rtAvg = document.getElementById('rtAvg');
+const rtResult = document.getElementById('rtResult');
+const rtResultTier = document.getElementById('rtResultTier');
+const rtResultText = document.getElementById('rtResultText');
 
 let rtState = 'idle';
 let rtTimeout, rtStart;
 let rtResults = [];
+
+function rateReaction(ms){
+  if(ms < 180) return ['Világszínvonal', 'Ez profi e-sport játékosok és élsportolók reakcióidejének felel meg (150–180 ms).'];
+  if(ms < 220) return ['Kiváló reakció', 'Átlag feletti eredmény — közel az edzett sportolók szintjéhez.'];
+  if(ms < 270) return ['Átlagos reakció', 'Egy egészséges felnőtt tipikus eredményének felel meg — az átlag kb. 250 ms körül van.'];
+  if(ms < 320) return ['Kissé átlag alatti', 'Van hova fejlődni — a rendszeres reakciótréning segít.'];
+  return ['Lassabb reakció', 'A reakcióidő rendszeres gyakorlással fejleszthető — próbáld újra pár nap múlva.'];
+}
 
 rtBox.addEventListener('click', () => {
   if(rtState === 'idle'){
@@ -331,6 +346,10 @@ rtBox.addEventListener('click', () => {
     rtState = 'idle';
     rtBox.classList.remove('go');
     rtMsg.textContent = 'Kattints a következő próbához';
+    const [tier, text] = rateReaction(Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length));
+    rtResultTier.textContent = tier;
+    rtResultText.textContent = text;
+    rtResult.style.display = 'block';
   }
 });
 

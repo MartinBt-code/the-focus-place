@@ -38,6 +38,10 @@
         <div><div class="num" id="cptAcc">—</div><div class="lbl">Accuracy</div></div>
         <div><div class="num" id="cptAvg">—</div><div class="lbl">Average (ms)</div></div>
       </div>
+      <div class="result-banner" id="cptResult" style="display:none;">
+        <div class="result-tier" id="cptResultTier"></div>
+        <p id="cptResultText"></p>
+      </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the box only when <strong style="color:var(--orange);">X</strong> appears. Don't click for other letters.</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Start</button>
     </div>
@@ -65,6 +69,16 @@ const cptMsg = document.getElementById('cptMsg');
 const cptScoreEl = document.getElementById('cptScore');
 const cptAccEl = document.getElementById('cptAcc');
 const cptAvgEl = document.getElementById('cptAvg');
+const cptResult = document.getElementById('cptResult');
+const cptResultTier = document.getElementById('cptResultTier');
+const cptResultText = document.getElementById('cptResultText');
+
+function rateAttention(acc){
+  if(acc >= 95) return ['Exceptional attention', 'This matches results from trained athletes and pilots — the typical average is 80–90%.'];
+  if(acc >= 85) return ['Excellent attention', 'Above-average result — few people keep this accuracy throughout the whole test.'];
+  if(acc >= 70) return ['Average attention', 'Matches a typical adult result — the average is around 80%.'];
+  return ['Below-average attention', 'Focus wavers — regular practice with similar tasks can improve it.'];
+}
 
 const CPT_LETTERS = ['A','B','E','K','M','P','R','T','X'];
 const CPT_TARGET = 'X';
@@ -110,6 +124,14 @@ function nextCptRound(){
     cptRunning = false;
     cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Done!';
+    const totalTargets = cptHits + cptMisses;
+    if(totalTargets > 0){
+      const acc = Math.round((cptHits/totalTargets)*100);
+      const [tier, text] = rateAttention(acc);
+      cptResultTier.textContent = tier;
+      cptResultText.textContent = text;
+      cptResult.style.display = 'block';
+    }
     return;
   }
   cptRound++;

@@ -35,6 +35,10 @@
         <div><div class="num" id="memLevel">0</div><div class="lbl">Stufe</div></div>
         <div><div class="num" id="memBest">0</div><div class="lbl">Beste</div></div>
       </div>
+      <div class="result-banner" id="memResult" style="display:none;">
+        <div class="result-tier" id="memResultTier"></div>
+        <p id="memResultText"></p>
+      </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Merke dir eine wachsende Sequenz von Feldern und wiederhole sie. Wie viele Stufen schaffst du?</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Starten</button>
     </div>
@@ -60,7 +64,17 @@
 const memGrid = document.getElementById('memGrid');
 const memLevelEl = document.getElementById('memLevel');
 const memBestEl = document.getElementById('memBest');
+const memResult = document.getElementById('memResult');
+const memResultTier = document.getElementById('memResultTier');
+const memResultText = document.getElementById('memResultText');
 let memTiles = [];
+
+function rateMemory(level){
+  if(level >= 10) return ['Außergewöhnliches Gedächtnis', 'Das entspricht dem Niveau trainierter Gedächtnissportler — der typische Durchschnitt liegt bei 4–6 Stufen.'];
+  if(level >= 7) return ['Ausgezeichnetes Gedächtnis', 'Überdurchschnittliches Ergebnis — die meisten Menschen stoppen bei Stufe 5–6.'];
+  if(level >= 4) return ['Durchschnittliches Gedächtnis', 'Entspricht einem typischen Erwachsenenergebnis — der Durchschnitt liegt bei etwa 4–6 Stufen.'];
+  return ['Unterdurchschnittliches Gedächtnis', 'Versuch es erneut — das Arbeitsgedächtnis lässt sich durch regelmäßiges Training verbessern.'];
+}
 let sequence = [];
 let userStep = 0;
 let memLevel = 0;
@@ -122,9 +136,16 @@ function onTileClick(idx){
     }
   } else {
     accepting = false;
-    if(memLevel-1 > memBest){ memBest = memLevel-1; memBestEl.textContent = memBest; }
+    const reached = memLevel - 1;
+    if(reached > memBest){ memBest = reached; memBestEl.textContent = memBest; }
     memTiles.forEach(t=>{ t.style.background = '#C0392B'; });
     setTimeout(()=>{ memTiles.forEach(t=>{ t.style.background = '#1A2029'; }); }, 500);
+    if(reached > 0){
+      const [tier, text] = rateMemory(reached);
+      memResultTier.textContent = tier;
+      memResultText.textContent = text;
+      memResult.style.display = 'block';
+    }
   }
 }
 </script>

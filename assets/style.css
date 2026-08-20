@@ -126,6 +126,16 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
   font-family:'Space Mono'; font-size:12px; color:var(--gray); text-transform:uppercase;
   letter-spacing:1px; display:flex; justify-content:space-between; margin-bottom:20px;
 }
+.result-banner{
+  margin-top:16px; padding:16px 20px; border-radius:6px;
+  background:var(--orange-dim); border:1px solid var(--orange);
+  animation:popInPlain .2s ease-out;
+}
+.result-banner .result-tier{
+  font-family:'Space Mono'; font-size:12px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--orange); margin-bottom:6px; font-weight:700;
+}
+.result-banner p{color:var(--off-white); font-size:13px; line-height:1.55; margin:0;}
 .rt-box{
   height:220px; border-radius:4px; display:flex; align-items:center; justify-content:center;
   flex-direction:column; cursor:pointer; user-select:none; transition:background .15s;

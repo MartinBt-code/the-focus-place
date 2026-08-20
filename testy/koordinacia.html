@@ -39,6 +39,10 @@
       <div><div class="num" id="hecAvg">—</div><div class="lbl">Priemer (ms)</div></div>
       <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kolo</div></div>
     </div>
+    <div class="result-banner" id="hecResult" style="display:none;">
+      <div class="result-tier" id="hecResultTier"></div>
+      <p id="hecResultText"></p>
+    </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Spustiť</button>
     </div>
@@ -74,6 +78,16 @@ const hecMsg = document.getElementById('hecMsg');
 const hecHitsEl = document.getElementById('hecHits');
 const hecAvgEl = document.getElementById('hecAvg');
 const hecRoundEl = document.getElementById('hecRound');
+const hecResult = document.getElementById('hecResult');
+const hecResultTier = document.getElementById('hecResultTier');
+const hecResultText = document.getElementById('hecResultText');
+
+function rateCoordination(avgMs){
+  if(avgMs < 400) return ['Špičková koordinácia', 'Toto zodpovedá reakciám špičkových hráčov loptových športov (pod 400 ms).'];
+  if(avgMs < 600) return ['Výborná koordinácia', 'Nadpriemerný výsledok — rýchlejšie ako väčšina bežných hráčov.'];
+  if(avgMs < 800) return ['Priemerná koordinácia', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná koordinácia', 'Priestor na zlepšenie — pravidelný tréning zrak-ruka pomáha.'];
+}
 
 const HEC_ROUNDS = 15;
 let hecRound = 0, hecHits = 0, hecTimes = [], hecShownAt, hecRunning = false;
@@ -98,6 +112,13 @@ function nextHecRound(){
     hecMsg.style.display = 'flex';
     hecMsg.textContent = 'Hotovo!';
     hecRoundEl.textContent = HEC_ROUNDS + '/' + HEC_ROUNDS;
+    if(hecTimes.length > 0){
+      const avgMs = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
+      const [tier, text] = rateCoordination(avgMs);
+      hecResultTier.textContent = tier;
+      hecResultText.textContent = text;
+      hecResult.style.display = 'block';
+    }
     return;
   }
   hecRound++;

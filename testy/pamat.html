@@ -35,6 +35,10 @@
         <div><div class="num" id="memLevel">0</div><div class="lbl">Úroveň</div></div>
         <div><div class="num" id="memBest">0</div><div class="lbl">Najlepšie</div></div>
       </div>
+      <div class="result-banner" id="memResult" style="display:none;">
+        <div class="result-tier" id="memResultTier"></div>
+        <p id="memResultText"></p>
+      </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
     </div>
@@ -60,7 +64,17 @@
 const memGrid = document.getElementById('memGrid');
 const memLevelEl = document.getElementById('memLevel');
 const memBestEl = document.getElementById('memBest');
+const memResult = document.getElementById('memResult');
+const memResultTier = document.getElementById('memResultTier');
+const memResultText = document.getElementById('memResultText');
 let memTiles = [];
+
+function rateMemory(level){
+  if(level >= 10) return ['Výnimočná pamäť', 'Toto je výsledok na úrovni trénovaných pamäťových športovcov — bežný priemer je 4–6 úrovní.'];
+  if(level >= 7) return ['Výborná pamäť', 'Nadpriemerný výsledok — väčšina ľudí sa zastaví okolo 5.–6. úrovne.'];
+  if(level >= 4) return ['Priemerná pamäť', 'Zodpovedá bežnému výsledku dospelého — priemer je približne 4–6 úrovní.'];
+  return ['Podpriemerná pamäť', 'Skús to znova — pracovná pamäť sa dá pravidelným tréningom zlepšiť.'];
+}
 let sequence = [];
 let userStep = 0;
 let memLevel = 0;
@@ -122,9 +136,16 @@ function onTileClick(idx){
     }
   } else {
     accepting = false;
-    if(memLevel-1 > memBest){ memBest = memLevel-1; memBestEl.textContent = memBest; }
+    const reached = memLevel - 1;
+    if(reached > memBest){ memBest = reached; memBestEl.textContent = memBest; }
     memTiles.forEach(t=>{ t.style.background = '#C0392B'; });
     setTimeout(()=>{ memTiles.forEach(t=>{ t.style.background = '#1A2029'; }); }, 500);
+    if(reached > 0){
+      const [tier, text] = rateMemory(reached);
+      memResultTier.textContent = tier;
+      memResultText.textContent = text;
+      memResult.style.display = 'block';
+    }
   }
 }
 </script>

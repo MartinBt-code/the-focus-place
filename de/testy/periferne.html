@@ -50,6 +50,10 @@
       <div><div class="num" id="pvAcc">—</div><div class="lbl">Genauigkeit</div></div>
       <div><div class="num" id="pvRound">0/12</div><div class="lbl">Runde</div></div>
     </div>
+    <div class="result-banner" id="pvResult" style="display:none;">
+      <div class="result-tier" id="pvResultTier"></div>
+      <p id="pvResultText"></p>
+    </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Schau auf den Punkt in der Mitte. Wenn am Rand ein Punkt aufblitzt, klicke auf die Richtung, in der er erschienen ist.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Starten</button>
     </div>
@@ -83,6 +87,17 @@ const pvTarget = document.getElementById('pvTarget');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
+const pvResult = document.getElementById('pvResult');
+const pvResultTier = document.getElementById('pvResultTier');
+const pvResultText = document.getElementById('pvResultText');
+
+function ratePeripheral(acc){
+  if(acc >= 90) return ['Außergewöhnliches peripheres Sehen', 'Spitzenergebnis — entspricht erfahrenen Mannschaftssportlern.'];
+  if(acc >= 75) return ['Gutes peripheres Sehen', 'Überdurchschnittliches Ergebnis — der typische Durchschnitt liegt bei 60–75 %.'];
+  if(acc >= 60) return ['Durchschnittliches peripheres Sehen', 'Entspricht einem typischen Erwachsenenergebnis.'];
+  return ['Unterdurchschnittliches peripheres Sehen', 'Verbesserungspotenzial — versuch es erneut und behalte den Mittelpunkt im Blick.'];
+}
+
 const pvButtons = {};
 document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
 
@@ -112,6 +127,11 @@ function startPV(){
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
+    const [tier, text] = ratePeripheral(acc);
+    pvResultTier.textContent = tier;
+    pvResultText.textContent = text;
+    pvResult.style.display = 'block';
     return;
   }
   pvRound++;
