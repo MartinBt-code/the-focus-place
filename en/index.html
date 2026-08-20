@@ -56,6 +56,7 @@
           <div><div class="num" id="rtBest">—</div><div class="lbl">Best (ms)</div></div>
           <div><div class="num" id="rtAvg">—</div><div class="lbl">Average (ms)</div></div>
         </div>
+        <p class="mono" style="color:var(--gray); font-size:12px; margin-top:8px;">The rating is based on the average of all attempts — for a more objective result we recommend at least 5 repetitions.</p>
         <div class="result-banner" id="rtResult" style="display:none;">
           <div class="result-tier" id="rtResultTier"></div>
           <p id="rtResultText"></p>
@@ -345,16 +346,12 @@ rtBox.addEventListener('click', () => {
     rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
     rtState = 'idle';
     rtBox.classList.remove('go');
-    if(rtResults.length < 5){
-      rtMsg.textContent = `Click for next attempt (${rtResults.length}/5 for rating)`;
-    } else {
-      rtMsg.textContent = 'Click for next attempt';
-      const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
-      const [tier, text] = rateReaction(avg);
-      rtResultTier.textContent = tier;
-      rtResultText.textContent = text;
-      rtResult.style.display = 'block';
-    }
+    rtMsg.textContent = 'Click for next attempt';
+    const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+    const [tier, text] = rateReaction(avg);
+    rtResultTier.textContent = tier;
+    rtResultText.textContent = text;
+    rtResult.style.display = 'block';
   }
 });
 

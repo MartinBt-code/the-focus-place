@@ -56,6 +56,7 @@
           <div><div class="num" id="rtBest">—</div><div class="lbl">Legjobb (ms)</div></div>
           <div><div class="num" id="rtAvg">—</div><div class="lbl">Átlag (ms)</div></div>
         </div>
+        <p class="mono" style="color:var(--gray); font-size:12px; margin-top:8px;">Az értékelés az összes próba átlagán alapul — az objektívebb eredmény érdekében legalább 5 ismétlést javaslunk.</p>
         <div class="result-banner" id="rtResult" style="display:none;">
           <div class="result-tier" id="rtResultTier"></div>
           <p id="rtResultText"></p>
@@ -345,16 +346,12 @@ rtBox.addEventListener('click', () => {
     rtAvg.textContent = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
     rtState = 'idle';
     rtBox.classList.remove('go');
-    if(rtResults.length < 5){
-      rtMsg.textContent = `Kattints a következő próbához (${rtResults.length}/5 az értékeléshez)`;
-    } else {
-      rtMsg.textContent = 'Kattints a következő próbához';
-      const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
-      const [tier, text] = rateReaction(avg);
-      rtResultTier.textContent = tier;
-      rtResultText.textContent = text;
-      rtResult.style.display = 'block';
-    }
+    rtMsg.textContent = 'Kattints a következő próbához';
+    const avg = Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length);
+    const [tier, text] = rateReaction(avg);
+    rtResultTier.textContent = tier;
+    rtResultText.textContent = text;
+    rtResult.style.display = 'block';
   }
 });
 
