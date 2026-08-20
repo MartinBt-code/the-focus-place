@@ -47,6 +47,10 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
   font-family:'Space Mono'; font-weight:700; font-size:12px; text-transform:uppercase;
   letter-spacing:1px; border-radius:2px;
 }
+.nav-toggle{
+  display:none; background:none; border:none; color:var(--off-white);
+  font-size:22px; cursor:pointer; padding:4px 8px; line-height:1;
+}
 .lang-switch{
   display:flex; align-items:center; gap:2px; font-family:'Space Mono'; font-size:11px;
   letter-spacing:1px; margin-left:8px;
@@ -334,6 +338,16 @@ footer .mono{color:var(--gray); font-size:12px;}
 @media(max-width:860px){
   .hero-grid{grid-template-columns:1fr;}
   .grid-3, .pricing-grid{grid-template-columns:1fr;}
-  .navlinks{display:none;}
   .test-card-xl .rt-box{height:260px;}
+  nav .wrap{height:auto; min-height:72px; padding-top:16px; padding-bottom:16px; flex-wrap:wrap;}
+  .nav-toggle{display:block; order:1; margin-left:auto;}
+  .lang-switch{order:2; margin-left:14px;}
+  .navlinks{
+    display:none; order:3; width:100%; flex-direction:column; gap:0;
+    border-top:1px solid var(--navy-line); margin-top:16px; padding-top:4px;
+  }
+  .navlinks a{padding:14px 2px; border-bottom:1px solid var(--navy-line); display:block;}
+  .nav-cta{display:none; order:4; width:100%; text-align:center; margin-top:12px; padding:13px 20px;}
+  nav.nav-open .navlinks{display:flex;}
+  nav.nav-open .nav-cta{display:block;}
 }
