@@ -346,7 +346,7 @@ rtBox.addEventListener('click', () => {
     rtState = 'idle';
     rtBox.classList.remove('go');
     rtMsg.textContent = 'Click for next attempt';
-    const [tier, text] = rateReaction(Math.round(rtResults.reduce((a,b)=>a+b,0)/rtResults.length));
+    const [tier, text] = rateReaction(time);
     rtResultTier.textContent = tier;
     rtResultText.textContent = text;
     rtResult.style.display = 'block';
