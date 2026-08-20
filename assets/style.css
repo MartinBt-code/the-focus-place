@@ -295,6 +295,24 @@ footer{border-top:1px solid var(--navy-line); padding:48px 0;}
 footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
 footer .mono{color:var(--gray); font-size:12px;}
 
+/* AMBASSADOR + PARTNERS */
+.ambassador-card{
+  display:flex; align-items:center; gap:24px; background:var(--navy-panel);
+  border:1px solid var(--navy-line); border-radius:6px; padding:24px;
+}
+.ambassador-photo{
+  width:88px; height:88px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  border:2px solid var(--orange);
+}
+@media(max-width:600px){
+  .ambassador-card{flex-direction:column; text-align:center;}
+}
+.partner-logos{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:40px;
+}
+.partner-logos img{height:32px; width:auto; opacity:0.5; filter:grayscale(1); transition:opacity .2s;}
+.partner-logos img:hover{opacity:0.9;}
+
 /* FULLSCREEN TEST PAGES */
 .test-page{
   min-height:calc(100vh - 73px);
