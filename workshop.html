@@ -37,7 +37,16 @@
   </div>
 </header>
 
-<section style="padding-top:0;">
+<section style="padding-top:0; padding-bottom:0;">
+  <div class="wrap">
+    <div class="gallery-hero" style="max-width:380px;" onclick="openGallery(0)">
+      <img src="assets/workshop/poster-workshop-2026.png" alt="Workshop: Vizuálny a kognitívny tréning">
+      <div class="hint">🔍 Zobraziť galériu</div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:32px;">
   <div class="wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:start;">
     <div>
       <div class="test-card" style="margin-bottom:32px;">
@@ -78,7 +87,48 @@
   </div>
 </footer>
 
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeGallery()" aria-label="Zavrieť">&times;</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navGallery(-1)" aria-label="Predchádzajúca">‹</button>
+  <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="navGallery(1)" aria-label="Ďalšia">›</button>
+  <div class="lightbox-count" id="lightboxCount"></div>
+</div>
+
 <script>
+const galleryImages = [
+  { src: 'assets/workshop/poster-workshop-2026.png', alt: 'Workshop: Vizuálny a kognitívny tréning' },
+];
+let galleryIndex = 0;
+
+function openGallery(i){
+  galleryIndex = i;
+  updateGallery();
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeGallery(){
+  document.getElementById('lightbox').classList.remove('open');
+}
+function navGallery(dir){
+  galleryIndex = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
+  updateGallery();
+}
+function updateGallery(){
+  const img = galleryImages[galleryIndex];
+  document.getElementById('lightboxImg').src = img.src;
+  document.getElementById('lightboxImg').alt = img.alt;
+  document.getElementById('lightboxCount').textContent = (galleryIndex + 1) + ' / ' + galleryImages.length;
+}
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  if (e.target.id === 'lightbox') closeGallery();
+});
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeGallery();
+  if (e.key === 'ArrowLeft') navGallery(-1);
+  if (e.key === 'ArrowRight') navGallery(1);
+});
+
 const EARLY_BIRD_DEADLINE = new Date('2026-09-01T00:00:00+02:00');
 if (new Date() >= EARLY_BIRD_DEADLINE) {
   document.getElementById('wsPrice').textContent = '99 €';
