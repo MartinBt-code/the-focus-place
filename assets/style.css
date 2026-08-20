@@ -314,6 +314,19 @@ footer .mono{color:var(--gray); font-size:12px;}
 @media(max-width:600px){
   .test-info-grid{grid-template-columns:1fr;}
 }
+.benchmark-table{margin-top:22px; padding-top:22px; border-top:1px solid var(--navy-line);}
+.benchmark-table h4{
+  font-family:'Space Mono'; font-size:11px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--orange); margin-bottom:12px;
+}
+.benchmark-table .bm-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding:8px 0; border-bottom:1px solid var(--navy-line); font-size:13px;
+}
+.benchmark-table .bm-row:last-of-type{border-bottom:none;}
+.benchmark-table .bm-range{font-family:'Space Mono'; color:var(--gray); white-space:nowrap;}
+.benchmark-table .bm-label{color:var(--off-white); text-align:right;}
+.benchmark-table .bm-note{color:var(--gray); font-size:12px; line-height:1.6; margin-top:14px;}
 .test-card-xl .rt-box{height:340px;}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--gray); font-family:'Space Mono'; font-size:13px; text-transform:uppercase; letter-spacing:1px; transition:color .15s;}
 .back-link:hover{color:var(--orange);}
