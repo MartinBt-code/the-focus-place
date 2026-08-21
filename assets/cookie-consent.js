@@ -2,72 +2,34 @@
   var LANG = document.documentElement.lang || 'sk';
   var T = {
     sk: {
-      text: 'Táto stránka používa cookies na zlepšenie tvojho zážitku a pre funkcie ako Instagram feed. Viac info v ',
+      text: 'Táto stránka používa cookies na zlepšenie tvojho zážitku. Viac info v ',
       link: 'Ochrane osobných údajov',
       accept: 'Prijať',
       reject: 'Odmietnuť',
-      igPrompt: 'Pre zobrazenie Instagram príspevkov prijmi cookies.',
-      igAccept: 'Prijať cookies',
     },
     en: {
-      text: 'This site uses cookies to improve your experience and for features like the Instagram feed. More in the ',
+      text: 'This site uses cookies to improve your experience. More in the ',
       link: 'Privacy Policy',
       accept: 'Accept',
       reject: 'Reject',
-      igPrompt: 'Accept cookies to view the Instagram feed.',
-      igAccept: 'Accept cookies',
     },
     de: {
-      text: 'Diese Website verwendet Cookies, um dein Erlebnis zu verbessern und für Funktionen wie den Instagram-Feed. Mehr dazu in der ',
+      text: 'Diese Website verwendet Cookies, um dein Erlebnis zu verbessern. Mehr dazu in der ',
       link: 'Datenschutzerklärung',
       accept: 'Akzeptieren',
       reject: 'Ablehnen',
-      igPrompt: 'Akzeptiere Cookies, um den Instagram-Feed zu sehen.',
-      igAccept: 'Cookies akzeptieren',
     },
     hu: {
-      text: 'Ez az oldal sütiket használ az élmény javítása és olyan funkciók érdekében, mint az Instagram-hírfolyam. Bővebben az ',
+      text: 'Ez az oldal sütiket használ az élmény javítása érdekében. Bővebben az ',
       link: 'Adatvédelmi tájékoztatóban',
       accept: 'Elfogadom',
       reject: 'Elutasítom',
-      igPrompt: 'Fogadd el a sütiket az Instagram-hírfolyam megtekintéséhez.',
-      igAccept: 'Sütik elfogadása',
     },
   };
   var t = T[LANG] || T.sk;
 
   function getConsent(){ try { return localStorage.getItem('cookieConsent'); } catch(e){ return null; } }
   function setConsent(v){ try { localStorage.setItem('cookieConsent', v); } catch(e){} }
-
-  function injectElfsight(){
-    var el = document.querySelector('[class*="elfsight-app-"]');
-    if(!el) return;
-    if(document.querySelector('script[src*="elfsightcdn.com"]')) return;
-    var s = document.createElement('script');
-    s.src = 'https://elfsightcdn.com/platform.js';
-    s.async = true;
-    document.body.appendChild(s);
-    var placeholder = document.getElementById('ig-consent-placeholder');
-    if(placeholder) placeholder.remove();
-    el.style.display = '';
-  }
-
-  function showIgPlaceholder(){
-    var el = document.querySelector('[class*="elfsight-app-"]');
-    if(!el || document.getElementById('ig-consent-placeholder')) return;
-    var div = document.createElement('div');
-    div.id = 'ig-consent-placeholder';
-    div.style.cssText = 'padding:40px 20px; text-align:center; background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:6px;';
-    div.innerHTML = '<p style="color:var(--gray); font-size:14px; margin-bottom:16px;">' + t.igPrompt + '</p><button class="btn btn-primary" id="ig-consent-accept-btn">' + t.igAccept + '</button>';
-    el.style.display = 'none';
-    el.parentElement.insertBefore(div, el);
-    document.getElementById('ig-consent-accept-btn').onclick = function(){
-      setConsent('accepted');
-      div.remove();
-      injectElfsight();
-      hideBanner();
-    };
-  }
 
   function showBanner(){
     if(document.getElementById('cookie-banner')) return;
@@ -81,15 +43,8 @@
         '<button class="btn btn-primary" id="cookie-accept" style="padding:10px 18px; font-size:12px;">' + t.accept + '</button>' +
       '</div>';
     document.body.appendChild(bar);
-    document.getElementById('cookie-accept').onclick = function(){
-      setConsent('accepted');
-      hideBanner();
-      injectElfsight();
-    };
-    document.getElementById('cookie-reject').onclick = function(){
-      setConsent('rejected');
-      hideBanner();
-    };
+    document.getElementById('cookie-accept').onclick = function(){ setConsent('accepted'); hideBanner(); };
+    document.getElementById('cookie-reject').onclick = function(){ setConsent('rejected'); hideBanner(); };
   }
 
   function hideBanner(){
@@ -97,13 +52,7 @@
     if(bar) bar.remove();
   }
 
-  var consent = getConsent();
-  if(consent === 'accepted'){
-    injectElfsight();
-  } else if(consent === 'rejected'){
-    showIgPlaceholder();
-  } else {
-    showIgPlaceholder();
+  if(!getConsent()){
     showBanner();
   }
 })();
