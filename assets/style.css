@@ -295,6 +295,12 @@ a.product-card:hover{border-color:var(--orange); transform:translateY(-4px);}
 footer{border-top:1px solid var(--navy-line); padding:48px 0;}
 footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
 footer .mono{color:var(--gray); font-size:12px;}
+.footer-legal{
+  margin-top:20px; padding-top:20px; border-top:1px solid var(--navy-line);
+  font-family:'Space Mono'; font-size:11px; color:var(--gray); line-height:1.7;
+}
+.footer-legal a{color:var(--gray); text-decoration:underline; text-underline-offset:2px;}
+.footer-legal a:hover{color:var(--orange);}
 
 /* AMBASSADOR + PARTNERS */
 .ambassador-card{
