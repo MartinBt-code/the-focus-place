@@ -31,20 +31,28 @@
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Peripheral vision</span></div>
     <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
+      <div id="pvCenterShape" style="font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
       <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
+      <div id="pvMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); position:absolute;">Click Start</div>
     </div>
-    <div id="pvDirections" class="pv-compass">
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswer('hore-vlavo')">↖</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswer('hore')">↑</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswer('hore-vpravo')">↗</button>
-      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswer('vlavo')">←</button>
+
+    <div id="pvStep1" class="pv-compass" style="display:none; grid-template-columns:repeat(3,1fr);">
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('circle')">●</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('square')">■</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('triangle')">▲</button>
+    </div>
+    <div id="pvStep2" class="pv-compass" style="display:none;">
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswerDir('hore-vlavo')">↖</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswerDir('hore')">↑</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswerDir('hore-vpravo')">↗</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswerDir('vlavo')">←</button>
       <span class="pv-btn center">●</span>
-      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswer('vpravo')">→</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswer('dole-vlavo')">↙</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswer('dole')">↓</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswerDir('vpravo')">→</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswerDir('dole-vlavo')">↙</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswerDir('dole')">↓</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswerDir('dole-vpravo')">↘</button>
     </div>
+
     <div class="rt-stats" style="margin-top:16px;">
       <div><div class="num" id="pvScore">0</div><div class="lbl">Score</div></div>
       <div><div class="num" id="pvAcc">—</div><div class="lbl">Accuracy</div></div>
@@ -54,17 +62,17 @@
       <div class="result-tier" id="pvResultTier"></div>
       <p id="pvResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Look at the dot in the center. When a dot flashes at the edge, click the direction it appeared in.</p>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Look at the center. For a split second, a shape flashes in the middle and a dot flashes on the edge at the same time. First confirm the shape, then the dot's direction.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Start</button>
     </div>
 
     <div class="test-info">
       <h3>Why it matters</h3>
-      <p class="lead-text">Most game situations — a teammate's pass, an opponent approaching from the side, the ball at the edge of your vision — happen outside your direct line of sight. Good peripheral vision means faster decisions without having to turn your head.</p>
+      <p class="lead-text">Most game situations — a teammate's pass, an opponent approaching from the side, the ball at the edge of your vision — happen outside your direct line of sight, at the same time as whatever you're directly focused on. Good peripheral vision means processing both at once, without losing focus on the main task.</p>
       <div class="test-info-grid">
         <div>
           <strong>What it measures</strong>
-          <p>The width and speed of your field of vision — how quickly and accurately you notice a stimulus outside the point you're directly looking at.</p>
+          <p>Your ability to split attention between a central and a peripheral stimulus at the same time (the "useful field of view") — not just whether you notice something at the edge, but whether you can while also handling the main task.</p>
         </div>
         <div>
           <strong>Who it helps</strong>
@@ -77,7 +85,7 @@
         <div class="bm-row"><span class="bm-range">75–89%</span><span class="bm-label">Good peripheral vision</span></div>
         <div class="bm-row"><span class="bm-range">60–74%</span><span class="bm-label">Average peripheral vision</span></div>
         <div class="bm-row"><span class="bm-range">&lt; 60%</span><span class="bm-label">Below average peripheral vision</span></div>
-        <p class="bm-note">Wide, fast peripheral vision is typical of experienced team sport players — it helps you sense teammates and opponents outside your direct line of sight without turning your head.</p>
+        <p class="bm-note">This test follows the principle of clinical UFOV (useful field of view) tests, which measure not raw field width but how well you process a central and a peripheral stimulus at the same time.</p>
       </div>
     </div>
   </div>
@@ -91,7 +99,11 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+const pvCenterShape = document.getElementById('pvCenterShape');
 const pvTarget = document.getElementById('pvTarget');
+const pvMsg = document.getElementById('pvMsg');
+const pvStep1 = document.getElementById('pvStep1');
+const pvStep2 = document.getElementById('pvStep2');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
@@ -103,12 +115,14 @@ function ratePeripheral(acc){
   if(acc >= 90) return ['Exceptional peripheral vision', 'Elite-level result — matches experienced team-sport players.'];
   if(acc >= 75) return ['Good peripheral vision', 'Above-average result — the typical average is around 60–75%.'];
   if(acc >= 60) return ['Average peripheral vision', 'Matches a typical adult result.'];
-  return ['Below-average peripheral vision', 'Room for improvement — try again and keep watching the center dot.'];
+  return ['Below-average peripheral vision', 'Room for improvement — try again and keep watching the center.'];
 }
 
-const pvButtons = {};
-document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
+const pvDirButtons = {};
+document.querySelectorAll('#pvStep2 .pv-btn[data-dir]').forEach(b => { pvDirButtons[b.dataset.dir] = b; });
 
+const PV_SHAPES = ['circle','square','triangle'];
+const SHAPE_GLYPH = { circle:'●', square:'■', triangle:'▲' };
 const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
 const PV_POS = {
   'hore':{top:'6%', left:'50%'},
@@ -121,7 +135,8 @@ const PV_POS = {
   'hore-vlavo':{top:'14%', left:'12%'}
 };
 const PV_ROUNDS = 12;
-let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false, pvCurrentDir = null, pvTimer, pvAnswered = false;
+let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false;
+let pvCurrentShape = null, pvCurrentDir = null, pvShapeAnswer = null, pvTimer;
 
 function startPV(){
   pvRound = 0; pvScore = 0; pvCorrect = 0;
@@ -129,12 +144,18 @@ function startPV(){
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
-  pvTimer = setTimeout(nextPvRound, 500);
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'none';
+  pvMsg.style.display = 'flex';
+  pvMsg.textContent = 'Get ready...';
+  pvTimer = setTimeout(nextPvRound, 700);
 }
 
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    pvMsg.style.display = 'flex';
+    pvMsg.textContent = 'Done!';
     const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
     const [tier, text] = ratePeripheral(acc);
     pvResultTier.textContent = tier;
@@ -143,41 +164,52 @@ function nextPvRound(){
     return;
   }
   pvRound++;
-  pvAnswered = false;
   pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
+  pvMsg.style.display = 'none';
   const delay = 800 + Math.random()*900;
   pvTimer = setTimeout(showPvTarget, delay);
 }
 
 function showPvTarget(){
+  pvCurrentShape = PV_SHAPES[Math.floor(Math.random()*PV_SHAPES.length)];
   pvCurrentDir = PV_DIRS[Math.floor(Math.random()*PV_DIRS.length)];
+  pvCenterShape.textContent = SHAPE_GLYPH[pvCurrentShape];
+  pvCenterShape.style.opacity = '1';
   const pos = PV_POS[pvCurrentDir];
   pvTarget.style.top = pos.top;
   pvTarget.style.left = pos.left;
   pvTarget.style.transform = 'translate(-50%,-50%)';
-  pvTarget.classList.remove('show');
-  void pvTarget.offsetWidth;
-  pvTarget.classList.add('show');
   pvTarget.style.opacity = '1';
-  setTimeout(() => { pvTarget.style.opacity = '0'; }, 320);
+  setTimeout(() => {
+    pvCenterShape.style.opacity = '0';
+    pvTarget.style.opacity = '0';
+    pvStep1.style.display = 'grid';
+  }, 220);
 }
 
-function pvAnswer(dir){
-  if(!pvRunning || pvAnswered) return;
-  pvAnswered = true;
-  const correct = dir === pvCurrentDir;
-  const clicked = pvButtons[dir];
-  if(correct){
+function pvAnswerShape(shape){
+  pvShapeAnswer = shape;
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'grid';
+}
+
+function pvAnswerDir(dir){
+  const shapeCorrect = pvShapeAnswer === pvCurrentShape;
+  const dirCorrect = dir === pvCurrentDir;
+  const bothCorrect = shapeCorrect && dirCorrect;
+  const clicked = pvDirButtons[dir];
+  if(bothCorrect){
     pvScore++; pvCorrect++;
     clicked.classList.add('correct');
   } else {
     clicked.classList.add('wrong');
-    if(pvButtons[pvCurrentDir]) pvButtons[pvCurrentDir].classList.add('correct');
+    if(pvDirButtons[pvCurrentDir]) pvDirButtons[pvCurrentDir].classList.add('correct');
   }
-  setTimeout(() => { Object.values(pvButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
+  setTimeout(() => { Object.values(pvDirButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
   pvScoreEl.textContent = pvScore;
-  bump(pvScoreEl, correct);
+  bump(pvScoreEl, bothCorrect);
   pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
+  pvStep2.style.display = 'none';
   setTimeout(nextPvRound, 500);
 }
 </script>

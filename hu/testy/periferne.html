@@ -31,20 +31,28 @@
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Élő teszt</span><span>Periférikus látás</span></div>
     <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
+      <div id="pvCenterShape" style="font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
       <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
+      <div id="pvMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); position:absolute;">Kattints az Indításra</div>
     </div>
-    <div id="pvDirections" class="pv-compass">
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswer('hore-vlavo')">↖</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswer('hore')">↑</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswer('hore-vpravo')">↗</button>
-      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswer('vlavo')">←</button>
+
+    <div id="pvStep1" class="pv-compass" style="display:none; grid-template-columns:repeat(3,1fr);">
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('circle')">●</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('square')">■</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('triangle')">▲</button>
+    </div>
+    <div id="pvStep2" class="pv-compass" style="display:none;">
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswerDir('hore-vlavo')">↖</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswerDir('hore')">↑</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswerDir('hore-vpravo')">↗</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswerDir('vlavo')">←</button>
       <span class="pv-btn center">●</span>
-      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswer('vpravo')">→</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswer('dole-vlavo')">↙</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswer('dole')">↓</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswerDir('vpravo')">→</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswerDir('dole-vlavo')">↙</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswerDir('dole')">↓</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswerDir('dole-vpravo')">↘</button>
     </div>
+
     <div class="rt-stats" style="margin-top:16px;">
       <div><div class="num" id="pvScore">0</div><div class="lbl">Pontszám</div></div>
       <div><div class="num" id="pvAcc">—</div><div class="lbl">Pontosság</div></div>
@@ -54,17 +62,17 @@
       <div class="result-tier" id="pvResultTier"></div>
       <p id="pvResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nézd a középső pontot. Amikor a szélén felvillan egy pont, kattints arra az irányra, ahol megjelent.</p>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nézz a középpontra. Egy pillanatra egyszerre villan fel egy forma középen és egy pont a szélén. Először erősítsd meg a formát, aztán a pont irányát.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Indítás</button>
     </div>
 
     <div class="test-info">
       <h3>Miért fontos ez</h3>
-      <p class="lead-text">A legtöbb játékhelyzet — egy csapattárs passza, oldalról érkező ellenfél, a látótér szélén lévő labda — a közvetlen látótered peremén kívül történik. A jó periférikus látás gyorsabb döntéshozatalt jelent anélkül, hogy el kellene fordítanod a fejed.</p>
+      <p class="lead-text">A legtöbb játékhelyzet — egy csapattárs passza, oldalról érkező ellenfél, a látótér szélén lévő labda — a közvetlen látótered peremén kívül történik, méghozzá pontosan akkor, amikor valami másra fókuszálsz. A jó periférikus látás azt jelenti, hogy mindkettőt egyszerre dolgozod fel, anélkül hogy elvesztenéd a fókuszt a fő feladatról.</p>
       <div class="test-info-grid">
         <div>
           <strong>Mit mér</strong>
-          <p>A látótered szélességét és sebességét — mennyire gyorsan és pontosan veszed észre az ingert azon a ponton kívül, amire közvetlenül nézel.</p>
+          <p>Azt a képességet, hogy egyszerre oszd meg a figyelmedet egy központi és egy periférikus inger között (az ún. "useful field of view") — nemcsak azt, hogy észreveszed-e a szélén történő dolgot, hanem hogy ezt a fő feladat mellett is meg tudod-e tenni.</p>
         </div>
         <div>
           <strong>Kinek segít</strong>
@@ -77,7 +85,7 @@
         <div class="bm-row"><span class="bm-range">75–89%</span><span class="bm-label">Jó periférikus látás</span></div>
         <div class="bm-row"><span class="bm-range">60–74%</span><span class="bm-label">Átlagos periférikus látás</span></div>
         <div class="bm-row"><span class="bm-range">&lt; 60%</span><span class="bm-label">Átlag alatti periférikus látás</span></div>
-        <p class="bm-note">A széles, gyors periférikus látás jellemző a tapasztalt csapatsportolókra — segít érzékelni a csapattársakat és ellenfeleket a közvetlen látótéren kívül, fejfordítás nélkül.</p>
+        <p class="bm-note">Ez a teszt a klinikai UFOV (useful field of view) tesztek elvét követi, amelyek nem a látótér szélességét mérik, hanem azt, hogy mennyire jól dolgozod fel a központi és periférikus ingert egyszerre.</p>
       </div>
     </div>
   </div>
@@ -91,7 +99,11 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+const pvCenterShape = document.getElementById('pvCenterShape');
 const pvTarget = document.getElementById('pvTarget');
+const pvMsg = document.getElementById('pvMsg');
+const pvStep1 = document.getElementById('pvStep1');
+const pvStep2 = document.getElementById('pvStep2');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
@@ -103,12 +115,14 @@ function ratePeripheral(acc){
   if(acc >= 90) return ['Kivételes periférikus látás', 'Csúcseredmény — tapasztalt csapatsportolók szintjének felel meg.'];
   if(acc >= 75) return ['Jó periférikus látás', 'Átlag feletti eredmény — a tipikus átlag 60–75% körül van.'];
   if(acc >= 60) return ['Átlagos periférikus látás', 'Egy tipikus felnőtt eredményének felel meg.'];
-  return ['Átlag alatti periférikus látás', 'Van hova fejlődni — próbáld újra, és nézz folyamatosan a középső pontra.'];
+  return ['Átlag alatti periférikus látás', 'Van hova fejlődni — próbáld újra, és nézz folyamatosan a középpontra.'];
 }
 
-const pvButtons = {};
-document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
+const pvDirButtons = {};
+document.querySelectorAll('#pvStep2 .pv-btn[data-dir]').forEach(b => { pvDirButtons[b.dataset.dir] = b; });
 
+const PV_SHAPES = ['circle','square','triangle'];
+const SHAPE_GLYPH = { circle:'●', square:'■', triangle:'▲' };
 const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
 const PV_POS = {
   'hore':{top:'6%', left:'50%'},
@@ -121,7 +135,8 @@ const PV_POS = {
   'hore-vlavo':{top:'14%', left:'12%'}
 };
 const PV_ROUNDS = 12;
-let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false, pvCurrentDir = null, pvTimer, pvAnswered = false;
+let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false;
+let pvCurrentShape = null, pvCurrentDir = null, pvShapeAnswer = null, pvTimer;
 
 function startPV(){
   pvRound = 0; pvScore = 0; pvCorrect = 0;
@@ -129,12 +144,18 @@ function startPV(){
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
-  pvTimer = setTimeout(nextPvRound, 500);
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'none';
+  pvMsg.style.display = 'flex';
+  pvMsg.textContent = 'Készülj...';
+  pvTimer = setTimeout(nextPvRound, 700);
 }
 
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    pvMsg.style.display = 'flex';
+    pvMsg.textContent = 'Kész!';
     const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
     const [tier, text] = ratePeripheral(acc);
     pvResultTier.textContent = tier;
@@ -143,41 +164,52 @@ function nextPvRound(){
     return;
   }
   pvRound++;
-  pvAnswered = false;
   pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
+  pvMsg.style.display = 'none';
   const delay = 800 + Math.random()*900;
   pvTimer = setTimeout(showPvTarget, delay);
 }
 
 function showPvTarget(){
+  pvCurrentShape = PV_SHAPES[Math.floor(Math.random()*PV_SHAPES.length)];
   pvCurrentDir = PV_DIRS[Math.floor(Math.random()*PV_DIRS.length)];
+  pvCenterShape.textContent = SHAPE_GLYPH[pvCurrentShape];
+  pvCenterShape.style.opacity = '1';
   const pos = PV_POS[pvCurrentDir];
   pvTarget.style.top = pos.top;
   pvTarget.style.left = pos.left;
   pvTarget.style.transform = 'translate(-50%,-50%)';
-  pvTarget.classList.remove('show');
-  void pvTarget.offsetWidth;
-  pvTarget.classList.add('show');
   pvTarget.style.opacity = '1';
-  setTimeout(() => { pvTarget.style.opacity = '0'; }, 320);
+  setTimeout(() => {
+    pvCenterShape.style.opacity = '0';
+    pvTarget.style.opacity = '0';
+    pvStep1.style.display = 'grid';
+  }, 220);
 }
 
-function pvAnswer(dir){
-  if(!pvRunning || pvAnswered) return;
-  pvAnswered = true;
-  const correct = dir === pvCurrentDir;
-  const clicked = pvButtons[dir];
-  if(correct){
+function pvAnswerShape(shape){
+  pvShapeAnswer = shape;
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'grid';
+}
+
+function pvAnswerDir(dir){
+  const shapeCorrect = pvShapeAnswer === pvCurrentShape;
+  const dirCorrect = dir === pvCurrentDir;
+  const bothCorrect = shapeCorrect && dirCorrect;
+  const clicked = pvDirButtons[dir];
+  if(bothCorrect){
     pvScore++; pvCorrect++;
     clicked.classList.add('correct');
   } else {
     clicked.classList.add('wrong');
-    if(pvButtons[pvCurrentDir]) pvButtons[pvCurrentDir].classList.add('correct');
+    if(pvDirButtons[pvCurrentDir]) pvDirButtons[pvCurrentDir].classList.add('correct');
   }
-  setTimeout(() => { Object.values(pvButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
+  setTimeout(() => { Object.values(pvDirButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
   pvScoreEl.textContent = pvScore;
-  bump(pvScoreEl, correct);
+  bump(pvScoreEl, bothCorrect);
   pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
+  pvStep2.style.display = 'none';
   setTimeout(nextPvRound, 500);
 }
 </script>

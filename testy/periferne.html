@@ -31,20 +31,28 @@
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Periférne videnie</span></div>
     <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--gray);"></div>
+      <div id="pvCenterShape" style="font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
       <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
+      <div id="pvMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); position:absolute;">Klikni na Spustiť</div>
     </div>
-    <div id="pvDirections" class="pv-compass">
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswer('hore-vlavo')">↖</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswer('hore')">↑</button>
-      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswer('hore-vpravo')">↗</button>
-      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswer('vlavo')">←</button>
+
+    <div id="pvStep1" class="pv-compass" style="display:none; grid-template-columns:repeat(3,1fr);">
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('circle')">●</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('square')">■</button>
+      <button class="btn btn-ghost pv-btn" onclick="pvAnswerShape('triangle')">▲</button>
+    </div>
+    <div id="pvStep2" class="pv-compass" style="display:none;">
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vlavo" onclick="pvAnswerDir('hore-vlavo')">↖</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore" onclick="pvAnswerDir('hore')">↑</button>
+      <button class="btn btn-ghost pv-btn" data-dir="hore-vpravo" onclick="pvAnswerDir('hore-vpravo')">↗</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vlavo" onclick="pvAnswerDir('vlavo')">←</button>
       <span class="pv-btn center">●</span>
-      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswer('vpravo')">→</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswer('dole-vlavo')">↙</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswer('dole')">↓</button>
-      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswer('dole-vpravo')">↘</button>
+      <button class="btn btn-ghost pv-btn" data-dir="vpravo" onclick="pvAnswerDir('vpravo')">→</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vlavo" onclick="pvAnswerDir('dole-vlavo')">↙</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole" onclick="pvAnswerDir('dole')">↓</button>
+      <button class="btn btn-ghost pv-btn" data-dir="dole-vpravo" onclick="pvAnswerDir('dole-vpravo')">↘</button>
     </div>
+
     <div class="rt-stats" style="margin-top:16px;">
       <div><div class="num" id="pvScore">0</div><div class="lbl">Skóre</div></div>
       <div><div class="num" id="pvAcc">—</div><div class="lbl">Presnosť</div></div>
@@ -54,17 +62,17 @@
       <div class="result-tier" id="pvResultTier"></div>
       <p id="pvResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na bodku v strede. Keď sa na okraji mihne bod, klikni na smer, kde sa objavil.</p>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na stred. Na zlomok sekundy sa naraz objaví tvar v strede aj bodka na okraji. Najprv over tvar, potom smer bodky.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Spustiť</button>
     </div>
 
     <div class="test-info">
       <h3>Prečo je to dôležité</h3>
-      <p class="lead-text">Väčšina herných situácií — prihrávka spoluhráča, súper prichádzajúci zboku, lopta na okraji zorného poľa — sa deje mimo priameho pohľadu. Kvalitné periférne videnie znamená rýchlejšie rozhodovanie bez potreby otáčať hlavu.</p>
+      <p class="lead-text">Väčšina herných situácií — prihrávka spoluhráča, súper prichádzajúci zboku, lopta na okraji zorného poľa — sa deje mimo priameho pohľadu, a to súčasne s tým, na čo sa priamo pozeráš. Kvalitné periférne videnie znamená spracovať oboje naraz, bez straty pozornosti na hlavnú úlohu.</p>
       <div class="test-info-grid">
         <div>
           <strong>Čo meria</strong>
-          <p>Šírku a rýchlosť zorného poľa — ako rýchlo a presne dokážeš zaregistrovať podnet mimo bodu, na ktorý sa priamo pozeráš.</p>
+          <p>Schopnosť rozdeliť pozornosť medzi centrálny a periférny podnet naraz (tzv. useful field of view) — nie len to, či niečo zbadáš na okraji, ale či to zvládneš popri hlavnej úlohe.</p>
         </div>
         <div>
           <strong>Komu pomôže</strong>
@@ -77,7 +85,7 @@
         <div class="bm-row"><span class="bm-range">75–89 %</span><span class="bm-label">Dobré periférne videnie</span></div>
         <div class="bm-row"><span class="bm-range">60–74 %</span><span class="bm-label">Priemerné periférne videnie</span></div>
         <div class="bm-row"><span class="bm-range">&lt; 60 %</span><span class="bm-label">Podpriemerné periférne videnie</span></div>
-        <p class="bm-note">Široké a rýchle periférne videnie je typické pre skúsených hráčov kolektívnych športov — pomáha vnímať spoluhráčov a súperov mimo priameho zorného poľa bez otáčania hlavy.</p>
+        <p class="bm-note">Test vychádza z princípu klinických UFOV (useful field of view) testov, ktoré namiesto samotnej šírky zorného poľa merajú, ako dobre dokážeš spracovať centrálny aj periférny podnet súčasne.</p>
       </div>
     </div>
   </div>
@@ -91,7 +99,11 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+const pvCenterShape = document.getElementById('pvCenterShape');
 const pvTarget = document.getElementById('pvTarget');
+const pvMsg = document.getElementById('pvMsg');
+const pvStep1 = document.getElementById('pvStep1');
+const pvStep2 = document.getElementById('pvStep2');
 const pvScoreEl = document.getElementById('pvScore');
 const pvAccEl = document.getElementById('pvAcc');
 const pvRoundEl = document.getElementById('pvRound');
@@ -106,9 +118,11 @@ function ratePeripheral(acc){
   return ['Podpriemerné periférne videnie', 'Priestor na zlepšenie — skús test zopakovať a sledovať stále stred.'];
 }
 
-const pvButtons = {};
-document.querySelectorAll('.pv-btn[data-dir]').forEach(b => { pvButtons[b.dataset.dir] = b; });
+const pvDirButtons = {};
+document.querySelectorAll('#pvStep2 .pv-btn[data-dir]').forEach(b => { pvDirButtons[b.dataset.dir] = b; });
 
+const PV_SHAPES = ['circle','square','triangle'];
+const SHAPE_GLYPH = { circle:'●', square:'■', triangle:'▲' };
 const PV_DIRS = ['hore','hore-vpravo','vpravo','dole-vpravo','dole','dole-vlavo','vlavo','hore-vlavo'];
 const PV_POS = {
   'hore':{top:'6%', left:'50%'},
@@ -121,7 +135,8 @@ const PV_POS = {
   'hore-vlavo':{top:'14%', left:'12%'}
 };
 const PV_ROUNDS = 12;
-let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false, pvCurrentDir = null, pvTimer, pvAnswered = false;
+let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false;
+let pvCurrentShape = null, pvCurrentDir = null, pvShapeAnswer = null, pvTimer;
 
 function startPV(){
   pvRound = 0; pvScore = 0; pvCorrect = 0;
@@ -129,12 +144,18 @@ function startPV(){
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
-  pvTimer = setTimeout(nextPvRound, 500);
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'none';
+  pvMsg.style.display = 'flex';
+  pvMsg.textContent = 'Priprav sa...';
+  pvTimer = setTimeout(nextPvRound, 700);
 }
 
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    pvMsg.style.display = 'flex';
+    pvMsg.textContent = 'Hotovo!';
     const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
     const [tier, text] = ratePeripheral(acc);
     pvResultTier.textContent = tier;
@@ -143,41 +164,52 @@ function nextPvRound(){
     return;
   }
   pvRound++;
-  pvAnswered = false;
   pvRoundEl.textContent = pvRound + '/' + PV_ROUNDS;
+  pvMsg.style.display = 'none';
   const delay = 800 + Math.random()*900;
   pvTimer = setTimeout(showPvTarget, delay);
 }
 
 function showPvTarget(){
+  pvCurrentShape = PV_SHAPES[Math.floor(Math.random()*PV_SHAPES.length)];
   pvCurrentDir = PV_DIRS[Math.floor(Math.random()*PV_DIRS.length)];
+  pvCenterShape.textContent = SHAPE_GLYPH[pvCurrentShape];
+  pvCenterShape.style.opacity = '1';
   const pos = PV_POS[pvCurrentDir];
   pvTarget.style.top = pos.top;
   pvTarget.style.left = pos.left;
   pvTarget.style.transform = 'translate(-50%,-50%)';
-  pvTarget.classList.remove('show');
-  void pvTarget.offsetWidth;
-  pvTarget.classList.add('show');
   pvTarget.style.opacity = '1';
-  setTimeout(() => { pvTarget.style.opacity = '0'; }, 320);
+  setTimeout(() => {
+    pvCenterShape.style.opacity = '0';
+    pvTarget.style.opacity = '0';
+    pvStep1.style.display = 'grid';
+  }, 220);
 }
 
-function pvAnswer(dir){
-  if(!pvRunning || pvAnswered) return;
-  pvAnswered = true;
-  const correct = dir === pvCurrentDir;
-  const clicked = pvButtons[dir];
-  if(correct){
+function pvAnswerShape(shape){
+  pvShapeAnswer = shape;
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'grid';
+}
+
+function pvAnswerDir(dir){
+  const shapeCorrect = pvShapeAnswer === pvCurrentShape;
+  const dirCorrect = dir === pvCurrentDir;
+  const bothCorrect = shapeCorrect && dirCorrect;
+  const clicked = pvDirButtons[dir];
+  if(bothCorrect){
     pvScore++; pvCorrect++;
     clicked.classList.add('correct');
   } else {
     clicked.classList.add('wrong');
-    if(pvButtons[pvCurrentDir]) pvButtons[pvCurrentDir].classList.add('correct');
+    if(pvDirButtons[pvCurrentDir]) pvDirButtons[pvCurrentDir].classList.add('correct');
   }
-  setTimeout(() => { Object.values(pvButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
+  setTimeout(() => { Object.values(pvDirButtons).forEach(b => b.classList.remove('correct','wrong')); }, 380);
   pvScoreEl.textContent = pvScore;
-  bump(pvScoreEl, correct);
+  bump(pvScoreEl, bothCorrect);
   pvAccEl.textContent = Math.round((pvCorrect/pvRound)*100) + '%';
+  pvStep2.style.display = 'none';
   setTimeout(nextPvRound, 500);
 }
 </script>
