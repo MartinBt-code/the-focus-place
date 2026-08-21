@@ -2,27 +2,31 @@
   var LANG = document.documentElement.lang || 'sk';
   var T = {
     sk: {
-      text: 'Táto stránka používa cookies na zlepšenie tvojho zážitku. Viac info v ',
+      title: 'Táto stránka používa cookies',
+      text: 'Používame cookies na zlepšenie tvojho zážitku na stránke. Viac info nájdeš v ',
       link: 'Ochrane osobných údajov',
-      accept: 'Prijať',
+      accept: 'Prijať všetko',
       reject: 'Odmietnuť',
     },
     en: {
-      text: 'This site uses cookies to improve your experience. More in the ',
+      title: 'This site uses cookies',
+      text: 'We use cookies to improve your experience on the site. More info in the ',
       link: 'Privacy Policy',
-      accept: 'Accept',
+      accept: 'Accept all',
       reject: 'Reject',
     },
     de: {
-      text: 'Diese Website verwendet Cookies, um dein Erlebnis zu verbessern. Mehr dazu in der ',
+      title: 'Diese Website verwendet Cookies',
+      text: 'Wir verwenden Cookies, um dein Erlebnis auf der Website zu verbessern. Mehr dazu in der ',
       link: 'Datenschutzerklärung',
-      accept: 'Akzeptieren',
+      accept: 'Alle akzeptieren',
       reject: 'Ablehnen',
     },
     hu: {
-      text: 'Ez az oldal sütiket használ az élmény javítása érdekében. Bővebben az ',
+      title: 'Ez az oldal sütiket használ',
+      text: 'Sütiket használunk az oldalon nyújtott élmény javítása érdekében. Bővebben az ',
       link: 'Adatvédelmi tájékoztatóban',
-      accept: 'Elfogadom',
+      accept: 'Összes elfogadása',
       reject: 'Elutasítom',
     },
   };
@@ -31,28 +35,35 @@
   function getConsent(){ try { return localStorage.getItem('cookieConsent'); } catch(e){ return null; } }
   function setConsent(v){ try { localStorage.setItem('cookieConsent', v); } catch(e){} }
 
-  function showBanner(){
-    if(document.getElementById('cookie-banner')) return;
-    var bar = document.createElement('div');
-    bar.id = 'cookie-banner';
-    bar.style.cssText = 'position:fixed; left:0; right:0; bottom:0; z-index:200; background:var(--navy-panel); border-top:1px solid var(--navy-line); padding:18px 24px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px; font-family:Inter,sans-serif;';
-    bar.innerHTML =
-      '<p style="color:var(--off-white); font-size:13px; line-height:1.5; margin:0; max-width:640px; flex:1; min-width:240px;">' + t.text + '<a href="/ochrana-osobnych-udajov.html" style="color:var(--orange); text-decoration:underline;">' + t.link + '</a></p>' +
-      '<div style="display:flex; gap:10px; flex-shrink:0;">' +
-        '<button class="btn btn-ghost" id="cookie-reject" style="padding:10px 18px; font-size:12px;">' + t.reject + '</button>' +
-        '<button class="btn btn-primary" id="cookie-accept" style="padding:10px 18px; font-size:12px;">' + t.accept + '</button>' +
-      '</div>';
-    document.body.appendChild(bar);
-    document.getElementById('cookie-accept').onclick = function(){ setConsent('accepted'); hideBanner(); };
-    document.getElementById('cookie-reject').onclick = function(){ setConsent('rejected'); hideBanner(); };
-  }
+  function showModal(){
+    if(document.getElementById('cookie-overlay')) return;
 
-  function hideBanner(){
-    var bar = document.getElementById('cookie-banner');
-    if(bar) bar.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'cookie-overlay';
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:300; background:rgba(17,24,29,0.72); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; padding:20px; font-family:Inter,sans-serif;';
+
+    var modal = document.createElement('div');
+    modal.style.cssText = 'background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:8px; max-width:460px; width:100%; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.4);';
+    modal.innerHTML =
+      '<h3 style="font-family:\'Anton\'; text-transform:uppercase; font-size:20px; color:var(--off-white); margin-bottom:14px; letter-spacing:0.5px;">' + t.title + '</h3>' +
+      '<p style="color:var(--gray); font-size:14px; line-height:1.6; margin-bottom:24px;">' + t.text + '<a href="/ochrana-osobnych-udajov.html" style="color:var(--orange); text-decoration:underline;">' + t.link + '</a>.</p>' +
+      '<div style="display:flex; gap:10px; flex-wrap:wrap;">' +
+        '<button class="btn btn-primary" id="cookie-accept" style="flex:1; min-width:140px;">' + t.accept + '</button>' +
+        '<button class="btn btn-ghost" id="cookie-reject" style="flex:1; min-width:140px;">' + t.reject + '</button>' +
+      '</div>';
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    document.getElementById('cookie-accept').onclick = function(){ setConsent('accepted'); overlay.remove(); };
+    document.getElementById('cookie-reject').onclick = function(){ setConsent('rejected'); overlay.remove(); };
   }
 
   if(!getConsent()){
-    showBanner();
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', showModal);
+    } else {
+      showModal();
+    }
   }
 })();
