@@ -75,6 +75,7 @@ module.exports = async (req, res) => {
       mode: 'payment',
       payment_method_types: ['card'],
       locale: t.locale,
+      metadata: { lang },
       phone_number_collection: { enabled: true },
       billing_address_collection: 'required',
       tax_id_collection: { enabled: true },
