@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Contrast Sensitivity — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/kontrast-citlivost.html">SK</a><span>/</span>
+        <a href="/en/testy/kontrast-citlivost.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/kontrast-citlivost.html">DE</a><span>/</span>
+        <a href="/hu/testy/kontrast-citlivost.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Contrast Sensitivity</span></div>
+    <div id="csGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px;"></div>
+    <div class="rt-stats">
+      <div><div class="num" id="csLevel">0</div><div class="lbl">Level</div></div>
+      <div><div class="num" id="csBest">0</div><div class="lbl">Best</div></div>
+    </div>
+    <div class="result-banner" id="csResult" style="display:none;">
+      <div class="result-tier" id="csResultTier"></div>
+      <p id="csResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the tile that's <strong style="color:var(--orange);">slightly different</strong> from the rest. The difference shrinks each level.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startContrast()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">Contrast sensitivity is a different skill from visual acuity — it determines how well you can tell an object apart from its background under poor conditions, like dusk, fog, or glare. This ability tends to decline with age and fatigue before classic visual sharpness does.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Sensitivity to subtle contrast differences — the ability to distinguish an object from its background even with a very small brightness gap.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Drivers and athletes who need to spot details in poor lighting conditions, and anyone wanting to test the quality of their visual perception.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 16 levels</span><span class="bm-label">Exceptional sensitivity</span></div>
+        <div class="bm-row"><span class="bm-range">12–15 levels</span><span class="bm-label">Excellent sensitivity</span></div>
+        <div class="bm-row"><span class="bm-range">7–11 levels</span><span class="bm-label">Average sensitivity</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 7 levels</span><span class="bm-label">Below average sensitivity</span></div>
+        <p class="bm-note">The test is inspired by clinical contrast sensitivity tools (e.g. the Pelli-Robson chart), used in optometry alongside standard visual acuity tests. Your screen's brightness and settings significantly affect the result — treat it as a rough indicator rather than a precise clinical measurement.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const csGrid = document.getElementById('csGrid');
+const csLevelEl = document.getElementById('csLevel');
+const csBestEl = document.getElementById('csBest');
+const csResult = document.getElementById('csResult');
+const csResultTier = document.getElementById('csResultTier');
+const csResultText = document.getElementById('csResultText');
+
+function rateContrast(level){
+  if(level >= 16) return ['Exceptional sensitivity', 'You spotted extremely subtle contrast differences — you\'re among the best.'];
+  if(level >= 12) return ['Excellent sensitivity', 'Above-average contrast sensitivity.'];
+  if(level >= 7) return ['Average sensitivity', 'Matches a typical adult result.'];
+  return ['Below average sensitivity', 'Try again — the result is also affected by your screen brightness and room lighting.'];
+}
+
+const CS_GRID_SIZE = 9;
+const CS_BASE_L = 14;
+const CS_START_DELTA = 20;
+const CS_DECAY = 0.85;
+const CS_TIMEOUT_MS = 8000;
+
+let csTiles = [];
+let csLevel = 0;
+let csBest = 0;
+let csTargetIdx = -1;
+let csAccepting = false;
+let csTimer = null;
+
+for(let i=0;i<CS_GRID_SIZE;i++){
+  const t = document.createElement('div');
+  t.style.cssText = 'aspect-ratio:1;border-radius:4px;cursor:pointer;transition:transform .1s;';
+  t.dataset.idx = i;
+  t.addEventListener('click', () => onCsClick(i));
+  csGrid.appendChild(t);
+  csTiles.push(t);
+}
+
+function startContrast(){
+  csLevel = 0;
+  csLevelEl.textContent = csLevel;
+  csResult.style.display = 'none';
+  nextCsRound();
+}
+
+function deltaForLevel(level){
+  return Math.max(0.6, CS_START_DELTA * Math.pow(CS_DECAY, level-1));
+}
+
+function nextCsRound(){
+  csLevel++;
+  csLevelEl.textContent = csLevel;
+  csAccepting = false;
+  clearTimeout(csTimer);
+
+  const baseColor = 'hsl(213, 15%, ' + CS_BASE_L + '%)';
+  csTargetIdx = Math.floor(Math.random()*CS_GRID_SIZE);
+  const delta = deltaForLevel(csLevel);
+  const targetColor = 'hsl(213, 15%, ' + (CS_BASE_L + delta) + '%)';
+
+  csTiles.forEach((t, i) => {
+    t.style.background = (i === csTargetIdx) ? targetColor : baseColor;
+    t.style.transform = 'scale(1)';
+  });
+
+  csAccepting = true;
+  csTimer = setTimeout(() => {
+    if(csAccepting){
+      csAccepting = false;
+      endContrastRun();
+    }
+  }, CS_TIMEOUT_MS);
+}
+
+function onCsClick(idx){
+  if(!csAccepting) return;
+  csAccepting = false;
+  clearTimeout(csTimer);
+
+  if(idx === csTargetIdx){
+    csTiles[idx].style.transform = 'scale(0.92)';
+    if(csLevel > csBest){ csBest = csLevel; csBestEl.textContent = csBest; }
+    setTimeout(nextCsRound, 450);
+  } else {
+    endContrastRun();
+  }
+}
+
+function endContrastRun(){
+  const reached = csLevel - 1;
+  if(reached > csBest){ csBest = reached; csBestEl.textContent = csBest; }
+  if(reached > 0){
+    const [tier, text] = rateContrast(reached);
+    csResultTier.textContent = tier;
+    csResultText.textContent = text;
+    csResult.style.display = 'block';
+  }
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
