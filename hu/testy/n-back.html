@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Élő teszt</span><span>N-Back teszt</span></div>
+      <div class="diff-select">
+        <button class="diff-btn nb-diff" data-diff="easy" onclick="selectNbDiff('easy')">Könnyű<br><span style="font-size:10px; opacity:0.7;">1-Back</span></button>
+        <button class="diff-btn nb-diff active" data-diff="medium" onclick="selectNbDiff('medium')">Közepes<br><span style="font-size:10px; opacity:0.7;">2-Back</span></button>
+        <button class="diff-btn nb-diff" data-diff="hard" onclick="selectNbDiff('hard')">Nehéz<br><span style="font-size:10px; opacity:0.7;">3-Back</span></button>
+      </div>
       <div id="nbBox" class="rt-box" style="cursor:pointer;">
         <div class="rt-msg" id="nbMsg" style="font-size:64px;">—</div>
       </div>
@@ -42,7 +47,7 @@
         <div class="result-tier" id="nbResultTier"></div>
         <p id="nbResultText"></p>
       </div>
-      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőre, ha az aktuális betű <strong style="color:var(--orange);">megegyezik</strong> a <strong style="color:var(--orange);">2 lépéssel korábbi</strong> betűvel (2-Back).</p>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőre, ha az aktuális betű <strong style="color:var(--orange);">megegyezik</strong> a <strong style="color:var(--orange);" id="nbNLabel">2 lépéssel korábbi</strong> betűvel (<span id="nbNBackLabel">2-Back</span>).</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startNBack()">Indítás</button>
     </div>
 
@@ -89,9 +94,20 @@ function rateNBack(acc){
 }
 
 const NB_LETTERS = ['C','F','K','L','R','T'];
-const NB_N = 2;
+const NB_N_CONFIG = { easy: 1, medium: 2, hard: 3 };
+let nbDiff = 'medium';
+let NB_N = 2;
 const NB_ROUNDS = 22;
 const NB_MATCH_PROB = 0.35;
+
+function selectNbDiff(d){
+  if(nbRunning) return;
+  nbDiff = d;
+  NB_N = NB_N_CONFIG[d];
+  document.querySelectorAll('.nb-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('nbNLabel').textContent = NB_N + ' lépéssel korábbi';
+  document.getElementById('nbNBackLabel').textContent = NB_N + '-Back';
+}
 
 let nbHistory = [];
 let nbRound = 0;
@@ -120,6 +136,7 @@ function startNBack(){
   updateNbStats();
   nbResult.style.display = 'none';
   nbRunning = true;
+  document.querySelectorAll('.nb-diff').forEach(b => b.disabled = true);
   nbMsg.style.opacity = '0';
   nbMsg.textContent = 'Készülj...';
   nbMsg.style.fontSize = '18px';
@@ -140,6 +157,7 @@ function updateNbStats(){
 function nbNextRound(){
   if(nbRound >= NB_ROUNDS){
     nbRunning = false;
+    document.querySelectorAll('.nb-diff').forEach(b => b.disabled = false);
     nbMsg.style.fontSize = '20px';
     nbMsg.textContent = 'Kész!';
     const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
