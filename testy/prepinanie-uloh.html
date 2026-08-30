@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Prepínanie úloh</span></div>
+      <div class="diff-select">
+        <button class="diff-btn ts-diff" data-diff="easy" onclick="selectTsDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">menej prepínania</span></button>
+        <button class="diff-btn ts-diff active" data-diff="medium" onclick="selectTsDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">bežné prepínanie</span></button>
+        <button class="diff-btn ts-diff" data-diff="hard" onclick="selectTsDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">časté prepínanie</span></button>
+      </div>
       <div id="tsBox" class="rt-box" style="flex-direction:column; gap:4px;">
         <span class="ts-cue" id="tsCue">—</span>
         <div class="rt-msg" id="tsMsg">—</div>
@@ -99,11 +104,19 @@ function rateTaskSwitch(acc){
 
 const TS_NUMBERS = [1,2,3,4,6,7,8,9];
 const TS_ROUNDS = 24;
+const TS_SWITCH_PROB = { easy: 0.3, medium: 0.5, hard: 0.7 };
+let tsDiff = 'medium';
 let tsRound = 0, tsScore = 0, tsHits = 0, tsMisses = 0;
 let tsRepeatRts = [], tsSwitchRts = [];
 let tsTimer, tsShownAt, tsWaitingResponse = false, tsRunning = false;
 let tsCurrent = null;
 let tsPrevRule = null;
+
+function selectTsDiff(d){
+  if(tsRunning) return;
+  tsDiff = d;
+  document.querySelectorAll('.ts-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function bump(el, good){
   el.classList.remove('bump','good','bad');
@@ -119,6 +132,7 @@ function startTaskSwitch(){
   updateTsStats();
   tsResult.style.display = 'none';
   tsRunning = true;
+  document.querySelectorAll('.ts-diff').forEach(b => b.disabled = true);
   tsMsg.style.opacity = '0';
   tsCue.style.opacity = '0';
   tsOptionsOpacity(0);
@@ -152,6 +166,7 @@ function updateTsStats(){
 function nextTsRound(){
   if(tsRound >= TS_ROUNDS){
     tsRunning = false;
+    document.querySelectorAll('.ts-diff').forEach(b => b.disabled = false);
     tsMsg.style.fontSize = '20px';
     tsMsg.textContent = 'Hotovo!';
     tsCue.style.opacity = '0';
@@ -176,7 +191,13 @@ function nextTsRound(){
 }
 
 function showTsTrial(){
-  const rule = Math.random() < 0.5 ? 'parity' : 'magnitude';
+  let rule;
+  if(tsPrevRule === null){
+    rule = Math.random() < 0.5 ? 'parity' : 'magnitude';
+  } else {
+    const otherRule = tsPrevRule === 'parity' ? 'magnitude' : 'parity';
+    rule = Math.random() < TS_SWITCH_PROB[tsDiff] ? otherRule : tsPrevRule;
+  }
   const isSwitch = tsPrevRule !== null && rule !== tsPrevRule;
   const isRepeat = tsPrevRule !== null && rule === tsPrevRule;
   const number = TS_NUMBERS[Math.floor(Math.random()*TS_NUMBERS.length)];
