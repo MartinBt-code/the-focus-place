@@ -31,15 +31,22 @@
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Koncentračná mriežka</span></div>
 
-    <div id="cgLevels" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-      <button class="btn btn-ghost cg-level" data-size="5" onclick="selectLevel(5)" style="flex:1; min-width:80px;">5×5<br><span style="font-size:11px; opacity:0.7;">Ľahká</span></button>
-      <button class="btn btn-ghost cg-level" data-size="8" onclick="selectLevel(8)" style="flex:1; min-width:80px;">8×8<br><span style="font-size:11px; opacity:0.7;">Stredná</span></button>
-      <button class="btn btn-ghost cg-level" data-size="10" onclick="selectLevel(10)" style="flex:1; min-width:80px;">10×10<br><span style="font-size:11px; opacity:0.7;">Ťažká</span></button>
-      <button class="btn btn-ghost cg-level" data-size="13" onclick="selectLevel(13)" style="flex:1; min-width:80px;">13×13<br><span style="font-size:11px; opacity:0.7;">Expert</span></button>
+    <div style="margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+        <label for="cgSizeSlider" style="font-family:'Space Mono'; font-size:13px; color:var(--gray); text-transform:uppercase; letter-spacing:0.05em;">Veľkosť mriežky</label>
+        <span id="cgSizeLabel" style="font-family:'Space Mono'; font-size:20px; color:var(--orange); font-weight:700;">8×8</span>
+      </div>
+      <input type="range" id="cgSizeSlider" min="3" max="15" step="1" value="8" oninput="onSizeChange(this.value)" style="width:100%; accent-color:var(--orange);">
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray); margin-top:4px;">
+        <span>3×3 · Ľahká</span>
+        <span id="cgSizeHint">Stredná</span>
+        <span>15×15 · Expert</span>
+      </div>
+      <p id="cgTargetsHint" class="mono" style="color:var(--gray); font-size:12px; margin-top:8px; text-align:center;"></p>
     </div>
 
     <div id="cgWrap" style="position:relative;">
-      <div id="cgMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); height:220px; display:flex; align-items:center; justify-content:center; text-align:center; border:2px dashed var(--navy-line); border-radius:4px;">Vyber si úroveň a klikni na Spustiť</div>
+      <div id="cgMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); height:220px; display:flex; align-items:center; justify-content:center; text-align:center; border:2px dashed var(--navy-line); border-radius:4px;">Nastav veľkosť a klikni na Spustiť</div>
       <div id="cgGrid" style="display:none; grid-template-columns:repeat(8,1fr); gap:3px; width:100%; aspect-ratio:1;"></div>
     </div>
     <div class="rt-stats">
@@ -69,12 +76,12 @@
         </div>
       </div>
       <div class="benchmark-table">
-        <h4>Orientačné časy podľa úrovne (rýchlejšie = lepšie)</h4>
-        <div class="bm-row"><span class="bm-range">5×5</span><span class="bm-label">Výborne &lt; 20 s · Priemer 20–40 s</span></div>
-        <div class="bm-row"><span class="bm-range">8×8</span><span class="bm-label">Výborne &lt; 45 s · Priemer 45–80 s</span></div>
-        <div class="bm-row"><span class="bm-range">10×10</span><span class="bm-label">Výborne &lt; 75 s · Priemer 75–120 s</span></div>
-        <div class="bm-row"><span class="bm-range">13×13</span><span class="bm-label">Výborne &lt; 140 s · Priemer 140–220 s</span></div>
-        <p class="bm-note">Test vychádza z klasického cvičenia Concentration Grid (Harris &amp; Harris, 1984) používaného v mentálnom tréningu športovcov, s nastaviteľnou veľkosťou mriežky podľa modelu digitálnych implementácií (napr. cgridid.com). Orientačné časy sú približné — najviac vypovedá porovnanie s vlastným predošlým výsledkom na rovnakej úrovni.</p>
+        <h4>Orientačné časy podľa veľkosti mriežky</h4>
+        <div class="bm-row"><span class="bm-range">5×5 (25 čísel)</span><span class="bm-label">Výborne &lt; 19 s · Priemer do 33 s</span></div>
+        <div class="bm-row"><span class="bm-range">8×8 (64 čísel)</span><span class="bm-label">Výborne &lt; 48 s · Priemer do 83 s</span></div>
+        <div class="bm-row"><span class="bm-range">10×10 (100 čísel)</span><span class="bm-label">Výborne &lt; 75 s · Priemer do 130 s</span></div>
+        <div class="bm-row"><span class="bm-range">13×13 (169 čísel)</span><span class="bm-label">Výborne &lt; 127 s · Priemer do 220 s</span></div>
+        <p class="bm-note">Veľkosť mriežky si nastavíš ľubovoľne od 3×3 po 15×15 posuvníkom — orientačné časy vyššie sú len príklady, pre zvolenú veľkosť si ich aplikácia dopočíta priamo nad posuvníkom. Test vychádza z klasického cvičenia Concentration Grid (Harris &amp; Harris, 1984) používaného v mentálnom tréningu športovcov, s nastaviteľnou veľkosťou mriežky podľa modelu digitálnych implementácií (napr. cgridid.com). Najviac vypovedá porovnanie s vlastným predošlým výsledkom na rovnakej veľkosti.</p>
       </div>
     </div>
   </div>
@@ -89,7 +96,10 @@ const cgBestEl = document.getElementById('cgBest');
 const cgResult = document.getElementById('cgResult');
 const cgResultTier = document.getElementById('cgResultTier');
 const cgResultText = document.getElementById('cgResultText');
-const levelBtns = document.querySelectorAll('.cg-level');
+const cgSizeSlider = document.getElementById('cgSizeSlider');
+const cgSizeLabel = document.getElementById('cgSizeLabel');
+const cgSizeHint = document.getElementById('cgSizeHint');
+const cgTargetsHint = document.getElementById('cgTargetsHint');
 
 let cgSize = 8;
 let cgTotal = cgSize * cgSize;
@@ -100,32 +110,40 @@ let cgStartTime = 0;
 let cgRafId = null;
 const cgBests = {};
 
-function markActiveLevel(){
-  levelBtns.forEach(b => {
-    const active = parseInt(b.dataset.size) === cgSize;
-    b.style.background = active ? 'var(--orange)' : '';
-    b.style.color = active ? 'var(--navy)' : '';
-    b.style.borderColor = active ? 'var(--orange)' : '';
-  });
+function difficultyLabel(n){
+  if(n <= 5) return 'Ľahká';
+  if(n <= 8) return 'Stredná';
+  if(n <= 11) return 'Ťažká';
+  return 'Expert';
 }
 
-function selectLevel(size){
-  if(cgRunning) return;
-  cgSize = size;
-  cgTotal = size * size;
+function computeThresholds(n){
+  const cells = n * n;
+  return { excellent: Math.round(cells * 0.75), average: Math.round(cells * 1.3) };
+}
+
+function updateTargetsHint(){
+  const { excellent, average } = computeThresholds(cgSize);
+  cgTargetsHint.textContent = 'Orientačne: výborne < ' + excellent + ' s · priemer do ' + average + ' s';
+}
+
+function onSizeChange(val){
+  cgSize = parseInt(val);
+  cgTotal = cgSize * cgSize;
+  cgSizeLabel.textContent = cgSize + '×' + cgSize;
+  cgSizeHint.textContent = difficultyLabel(cgSize);
+  updateTargetsHint();
   cgProgressEl.textContent = '0 / ' + cgTotal;
   cgBestEl.textContent = cgBests[cgSize] ? cgBests[cgSize].toFixed(1) + 's' : '—';
   cgTimeEl.textContent = '0.0s';
   cgResult.style.display = 'none';
-  markActiveLevel();
 }
-selectLevel(8);
+onSizeChange(8);
 
 function rateGrid(size, time){
-  const thresholds = { 5:[20,40], 8:[45,80], 10:[75,120], 13:[140,220] };
-  const [good, avg] = thresholds[size] || [45,80];
-  if(time < good) return ['Výborná koncentrácia', 'Rýchly a plynulý postup celou mriežkou bez zaváhania.'];
-  if(time < avg) return ['Priemerná koncentrácia', 'Solídny výsledok — skús znížiť čas váhania medzi jednotlivými číslami.'];
+  const { excellent, average } = computeThresholds(size);
+  if(time < excellent) return ['Výborná koncentrácia', 'Rýchly a plynulý postup celou mriežkou bez zaváhania.'];
+  if(time < average) return ['Priemerná koncentrácia', 'Solídny výsledok — skús znížiť čas váhania medzi jednotlivými číslami.'];
   return ['Podpriemerná koncentrácia', 'Skús to znova — schopnosť udržať koncentráciu sa dá pravidelným tréningom zlepšiť.'];
 }
 
@@ -147,13 +165,14 @@ function startGrid(){
   cgCells = [];
   cgProgressEl.textContent = '0 / ' + cgTotal;
   cgTimeEl.textContent = '0.0s';
+  cgSizeSlider.disabled = true;
 
   const numbers = shuffle(Array.from({length:cgTotal}, (_, i) => i + 1));
+  const fontSize = Math.max(8, Math.min(22, Math.round(26 - cgSize * 1.3)));
   numbers.forEach(n => {
     const cell = document.createElement('div');
     cell.textContent = n;
     cell.dataset.num = n;
-    const fontSize = cgSize <= 5 ? 18 : cgSize <= 8 ? 14 : cgSize <= 10 ? 12 : 10;
     cell.style.cssText = `display:flex; align-items:center; justify-content:center; background:#1A2029; border:1px solid var(--navy-line); border-radius:3px; font-family:'Space Mono'; font-size:${fontSize}px; color:var(--off-white); cursor:pointer; user-select:none; transition:background .1s, color .1s;`;
     cell.addEventListener('click', () => onCgClick(cell, n));
     cgGrid.appendChild(cell);
@@ -196,6 +215,7 @@ function endGrid(){
   const finalTime = (performance.now() - cgStartTime) / 1000;
   cgTimeEl.textContent = finalTime.toFixed(1) + 's';
   cgCells.forEach(c => { c.style.cursor = 'default'; });
+  cgSizeSlider.disabled = false;
 
   if(!cgBests[cgSize] || finalTime < cgBests[cgSize]){ cgBests[cgSize] = finalTime; }
   cgBestEl.textContent = cgBests[cgSize].toFixed(1) + 's';
