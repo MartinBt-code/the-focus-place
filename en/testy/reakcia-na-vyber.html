@@ -30,14 +30,14 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Choice Reaction</span></div>
+      <div class="diff-select">
+        <button class="diff-btn cr-diff" data-diff="easy" onclick="selectCrDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">2 colors</span></button>
+        <button class="diff-btn cr-diff active" data-diff="medium" onclick="selectCrDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">4 colors</span></button>
+        <button class="diff-btn cr-diff" data-diff="hard" onclick="selectCrDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">6 colors</span></button>
+      </div>
       <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
         <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
-        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;">
-          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Red"></button>
-          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Blue"></button>
-          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Green"></button>
-          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Yellow"></button>
-        </div>
+        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;"></div>
       </div>
       <div class="rt-stats">
         <div><div class="num" id="crScore">0</div><div class="lbl">Score</div></div>
@@ -85,7 +85,8 @@ const crAvgEl = document.getElementById('crAvg');
 const crResult = document.getElementById('crResult');
 const crResultTier = document.getElementById('crResultTier');
 const crResultText = document.getElementById('crResultText');
-const crSwatches = Array.from(document.querySelectorAll('#crOptions .stroop-swatch'));
+const crOptions = document.getElementById('crOptions');
+let crSwatches = [];
 
 function rateChoiceRT(avgMs){
   if(avgMs < 400) return ['Elite decision speed', 'You choose between multiple options almost as fast as others react to a single cue.'];
@@ -94,13 +95,28 @@ function rateChoiceRT(avgMs){
   return ['Slower decision speed', 'Room to improve — decision speed can be trained.'];
 }
 
-const CR_COLORS = [
-  {key:'red', hex:'#E74C3C'},
-  {key:'blue', hex:'#3B82F6'},
-  {key:'green', hex:'#2ECC71'},
-  {key:'yellow', hex:'#F1C40F'}
-];
+const CR_COLOR_SETS = {
+  easy: [
+    {key:'red', hex:'#E74C3C', label:'Red'},
+    {key:'blue', hex:'#3B82F6', label:'Blue'}
+  ],
+  medium: [
+    {key:'red', hex:'#E74C3C', label:'Red'},
+    {key:'blue', hex:'#3B82F6', label:'Blue'},
+    {key:'green', hex:'#2ECC71', label:'Green'},
+    {key:'yellow', hex:'#F1C40F', label:'Yellow'}
+  ],
+  hard: [
+    {key:'red', hex:'#E74C3C', label:'Red'},
+    {key:'blue', hex:'#3B82F6', label:'Blue'},
+    {key:'green', hex:'#2ECC71', label:'Green'},
+    {key:'yellow', hex:'#F1C40F', label:'Yellow'},
+    {key:'orange', hex:'#F39C12', label:'Orange'},
+    {key:'purple', hex:'#9B59B6', label:'Purple'}
+  ]
+};
 const CR_ROUNDS = 20;
+let crDiff = 'medium';
 let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
 let crTimer, crShownAt, crCurrent = null, crWaitingResponse = false, crRunning = false;
 
@@ -111,11 +127,36 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+function renderCrOptions(){
+  const colors = CR_COLOR_SETS[crDiff];
+  crOptions.innerHTML = '';
+  crOptions.style.gridTemplateColumns = colors.length <= 4 ? `repeat(${colors.length},1fr)` : 'repeat(3,1fr)';
+  colors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'stroop-swatch';
+    btn.dataset.key = c.key;
+    btn.style.background = c.hex;
+    btn.setAttribute('aria-label', c.label);
+    btn.addEventListener('click', () => onCrSwatchClick(btn));
+    crOptions.appendChild(btn);
+  });
+  crSwatches = Array.from(crOptions.children);
+}
+
+function selectCrDiff(d){
+  if(crRunning) return;
+  crDiff = d;
+  document.querySelectorAll('.cr-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  renderCrOptions();
+}
+renderCrOptions();
+
 function startChoiceRT(){
   crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
   updateCrStats();
   crResult.style.display = 'none';
   crRunning = true;
+  document.querySelectorAll('.cr-diff').forEach(b => b.disabled = true);
   nextCrRound();
 }
 
@@ -129,6 +170,7 @@ function updateCrStats(){
 function nextCrRound(){
   if(crRound >= CR_ROUNDS){
     crRunning = false;
+    document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
     const total = crHits + crMisses;
     if(crRts.length > 0){
       const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
@@ -147,7 +189,8 @@ function nextCrRound(){
 }
 
 function showCrStim(){
-  const color = CR_COLORS[Math.floor(Math.random()*CR_COLORS.length)];
+  const colors = CR_COLOR_SETS[crDiff];
+  const color = colors[Math.floor(Math.random()*colors.length)];
   crCurrent = color;
   crStim.style.background = color.hex;
   crStim.style.opacity = '1';
@@ -164,30 +207,28 @@ function showCrStim(){
   }, 2500);
 }
 
-crSwatches.forEach(sw => {
-  sw.addEventListener('click', () => {
-    if(!crRunning || !crWaitingResponse || !crCurrent) return;
-    clearTimeout(crTimer);
-    crWaitingResponse = false;
-    const rt = Math.round(performance.now() - crShownAt);
-    const correct = sw.dataset.key === crCurrent.key;
-    if(correct){
-      crHits++; crScore++; crRts.push(rt);
-      sw.classList.add('correct');
-      bump(crScoreEl, true);
-    } else {
-      crMisses++;
-      sw.classList.add('wrong');
-      bump(crScoreEl, false);
-    }
-    updateCrStats();
-    setTimeout(() => {
-      sw.classList.remove('correct','wrong');
-      crStim.style.opacity = '0';
-      setTimeout(nextCrRound, 250);
-    }, 260);
-  });
-});
+function onCrSwatchClick(sw){
+  if(!crRunning || !crWaitingResponse || !crCurrent) return;
+  clearTimeout(crTimer);
+  crWaitingResponse = false;
+  const rt = Math.round(performance.now() - crShownAt);
+  const correct = sw.dataset.key === crCurrent.key;
+  if(correct){
+    crHits++; crScore++; crRts.push(rt);
+    sw.classList.add('correct');
+    bump(crScoreEl, true);
+  } else {
+    crMisses++;
+    sw.classList.add('wrong');
+    bump(crScoreEl, false);
+  }
+  updateCrStats();
+  setTimeout(() => {
+    sw.classList.remove('correct','wrong');
+    crStim.style.opacity = '0';
+    setTimeout(nextCrRound, 250);
+  }, 260);
+}
 </script>
 
 <script src="../../assets/cookie-consent.js" defer></script>
