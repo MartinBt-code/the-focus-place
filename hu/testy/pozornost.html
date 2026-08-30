@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Élő teszt</span><span>Go/No-Go teszt</span></div>
+      <div class="diff-select">
+        <button class="diff-btn cpt-diff" data-diff="easy" onclick="selectCptDiff('easy')">Könnyű<br><span style="font-size:10px; opacity:0.7;">gyakori X</span></button>
+        <button class="diff-btn cpt-diff active" data-diff="medium" onclick="selectCptDiff('medium')">Közepes<br><span style="font-size:10px; opacity:0.7;">normál X</span></button>
+        <button class="diff-btn cpt-diff" data-diff="hard" onclick="selectCptDiff('hard')">Nehéz<br><span style="font-size:10px; opacity:0.7;">ritka X</span></button>
+      </div>
       <div id="cptBox" class="rt-box" style="cursor:pointer;">
         <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
       </div>
@@ -88,11 +93,22 @@ function rateAttention(acc){
   return ['Átlag alatti figyelem', 'A koncentráció ingadozik — hasonló feladatok rendszeres gyakorlása segíthet.'];
 }
 
-const CPT_LETTERS = ['A','B','E','K','M','P','R','T','X'];
 const CPT_TARGET = 'X';
 const CPT_ROUNDS = 20;
+const CPT_CONFIG = {
+  easy: {letters: ['A','E','K','P','X'], window: 1300},
+  medium: {letters: ['A','B','E','K','M','P','R','T','X'], window: 1000},
+  hard: {letters: ['A','B','C','D','E','F','G','H','K','M','P','R','T','X'], window: 750}
+};
+let cptDiff = 'medium';
 let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptRts = [];
 let cptTimer, cptShownAt, cptWaitingResponse = false, cptRunning = false;
+
+function selectCptDiff(d){
+  if(cptRunning) return;
+  cptDiff = d;
+  document.querySelectorAll('.cpt-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function bump(el, good){
   el.classList.remove('bump','good','bad');
@@ -110,6 +126,7 @@ function startCPT(){
   cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptRts = [];
   updateCptStats();
   cptRunning = true;
+  document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = true);
   cptMsg.style.opacity = '0';
   cptMsg.textContent = 'Készülj...';
   cptMsg.style.fontSize = '18px';
@@ -130,6 +147,7 @@ function updateCptStats(){
 function nextCptRound(){
   if(cptRound >= CPT_ROUNDS){
     cptRunning = false;
+    document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = false);
     cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Kész!';
     const totalTargets = cptHits + cptMisses;
@@ -150,7 +168,8 @@ function nextCptRound(){
 }
 
 function showCptLetter(){
-  const letter = CPT_LETTERS[Math.floor(Math.random()*CPT_LETTERS.length)];
+  const config = CPT_CONFIG[cptDiff];
+  const letter = config.letters[Math.floor(Math.random()*config.letters.length)];
   cptMsg.textContent = letter;
   cptMsg.style.opacity = '1';
   cptShownAt = performance.now();
@@ -163,7 +182,7 @@ function showCptLetter(){
       cptMsg.style.opacity = '0';
       setTimeout(nextCptRound, 350);
     }
-  }, 1000);
+  }, config.window);
 }
 
 cptBox.addEventListener('click', () => {
