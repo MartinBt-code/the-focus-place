@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Saccadic Recognition — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/sakadicke-rozpoznavanie.html">SK</a><span>/</span>
+        <a href="/en/testy/sakadicke-rozpoznavanie.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/sakadicke-rozpoznavanie.html">DE</a><span>/</span>
+        <a href="/hu/testy/sakadicke-rozpoznavanie.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Saccadic Recognition</span></div>
+    <div id="srBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px;">
+      <div id="srMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Click Start</div>
+      <div id="srStim" style="position:absolute; font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
+    </div>
+    <div id="srOptions" class="pv-compass" style="display:none; grid-template-columns:repeat(5,1fr);">
+      <button class="btn btn-ghost pv-btn" data-shape="circle" onclick="srAnswer('circle')">●</button>
+      <button class="btn btn-ghost pv-btn" data-shape="square" onclick="srAnswer('square')">■</button>
+      <button class="btn btn-ghost pv-btn" data-shape="triangle" onclick="srAnswer('triangle')">▲</button>
+      <button class="btn btn-ghost pv-btn" data-shape="star" onclick="srAnswer('star')">★</button>
+      <button class="btn btn-ghost pv-btn" data-shape="diamond" onclick="srAnswer('diamond')">♦</button>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="srScore">0</div><div class="lbl">Score</div></div>
+      <div><div class="num" id="srAcc">—</div><div class="lbl">Accuracy</div></div>
+      <div><div class="num" id="srAvg">—</div><div class="lbl">Average (ms)</div></div>
+    </div>
+    <div class="result-banner" id="srResult" style="display:none;">
+      <div class="result-tier" id="srResultTier"></div>
+      <p id="srResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">A symbol flashes at a random spot for just <strong style="color:var(--orange);">130 ms</strong>. Pick which one it was.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startSaccadic()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">In fast sports situations you don't have time to stare at one spot — your eye has to jump quickly (a saccade) to a new cue and recognize it instantly before it disappears or changes. This test simulates exactly that combination of fast orienting and instant recognition.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Speed and accuracy of visual recognition for a briefly exposed cue at an unknown location — the ability to catch information before it vanishes.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes who need to recognize a signal or an opponent's movement in a split second, and anyone wanting to train visual processing speed.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90%</span><span class="bm-label">Exceptional recognition</span></div>
+        <div class="bm-row"><span class="bm-range">70–89%</span><span class="bm-label">Excellent recognition</span></div>
+        <div class="bm-row"><span class="bm-range">50–69%</span><span class="bm-label">Average recognition</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 50%</span><span class="bm-label">Below average recognition</span></div>
+        <p class="bm-note">The speed of recognizing a briefly exposed cue is tied to the duration of saccadic eye movements (typically 20–200 ms) and is commonly studied as part of rapid visual processing research. At exposures around 130 ms, accuracy drops sharply without training, while experienced observers can maintain high accuracy even at such short durations.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const srBox = document.getElementById('srBox');
+const srStim = document.getElementById('srStim');
+const srMsg = document.getElementById('srMsg');
+const srOptions = document.getElementById('srOptions');
+const srScoreEl = document.getElementById('srScore');
+const srAccEl = document.getElementById('srAcc');
+const srAvgEl = document.getElementById('srAvg');
+const srResult = document.getElementById('srResult');
+const srResultTier = document.getElementById('srResultTier');
+const srResultText = document.getElementById('srResultText');
+const srButtons = Array.from(document.querySelectorAll('#srOptions .pv-btn'));
+
+function rateSaccadic(acc){
+  if(acc >= 90) return ['Exceptional recognition', 'Nearly flawless recognition even at very brief exposure — you\'re among the best.'];
+  if(acc >= 70) return ['Excellent recognition', 'Above-average visual processing speed.'];
+  if(acc >= 50) return ['Average recognition', 'Matches a typical adult result.'];
+  return ['Below average recognition', 'A short exposure is hard for everyone — regular training improves performance.'];
+}
+
+const SR_SHAPES = [
+  {key:'circle', glyph:'●'},
+  {key:'square', glyph:'■'},
+  {key:'triangle', glyph:'▲'},
+  {key:'star', glyph:'★'},
+  {key:'diamond', glyph:'♦'}
+];
+const SR_ROUNDS = 16;
+const SR_FLASH_MS = 130;
+let srRound = 0, srScore = 0, srHits = 0, srMisses = 0, srRts = [];
+let srTimer, srShownAt, srCurrent = null, srWaitingResponse = false, srRunning = false;
+
+function updateSrStats(){
+  srScoreEl.textContent = srScore;
+  const total = srHits + srMisses;
+  srAccEl.textContent = total ? Math.round((srHits/total)*100)+'%' : '—';
+  srAvgEl.textContent = srRts.length ? Math.round(srRts.reduce((a,b)=>a+b,0)/srRts.length) : '—';
+}
+
+function startSaccadic(){
+  srRound = 0; srScore = 0; srHits = 0; srMisses = 0; srRts = [];
+  updateSrStats();
+  srResult.style.display = 'none';
+  srRunning = true;
+  srOptions.style.display = 'none';
+  srMsg.style.display = 'flex';
+  srMsg.textContent = 'Get ready...';
+  setTimeout(() => {
+    srMsg.style.display = 'none';
+    nextSrRound();
+  }, 700);
+}
+
+function nextSrRound(){
+  if(srRound >= SR_ROUNDS){
+    srRunning = false;
+    srOptions.style.display = 'none';
+    srMsg.style.display = 'flex';
+    srMsg.textContent = 'Done!';
+    const total = srHits + srMisses;
+    if(total > 0){
+      const acc = Math.round((srHits/total)*100);
+      const [tier, text] = rateSaccadic(acc);
+      srResultTier.textContent = tier;
+      srResultText.textContent = text;
+      srResult.style.display = 'block';
+    }
+    return;
+  }
+  srRound++;
+  srOptions.style.display = 'none';
+  const delay = 500 + Math.random()*500;
+  srTimer = setTimeout(showSrStim, delay);
+}
+
+function showSrStim(){
+  const shape = SR_SHAPES[Math.floor(Math.random()*SR_SHAPES.length)];
+  srCurrent = shape;
+  const boxRect = srBox.getBoundingClientRect();
+  const margin = 30;
+  const x = margin + Math.random()*(boxRect.width - margin*2);
+  const y = margin + Math.random()*(boxRect.height - margin*2);
+  srStim.style.left = x + 'px';
+  srStim.style.top = y + 'px';
+  srStim.textContent = shape.glyph;
+  srStim.style.opacity = '1';
+  srShownAt = performance.now();
+
+  srTimer = setTimeout(() => {
+    srStim.style.opacity = '0';
+    srOptions.style.display = 'grid';
+    srButtons.forEach(b => b.classList.remove('correct','wrong'));
+    srWaitingResponse = true;
+    srTimer = setTimeout(() => {
+      if(srWaitingResponse){
+        srWaitingResponse = false;
+        srMisses++;
+        updateSrStats();
+        setTimeout(nextSrRound, 400);
+      }
+    }, 3000);
+  }, SR_FLASH_MS);
+}
+
+function srAnswer(key){
+  if(!srRunning || !srWaitingResponse || !srCurrent) return;
+  clearTimeout(srTimer);
+  srWaitingResponse = false;
+  const rt = Math.round(performance.now() - srShownAt);
+  const btn = srButtons.find(b => b.dataset.shape === key);
+  if(key === srCurrent.key){
+    srHits++; srScore++; srRts.push(rt);
+    btn.classList.add('correct');
+  } else {
+    srMisses++;
+    btn.classList.add('wrong');
+    const correctBtn = srButtons.find(b => b.dataset.shape === srCurrent.key);
+    if(correctBtn) correctBtn.classList.add('correct');
+  }
+  updateSrStats();
+  setTimeout(nextSrRound, 500);
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
