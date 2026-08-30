@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Predikcia trajektórie — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/predikcia-trajektorie.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/predikcia-trajektorie.html">EN</a><span>/</span>
+        <a href="/de/testy/predikcia-trajektorie.html">DE</a><span>/</span>
+        <a href="/hu/testy/predikcia-trajektorie.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Predikcia trajektórie</span></div>
+    <div id="tpBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px; overflow:hidden;">
+      <div id="tpMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni na Spustiť</div>
+      <div id="tpGoal" style="position:absolute; top:0; bottom:0; width:2px; border-left:2px dashed var(--navy-line); display:none;"></div>
+      <div id="tpBall" style="position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:var(--orange); display:none;"></div>
+    </div>
+    <button class="btn btn-primary" id="tpRespondBtn" style="margin-top:16px; width:100%;" disabled>TERAZ!</button>
+    <div class="rt-stats">
+      <div><div class="num" id="tpScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="tpAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="tpAvg">—</div><div class="lbl">Priemerná odchýlka (ms)</div></div>
+    </div>
+    <div class="result-banner" id="tpResult" style="display:none;">
+      <div class="result-tier" id="tpResultTier"></div>
+      <p id="tpResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Loptička sa rozbehne a <strong style="color:var(--orange);">na chvíľu zmizne</strong>. Klikni na "TERAZ!" presne v momente, keď by mala dosiahnuť čiarkovanú čiaru.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startPrediction()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Loptu, spoluhráča alebo súpera nevidíš vždy celý čas — občas ju na zlomok sekundy stratíš z dohľadu (zakryje ju iný hráč, žmurkneš, otočíš hlavu) a musíš odhadnúť, kde a kedy sa objaví. Táto schopnosť predikcie pohybu je kľúčová pri chytaní, blokovaní aj časovaní úderu.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Presnosť časového odhadu pohybu, ktorý dočasne zmizne z dohľadu — schopnosť mentálne "domodelovať" trajektóriu bez toho, aby si ju stále videl.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom pri chytaní, blokovaní a časovaní úderu, aj každému, kto chce trénovať predikciu pohybu.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≤ 60 ms</span><span class="bm-label">Výnimočný odhad</span></div>
+        <div class="bm-row"><span class="bm-range">61–120 ms</span><span class="bm-label">Výborný odhad</span></div>
+        <div class="bm-row"><span class="bm-range">121–200 ms</span><span class="bm-label">Priemerný odhad</span></div>
+        <div class="bm-row"><span class="bm-range">&gt; 200 ms</span><span class="bm-label">Podpriemerný odhad</span></div>
+        <p class="bm-note">Test je založený na paradigme tzv. coincidence-anticipation timing, bežne používanej v športovej vede na meranie schopnosti načasovať reakciu na pohybujúci sa objekt, ktorý dočasne zmizne z dohľadu (napr. za prekážkou). Meria sa odchýlka medzi skutočným a odhadovaným časom príchodu k cieľu.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const tpBox = document.getElementById('tpBox');
+const tpBall = document.getElementById('tpBall');
+const tpGoal = document.getElementById('tpGoal');
+const tpMsg = document.getElementById('tpMsg');
+const tpRespondBtn = document.getElementById('tpRespondBtn');
+const tpScoreEl = document.getElementById('tpScore');
+const tpAccEl = document.getElementById('tpAcc');
+const tpAvgEl = document.getElementById('tpAvg');
+const tpResult = document.getElementById('tpResult');
+const tpResultTier = document.getElementById('tpResultTier');
+const tpResultText = document.getElementById('tpResultText');
+
+function ratePrediction(avgMs){
+  if(avgMs <= 60) return ['Výnimočný odhad', 'Tvoj časový odhad je extrémne presný — patríš medzi najlepších.'];
+  if(avgMs <= 120) return ['Výborný odhad', 'Nadpriemerná presnosť predikcie pohybu.'];
+  if(avgMs <= 200) return ['Priemerný odhad', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerný odhad', 'Priestor na zlepšenie — predikcia pohybu sa dá trénovať.'];
+}
+
+const TP_ROUNDS = 10;
+const TP_TOLERANCE_MS = 80;
+const TP_MAX_WAIT_MS = 1200;
+const TP_START_X_FRAC = 0.08;
+const TP_GOAL_X_FRAC = 0.85;
+
+let tpRound = 0, tpHits = 0, tpErrors = [];
+let tpRunning = false, tpRoundActive = false, tpClickedThisRound = false;
+let tpRoundStartPerf = 0, tpDuration = 0, tpOccludeFrac = 0;
+let tpRafId = null, tpMissTimer = null;
+
+function updateTpStats(){
+  tpScoreEl.textContent = tpHits;
+  tpAccEl.textContent = tpErrors.length ? Math.round((tpHits/tpErrors.length)*100)+'%' : '—';
+  tpAvgEl.textContent = tpErrors.length ? Math.round(tpErrors.reduce((a,b)=>a+b,0)/tpErrors.length) : '—';
+}
+
+function startPrediction(){
+  tpRound = 0; tpHits = 0; tpErrors = [];
+  updateTpStats();
+  tpResult.style.display = 'none';
+  tpRunning = true;
+  tpMsg.style.display = 'flex';
+  tpMsg.textContent = 'Priprav sa...';
+  tpGoal.style.display = 'none';
+  tpBall.style.display = 'none';
+  tpRespondBtn.disabled = true;
+  setTimeout(() => {
+    tpMsg.style.display = 'none';
+    nextTpRound();
+  }, 700);
+}
+
+function nextTpRound(){
+  if(tpRound >= TP_ROUNDS){
+    tpRunning = false;
+    tpMsg.style.display = 'flex';
+    tpMsg.textContent = 'Hotovo!';
+    tpRespondBtn.disabled = true;
+    const avgMs = Math.round(tpErrors.reduce((a,b)=>a+b,0)/tpErrors.length);
+    const [tier, text] = ratePrediction(avgMs);
+    tpResultTier.textContent = tier;
+    tpResultText.textContent = text;
+    tpResult.style.display = 'block';
+    return;
+  }
+  tpRound++;
+  tpDuration = 1400 + Math.random()*1200;
+  tpOccludeFrac = 0.4 + Math.random()*0.25;
+  tpRoundStartPerf = performance.now();
+  tpRoundActive = true;
+  tpClickedThisRound = false;
+  tpRespondBtn.disabled = false;
+
+  const boxRect = tpBox.getBoundingClientRect();
+  tpGoal.style.left = (boxRect.width*TP_GOAL_X_FRAC) + 'px';
+  tpGoal.style.display = 'block';
+  tpBall.style.top = (boxRect.height/2) + 'px';
+  tpBall.style.background = 'var(--orange)';
+  tpBall.style.display = 'block';
+
+  tpRafId = requestAnimationFrame(tpLoop);
+  tpMissTimer = setTimeout(() => {
+    if(tpRoundActive && !tpClickedThisRound){
+      resolveTpRound(TP_MAX_WAIT_MS);
+    }
+  }, tpDuration + TP_MAX_WAIT_MS);
+}
+
+function tpLoop(){
+  if(!tpRoundActive) return;
+  const boxRect = tpBox.getBoundingClientRect();
+  const startX = boxRect.width*TP_START_X_FRAC;
+  const goalX = boxRect.width*TP_GOAL_X_FRAC;
+  const elapsed = performance.now() - tpRoundStartPerf;
+  const frac = Math.min(1, elapsed/tpDuration);
+  const x = startX + (goalX-startX)*frac;
+  tpBall.style.left = x + 'px';
+  tpBall.style.opacity = (frac < tpOccludeFrac) ? '1' : '0';
+
+  if(elapsed < tpDuration + TP_MAX_WAIT_MS){
+    tpRafId = requestAnimationFrame(tpLoop);
+  }
+}
+
+function resolveTpRound(errorMs){
+  tpRoundActive = false;
+  clearTimeout(tpMissTimer);
+  tpRespondBtn.disabled = true;
+  const absErr = Math.round(Math.abs(errorMs));
+  tpErrors.push(absErr);
+  const hit = absErr <= TP_TOLERANCE_MS;
+  if(hit) tpHits++;
+  updateTpStats();
+
+  const boxRect = tpBox.getBoundingClientRect();
+  const goalX = boxRect.width*TP_GOAL_X_FRAC;
+  tpBall.style.left = goalX + 'px';
+  tpBall.style.opacity = '1';
+  tpBall.style.background = hit ? 'var(--green)' : '#C0392B';
+
+  setTimeout(() => {
+    tpBall.style.display = 'none';
+    tpGoal.style.display = 'none';
+    setTimeout(nextTpRound, 250);
+  }, 500);
+}
+
+tpRespondBtn.addEventListener('click', () => {
+  if(!tpRoundActive || tpClickedThisRound) return;
+  tpClickedThisRound = true;
+  const now = performance.now();
+  const error = now - (tpRoundStartPerf + tpDuration);
+  resolveTpRound(error);
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>
