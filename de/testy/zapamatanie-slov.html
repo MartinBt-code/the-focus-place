@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Wortgedächtnis — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/zapamatanie-slov.html">SK</a><span>/</span>
+        <a href="/en/testy/zapamatanie-slov.html">EN</a><span>/</span>
+        <a href="/de/testy/zapamatanie-slov.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/zapamatanie-slov.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Wortgedächtnis</span></div>
+      <div id="wrBox" class="rt-box" style="flex-direction:column; gap:14px; height:auto; min-height:280px; padding:24px;">
+        <div class="rt-msg" id="wrMsg" style="font-size:36px;">—</div>
+        <div id="wrRecallArea" style="display:none; width:100%;">
+          <div style="display:flex; gap:8px;">
+            <input id="wrInput" type="text" placeholder="Wort eingeben und Enter drücken" autocomplete="off" style="flex:1; background:#1A2029; border:2px solid var(--navy-line); border-radius:4px; padding:12px 14px; color:var(--off-white); font-family:'Inter'; font-size:15px;">
+            <button class="btn btn-ghost" id="wrAddBtn" style="padding:12px 18px;">Hinzufügen</button>
+          </div>
+          <div id="wrChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;"></div>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="wrScore">0</div><div class="lbl">Punkte</div></div>
+        <div><div class="num" id="wrAcc">—</div><div class="lbl">Genauigkeit</div></div>
+        <div><div class="num" id="wrExtra">0</div><div class="lbl">Falsch</div></div>
+      </div>
+      <div class="result-banner" id="wrResult" style="display:none;">
+        <div class="result-tier" id="wrResultTier"></div>
+        <p id="wrResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Präge dir eine Liste von <strong style="color:var(--orange);">12 Wörtern</strong> ein und tippe anschließend so viele wie möglich. Die Reihenfolge spielt keine Rolle.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" id="wrMainBtn" onclick="startWordRecall()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Freies Erinnern (ohne Hinweis) ist schwerer als Wiedererkennen — du musst die Information selbst aus dem Gedächtnis holen, statt nur zu bestätigen, dass du sie kennst. Genau das passiert, wenn ein Athlet sich an eine Reihe von Anweisungen des Trainers erinnern muss, ohne dass ihn jemand daran erinnert.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Kapazität des deklarativen Gedächtnisses für frei erinnerte Informationen — wie viele Wörter aus einer Liste du ohne Hinweis abrufen kannst.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Jedem, der sich eine Liste von Anweisungen, Namen oder Notizen ohne schriftliche Hilfe merken muss, und Athleten beim Erlernen von Anweisungen.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">≥ 10 / 12</span><span class="bm-label">Außergewöhnliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">7–9 / 12</span><span class="bm-label">Ausgezeichnetes Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">4–6 / 12</span><span class="bm-label">Durchschnittliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 4 / 12</span><span class="bm-label">Unterdurchschnittliches Gedächtnis</span></div>
+        <p class="bm-note">Der Test basiert auf dem klassischen Paradigma des freien Erinnerns (free recall), das in der Gedächtnisforschung seit Murdocks Arbeiten (1962) verbreitet ist. Bei einer Liste von 10–15 Wörtern erinnert sich ein gesunder Erwachsener typischerweise an 5–9 Elemente — Wörter am Anfang und Ende der Liste werden am besten behalten (Primacy- und Recency-Effekt).</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const wrBox = document.getElementById('wrBox');
+const wrMsg = document.getElementById('wrMsg');
+const wrRecallArea = document.getElementById('wrRecallArea');
+const wrInput = document.getElementById('wrInput');
+const wrAddBtn = document.getElementById('wrAddBtn');
+const wrChips = document.getElementById('wrChips');
+const wrScoreEl = document.getElementById('wrScore');
+const wrAccEl = document.getElementById('wrAcc');
+const wrExtraEl = document.getElementById('wrExtra');
+const wrResult = document.getElementById('wrResult');
+const wrResultTier = document.getElementById('wrResultTier');
+const wrResultText = document.getElementById('wrResultText');
+const wrMainBtn = document.getElementById('wrMainBtn');
+
+function rateWordRecall(score, total){
+  if(score >= 10) return ['Außergewöhnliches Gedächtnis', 'Du hast fast die gesamte Liste erinnert — du gehörst zu den Besten.'];
+  if(score >= 7) return ['Ausgezeichnetes Gedächtnis', 'Überdurchschnittliches Ergebnis — der typische Durchschnitt liegt bei 5–9 von 12 Wörtern.'];
+  if(score >= 4) return ['Durchschnittliches Gedächtnis', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  return ['Unterdurchschnittliches Gedächtnis', 'Versuch es nochmal — freies Erinnern verbessert sich durch regelmäßiges Training.'];
+}
+
+const WR_WORDS = ['BAUM','BALL','FENSTER','FLUSS','STUHL','MOND','BLUME','STRASSE','UHR','FEUER','SCHLÜSSEL','WOLKE'];
+const WR_STUDY_MS = 1000;
+const WR_GAP_MS = 300;
+
+let wrTargetsNorm = [];
+let wrFoundNorm = new Set();
+let wrSubmittedNorm = new Set();
+let wrHits = 0, wrIntrusions = 0;
+let wrPhase = 'idle'; // idle | study | recall | done
+
+function normalize(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function updateWrStats(){
+  wrScoreEl.textContent = wrHits;
+  wrAccEl.textContent = Math.round((wrHits/WR_WORDS.length)*100)+'%';
+  wrExtraEl.textContent = wrIntrusions;
+}
+
+function startWordRecall(){
+  wrTargetsNorm = WR_WORDS.map(normalize);
+  wrFoundNorm = new Set();
+  wrSubmittedNorm = new Set();
+  wrHits = 0; wrIntrusions = 0;
+  updateWrStats();
+  wrResult.style.display = 'none';
+  wrChips.innerHTML = '';
+  wrRecallArea.style.display = 'none';
+  wrPhase = 'study';
+  wrMainBtn.style.display = 'none';
+
+  wrMsg.style.fontSize = '18px';
+  wrMsg.textContent = 'Bereit machen...';
+  wrMsg.style.opacity = '1';
+
+  setTimeout(() => {
+    let i = 0;
+    function showNext(){
+      if(i >= WR_WORDS.length){
+        wrMsg.style.opacity = '0';
+        setTimeout(beginRecall, 400);
+        return;
+      }
+      wrMsg.style.fontSize = '36px';
+      wrMsg.textContent = WR_WORDS[i];
+      wrMsg.style.opacity = '1';
+      i++;
+      setTimeout(() => {
+        wrMsg.style.opacity = '0';
+        setTimeout(showNext, WR_GAP_MS);
+      }, WR_STUDY_MS);
+    }
+    showNext();
+  }, 900);
+}
+
+function beginRecall(){
+  wrPhase = 'recall';
+  wrMsg.style.fontSize = '16px';
+  wrMsg.textContent = 'Tippe so viele Wörter, wie du gesehen hast:';
+  wrMsg.style.opacity = '1';
+  wrRecallArea.style.display = 'block';
+  wrMainBtn.style.display = 'block';
+  wrMainBtn.textContent = 'Auswerten';
+  wrMainBtn.onclick = finishRecall;
+  wrInput.value = '';
+  wrInput.focus();
+}
+
+function addWord(){
+  const raw = wrInput.value.trim();
+  wrInput.value = '';
+  wrInput.focus();
+  if(!raw) return;
+  const norm = normalize(raw);
+  if(wrSubmittedNorm.has(norm)) return;
+  wrSubmittedNorm.add(norm);
+
+  const chip = document.createElement('span');
+  chip.style.cssText = 'font-family:\'Space Mono\'; font-size:13px; padding:6px 12px; border-radius:20px; display:inline-block;';
+  chip.textContent = raw;
+
+  if(wrTargetsNorm.includes(norm) && !wrFoundNorm.has(norm)){
+    wrFoundNorm.add(norm);
+    wrHits++;
+    chip.style.background = 'var(--green)';
+    chip.style.color = 'var(--navy)';
+  } else {
+    wrIntrusions++;
+    chip.style.background = '#C0392B';
+    chip.style.color = 'var(--off-white)';
+  }
+  wrChips.appendChild(chip);
+  updateWrStats();
+}
+
+wrAddBtn.addEventListener('click', addWord);
+wrInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' || e.keyCode === 13){ e.preventDefault(); addWord(); }
+});
+
+function finishRecall(){
+  wrPhase = 'done';
+  wrRecallArea.style.display = 'none';
+  wrMsg.style.fontSize = '20px';
+  wrMsg.textContent = 'Fertig!';
+  wrMainBtn.textContent = 'Nochmal starten';
+  wrMainBtn.onclick = startWordRecall;
+
+  const [tier, text] = rateWordRecall(wrHits, WR_WORDS.length);
+  wrResultTier.textContent = tier;
+  wrResultText.textContent = text;
+  wrResult.style.display = 'block';
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
