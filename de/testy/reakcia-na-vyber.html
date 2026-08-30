@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Auswahlreaktion — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/reakcia-na-vyber.html">SK</a><span>/</span>
+        <a href="/en/testy/reakcia-na-vyber.html">EN</a><span>/</span>
+        <a href="/de/testy/reakcia-na-vyber.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/reakcia-na-vyber.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Auswahlreaktion</span></div>
+      <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
+        <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
+        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;">
+          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Rot"></button>
+          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Blau"></button>
+          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Grün"></button>
+          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Gelb"></button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="crScore">0</div><div class="lbl">Punkte</div></div>
+        <div><div class="num" id="crAcc">—</div><div class="lbl">Genauigkeit</div></div>
+        <div><div class="num" id="crAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
+      </div>
+      <div class="result-banner" id="crResult" style="display:none;">
+        <div class="result-tier" id="crResultTier"></div>
+        <p id="crResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klicke auf die Schaltfläche mit der <strong style="color:var(--orange);">gleichen Farbe</strong>, die in der Mitte angezeigt wird.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startChoiceRT()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Eine einfache Reaktion (klicken, wenn sich etwas ändert) misst nur die Wahrnehmungsgeschwindigkeit. Im echten Sport musst du aber fast immer die richtige Reaktion aus mehreren Möglichkeiten auswählen — und diese Entscheidung dauert länger. Dieser Test isoliert die Zeit, die du für die richtige Wahl brauchst.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Entscheidungsgeschwindigkeit zwischen mehreren möglichen Reaktionen — anders als bei einfacher Reaktion musst du den Reiz zuerst identifizieren und die richtige Antwort wählen.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Athleten in Situationen mit mehreren möglichen Reaktionen (in welche Richtung ausweichen), und jedem, der die Entscheidungsgeschwindigkeit trainieren möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 400 ms</span><span class="bm-label">Spitzen-Entscheidungsgeschwindigkeit</span></div>
+        <div class="bm-row"><span class="bm-range">400–499 ms</span><span class="bm-label">Ausgezeichnete Entscheidungsgeschwindigkeit</span></div>
+        <div class="bm-row"><span class="bm-range">500–599 ms</span><span class="bm-label">Durchschnittliche Entscheidungsgeschwindigkeit</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 600 ms</span><span class="bm-label">Langsamere Entscheidungsgeschwindigkeit</span></div>
+        <p class="bm-note">Der Zusammenhang zwischen der Anzahl der Optionen und der Reaktionszeit wird durch das Hicksche Gesetz beschrieben (Hick, 1952) — die Entscheidungszeit wächst mit dem Logarithmus der Anzahl der Wahlmöglichkeiten. Eine Auswahlreaktion ist daher immer langsamer als eine einfache Reaktion auf einen einzelnen Reiz, obwohl sie eine verwandte Fähigkeit misst.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const crStim = document.getElementById('crStim');
+const crScoreEl = document.getElementById('crScore');
+const crAccEl = document.getElementById('crAcc');
+const crAvgEl = document.getElementById('crAvg');
+const crResult = document.getElementById('crResult');
+const crResultTier = document.getElementById('crResultTier');
+const crResultText = document.getElementById('crResultText');
+const crSwatches = Array.from(document.querySelectorAll('#crOptions .stroop-swatch'));
+
+function rateChoiceRT(avgMs){
+  if(avgMs < 400) return ['Spitzen-Entscheidungsgeschwindigkeit', 'Du wählst zwischen mehreren Optionen fast so schnell, wie andere auf einen einzelnen Reiz reagieren.'];
+  if(avgMs < 500) return ['Ausgezeichnete Entscheidungsgeschwindigkeit', 'Überdurchschnittliche Geschwindigkeit bei der Wahl der richtigen Reaktion.'];
+  if(avgMs < 600) return ['Durchschnittliche Entscheidungsgeschwindigkeit', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  return ['Langsamere Entscheidungsgeschwindigkeit', 'Raum für Verbesserung — Entscheidungsgeschwindigkeit lässt sich trainieren.'];
+}
+
+const CR_COLORS = [
+  {key:'red', hex:'#E74C3C'},
+  {key:'blue', hex:'#3B82F6'},
+  {key:'green', hex:'#2ECC71'},
+  {key:'yellow', hex:'#F1C40F'}
+];
+const CR_ROUNDS = 20;
+let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
+let crTimer, crShownAt, crCurrent = null, crWaitingResponse = false, crRunning = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startChoiceRT(){
+  crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
+  updateCrStats();
+  crResult.style.display = 'none';
+  crRunning = true;
+  nextCrRound();
+}
+
+function updateCrStats(){
+  crScoreEl.textContent = crScore;
+  const total = crHits + crMisses;
+  crAccEl.textContent = total ? Math.round((crHits/total)*100)+'%' : '—';
+  crAvgEl.textContent = crRts.length ? Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length) : '—';
+}
+
+function nextCrRound(){
+  if(crRound >= CR_ROUNDS){
+    crRunning = false;
+    const total = crHits + crMisses;
+    if(crRts.length > 0){
+      const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
+      const [tier, text] = rateChoiceRT(avgMs);
+      crResultTier.textContent = tier;
+      crResultText.textContent = text;
+      crResult.style.display = 'block';
+    }
+    return;
+  }
+  crRound++;
+  crWaitingResponse = false;
+  crStim.style.opacity = '0';
+  const delay = 500 + Math.random()*700;
+  crTimer = setTimeout(showCrStim, delay);
+}
+
+function showCrStim(){
+  const color = CR_COLORS[Math.floor(Math.random()*CR_COLORS.length)];
+  crCurrent = color;
+  crStim.style.background = color.hex;
+  crStim.style.opacity = '1';
+  crShownAt = performance.now();
+  crWaitingResponse = true;
+  crTimer = setTimeout(() => {
+    if(crWaitingResponse){
+      crWaitingResponse = false;
+      crMisses++;
+      updateCrStats();
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 300);
+    }
+  }, 2500);
+}
+
+crSwatches.forEach(sw => {
+  sw.addEventListener('click', () => {
+    if(!crRunning || !crWaitingResponse || !crCurrent) return;
+    clearTimeout(crTimer);
+    crWaitingResponse = false;
+    const rt = Math.round(performance.now() - crShownAt);
+    const correct = sw.dataset.key === crCurrent.key;
+    if(correct){
+      crHits++; crScore++; crRts.push(rt);
+      sw.classList.add('correct');
+      bump(crScoreEl, true);
+    } else {
+      crMisses++;
+      sw.classList.add('wrong');
+      bump(crScoreEl, false);
+    }
+    updateCrStats();
+    setTimeout(() => {
+      sw.classList.remove('correct','wrong');
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

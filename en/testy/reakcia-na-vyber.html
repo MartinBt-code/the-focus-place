@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Choice Reaction — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/reakcia-na-vyber.html">SK</a><span>/</span>
+        <a href="/en/testy/reakcia-na-vyber.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/reakcia-na-vyber.html">DE</a><span>/</span>
+        <a href="/hu/testy/reakcia-na-vyber.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Choice Reaction</span></div>
+      <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
+        <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
+        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;">
+          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Red"></button>
+          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Blue"></button>
+          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Green"></button>
+          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Yellow"></button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="crScore">0</div><div class="lbl">Score</div></div>
+        <div><div class="num" id="crAcc">—</div><div class="lbl">Accuracy</div></div>
+        <div><div class="num" id="crAvg">—</div><div class="lbl">Average (ms)</div></div>
+      </div>
+      <div class="result-banner" id="crResult" style="display:none;">
+        <div class="result-tier" id="crResultTier"></div>
+        <p id="crResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the button with the <strong style="color:var(--orange);">same color</strong> as the one shown in the center.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startChoiceRT()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">A simple reaction (click when something changes) only measures perceptual speed. In real sport you almost always have to choose the correct response from several options — and that decision takes longer. This test isolates the time you need to make the right choice.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>The speed of deciding between several possible responses — unlike simple reaction, you first have to identify the cue and pick the correct answer.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes in situations with multiple possible responses (which way to dodge), and anyone wanting to train decision speed.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 400 ms</span><span class="bm-label">Elite decision speed</span></div>
+        <div class="bm-row"><span class="bm-range">400–499 ms</span><span class="bm-label">Excellent decision speed</span></div>
+        <div class="bm-row"><span class="bm-range">500–599 ms</span><span class="bm-label">Average decision speed</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 600 ms</span><span class="bm-label">Slower decision speed</span></div>
+        <p class="bm-note">The relationship between the number of options and reaction time is described by Hick's law (Hick, 1952) — decision time grows with the logarithm of the number of choices. Choice reaction is therefore always slower than a simple reaction to a single cue, even though it measures a related skill.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const crStim = document.getElementById('crStim');
+const crScoreEl = document.getElementById('crScore');
+const crAccEl = document.getElementById('crAcc');
+const crAvgEl = document.getElementById('crAvg');
+const crResult = document.getElementById('crResult');
+const crResultTier = document.getElementById('crResultTier');
+const crResultText = document.getElementById('crResultText');
+const crSwatches = Array.from(document.querySelectorAll('#crOptions .stroop-swatch'));
+
+function rateChoiceRT(avgMs){
+  if(avgMs < 400) return ['Elite decision speed', 'You choose between multiple options almost as fast as others react to a single cue.'];
+  if(avgMs < 500) return ['Excellent decision speed', 'Above-average speed at picking the correct response.'];
+  if(avgMs < 600) return ['Average decision speed', 'Matches a typical adult result.'];
+  return ['Slower decision speed', 'Room to improve — decision speed can be trained.'];
+}
+
+const CR_COLORS = [
+  {key:'red', hex:'#E74C3C'},
+  {key:'blue', hex:'#3B82F6'},
+  {key:'green', hex:'#2ECC71'},
+  {key:'yellow', hex:'#F1C40F'}
+];
+const CR_ROUNDS = 20;
+let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
+let crTimer, crShownAt, crCurrent = null, crWaitingResponse = false, crRunning = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startChoiceRT(){
+  crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
+  updateCrStats();
+  crResult.style.display = 'none';
+  crRunning = true;
+  nextCrRound();
+}
+
+function updateCrStats(){
+  crScoreEl.textContent = crScore;
+  const total = crHits + crMisses;
+  crAccEl.textContent = total ? Math.round((crHits/total)*100)+'%' : '—';
+  crAvgEl.textContent = crRts.length ? Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length) : '—';
+}
+
+function nextCrRound(){
+  if(crRound >= CR_ROUNDS){
+    crRunning = false;
+    const total = crHits + crMisses;
+    if(crRts.length > 0){
+      const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
+      const [tier, text] = rateChoiceRT(avgMs);
+      crResultTier.textContent = tier;
+      crResultText.textContent = text;
+      crResult.style.display = 'block';
+    }
+    return;
+  }
+  crRound++;
+  crWaitingResponse = false;
+  crStim.style.opacity = '0';
+  const delay = 500 + Math.random()*700;
+  crTimer = setTimeout(showCrStim, delay);
+}
+
+function showCrStim(){
+  const color = CR_COLORS[Math.floor(Math.random()*CR_COLORS.length)];
+  crCurrent = color;
+  crStim.style.background = color.hex;
+  crStim.style.opacity = '1';
+  crShownAt = performance.now();
+  crWaitingResponse = true;
+  crTimer = setTimeout(() => {
+    if(crWaitingResponse){
+      crWaitingResponse = false;
+      crMisses++;
+      updateCrStats();
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 300);
+    }
+  }, 2500);
+}
+
+crSwatches.forEach(sw => {
+  sw.addEventListener('click', () => {
+    if(!crRunning || !crWaitingResponse || !crCurrent) return;
+    clearTimeout(crTimer);
+    crWaitingResponse = false;
+    const rt = Math.round(performance.now() - crShownAt);
+    const correct = sw.dataset.key === crCurrent.key;
+    if(correct){
+      crHits++; crScore++; crRts.push(rt);
+      sw.classList.add('correct');
+      bump(crScoreEl, true);
+    } else {
+      crMisses++;
+      sw.classList.add('wrong');
+      bump(crScoreEl, false);
+    }
+    updateCrStats();
+    setTimeout(() => {
+      sw.classList.remove('correct','wrong');
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

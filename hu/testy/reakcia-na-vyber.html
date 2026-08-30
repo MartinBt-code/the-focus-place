@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Választásos reakció — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/reakcia-na-vyber.html">SK</a><span>/</span>
+        <a href="/en/testy/reakcia-na-vyber.html">EN</a><span>/</span>
+        <a href="/de/testy/reakcia-na-vyber.html">DE</a><span>/</span>
+        <a href="/hu/testy/reakcia-na-vyber.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Választásos reakció</span></div>
+      <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
+        <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
+        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;">
+          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Piros"></button>
+          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Kék"></button>
+          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Zöld"></button>
+          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Sárga"></button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="crScore">0</div><div class="lbl">Pontszám</div></div>
+        <div><div class="num" id="crAcc">—</div><div class="lbl">Pontosság</div></div>
+        <div><div class="num" id="crAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      </div>
+      <div class="result-banner" id="crResult" style="display:none;">
+        <div class="result-tier" id="crResultTier"></div>
+        <p id="crResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Kattints arra a gombra, amelynek <strong style="color:var(--orange);">ugyanaz a színe</strong>, mint amit középen látsz.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startChoiceRT()">Indítás</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">Az egyszerű reakció (kattints, ha valami megváltozik) csak az érzékelési sebességet méri. A valódi sportban viszont szinte mindig a helyes választ kell kiválasztanod több lehetőség közül — és ez a döntés tovább tart. Ez a teszt pontosan a helyes választáshoz szükséges időt izolálja.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A több lehetséges válasz közötti döntés sebességét — az egyszerű reakcióval ellentétben itt először azonosítanod kell az ingert, majd ki kell választanod a helyes választ.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Sportolóknak olyan helyzetekben, ahol több lehetséges reakció van (melyik irányba kerüljön ki), és mindenkinek, aki szeretné edzeni a döntési sebességét.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Értékelési skála</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 400 ms</span><span class="bm-label">Elit döntési sebesség</span></div>
+        <div class="bm-row"><span class="bm-range">400–499 ms</span><span class="bm-label">Kiváló döntési sebesség</span></div>
+        <div class="bm-row"><span class="bm-range">500–599 ms</span><span class="bm-label">Átlagos döntési sebesség</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 600 ms</span><span class="bm-label">Lassabb döntési sebesség</span></div>
+        <p class="bm-note">Az opciók száma és a reakcióidő közötti kapcsolatot a Hick-törvény írja le (Hick, 1952) — a döntési idő a választási lehetőségek számának logaritmusával nő. A választásos reakció ezért mindig lassabb, mint egy egyszerű reakció egyetlen ingerre, bár rokon képességet mér.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const crStim = document.getElementById('crStim');
+const crScoreEl = document.getElementById('crScore');
+const crAccEl = document.getElementById('crAcc');
+const crAvgEl = document.getElementById('crAvg');
+const crResult = document.getElementById('crResult');
+const crResultTier = document.getElementById('crResultTier');
+const crResultText = document.getElementById('crResultText');
+const crSwatches = Array.from(document.querySelectorAll('#crOptions .stroop-swatch'));
+
+function rateChoiceRT(avgMs){
+  if(avgMs < 400) return ['Elit döntési sebesség', 'Szinte olyan gyorsan választasz több lehetőség közül, mint mások egyetlen ingerre reagálnak.'];
+  if(avgMs < 500) return ['Kiváló döntési sebesség', 'Átlag feletti sebesség a helyes válasz kiválasztásában.'];
+  if(avgMs < 600) return ['Átlagos döntési sebesség', 'Megfelel egy tipikus felnőtt eredménynek.'];
+  return ['Lassabb döntési sebesség', 'Van hova fejlődni — a döntési sebesség edzhető.'];
+}
+
+const CR_COLORS = [
+  {key:'red', hex:'#E74C3C'},
+  {key:'blue', hex:'#3B82F6'},
+  {key:'green', hex:'#2ECC71'},
+  {key:'yellow', hex:'#F1C40F'}
+];
+const CR_ROUNDS = 20;
+let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
+let crTimer, crShownAt, crCurrent = null, crWaitingResponse = false, crRunning = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startChoiceRT(){
+  crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
+  updateCrStats();
+  crResult.style.display = 'none';
+  crRunning = true;
+  nextCrRound();
+}
+
+function updateCrStats(){
+  crScoreEl.textContent = crScore;
+  const total = crHits + crMisses;
+  crAccEl.textContent = total ? Math.round((crHits/total)*100)+'%' : '—';
+  crAvgEl.textContent = crRts.length ? Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length) : '—';
+}
+
+function nextCrRound(){
+  if(crRound >= CR_ROUNDS){
+    crRunning = false;
+    const total = crHits + crMisses;
+    if(crRts.length > 0){
+      const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
+      const [tier, text] = rateChoiceRT(avgMs);
+      crResultTier.textContent = tier;
+      crResultText.textContent = text;
+      crResult.style.display = 'block';
+    }
+    return;
+  }
+  crRound++;
+  crWaitingResponse = false;
+  crStim.style.opacity = '0';
+  const delay = 500 + Math.random()*700;
+  crTimer = setTimeout(showCrStim, delay);
+}
+
+function showCrStim(){
+  const color = CR_COLORS[Math.floor(Math.random()*CR_COLORS.length)];
+  crCurrent = color;
+  crStim.style.background = color.hex;
+  crStim.style.opacity = '1';
+  crShownAt = performance.now();
+  crWaitingResponse = true;
+  crTimer = setTimeout(() => {
+    if(crWaitingResponse){
+      crWaitingResponse = false;
+      crMisses++;
+      updateCrStats();
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 300);
+    }
+  }, 2500);
+}
+
+crSwatches.forEach(sw => {
+  sw.addEventListener('click', () => {
+    if(!crRunning || !crWaitingResponse || !crCurrent) return;
+    clearTimeout(crTimer);
+    crWaitingResponse = false;
+    const rt = Math.round(performance.now() - crShownAt);
+    const correct = sw.dataset.key === crCurrent.key;
+    if(correct){
+      crHits++; crScore++; crRts.push(rt);
+      sw.classList.add('correct');
+      bump(crScoreEl, true);
+    } else {
+      crMisses++;
+      sw.classList.add('wrong');
+      bump(crScoreEl, false);
+    }
+    updateCrStats();
+    setTimeout(() => {
+      sw.classList.remove('correct','wrong');
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
