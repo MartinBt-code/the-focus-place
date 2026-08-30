@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Folgebewegung — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/plynule-sledovanie.html">SK</a><span>/</span>
+        <a href="/en/testy/plynule-sledovanie.html">EN</a><span>/</span>
+        <a href="/de/testy/plynule-sledovanie.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/plynule-sledovanie.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Folgebewegung</span></div>
+    <div id="spBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px; overflow:hidden;">
+      <div id="spMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klicke Start</div>
+      <div id="spTarget" style="position:absolute; width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:50%; background:var(--orange); display:none; transition:background .08s;"></div>
+    </div>
+    <button class="btn btn-primary" id="spRespondBtn" style="margin-top:16px; width:100%;" disabled>Klicke, wenn das Ziel blinkt</button>
+    <div class="rt-stats">
+      <div><div class="num" id="spScore">0</div><div class="lbl">Punkte</div></div>
+      <div><div class="num" id="spAcc">—</div><div class="lbl">Genauigkeit</div></div>
+      <div><div class="num" id="spAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
+    </div>
+    <div class="result-banner" id="spResult" style="display:none;">
+      <div class="result-tier" id="spResultTier"></div>
+      <p id="spResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Verfolge das bewegte Ziel mit den Augen. Wenn es kurz <strong style="color:var(--orange);">grün aufblitzt</strong>, klicke so schnell wie möglich auf die Schaltfläche.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startSmooth()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Ein sich gleichmäßig bewegendes Objekt mit den Augen zu verfolgen und dabei subtile Veränderungen zu bemerken — genau das macht ein Verteidiger, der den Ball beobachtet, oder ein Torwart, der auf eine Änderung des Schussdralls wartet. Dieser Test misst, wie lange du die Aufmerksamkeit auf einem bewegten Ziel halten kannst, ohne den Fokus zu verlieren.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Fähigkeit, die visuelle Aufmerksamkeit über längere Zeit auf einem gleichmäßig bewegten Ziel zu halten und eine subtile Veränderung zu erfassen, bevor sie verschwindet.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Athleten, die ein bewegtes Objekt über längere Zeit verfolgen und dabei Veränderungen bemerken müssen (z. B. einen Richtungswechsel), und jedem, der visuelle Ausdauer trainieren möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90 %</span><span class="bm-label">Außergewöhnliches Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">75–89 %</span><span class="bm-label">Ausgezeichnetes Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">55–74 %</span><span class="bm-label">Durchschnittliches Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 55 %</span><span class="bm-label">Unterdurchschnittliches Tracking</span></div>
+        <p class="bm-note">Die Folgebewegung (Smooth Pursuit) ist eine der grundlegenden Augenbewegungsarten. Die Aufmerksamkeit während einer längeren, ununterbrochenen Verfolgungsaufgabe zu halten und dabei eine eingebettete Veränderung zu erfassen, ist schwerer, als es klingt — die Aufmerksamkeit neigt dazu "abzuschalten", wenn eine Aufgabe monoton wirkt.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const spBox = document.getElementById('spBox');
+const spTarget = document.getElementById('spTarget');
+const spMsg = document.getElementById('spMsg');
+const spRespondBtn = document.getElementById('spRespondBtn');
+const spScoreEl = document.getElementById('spScore');
+const spAccEl = document.getElementById('spAcc');
+const spAvgEl = document.getElementById('spAvg');
+const spResult = document.getElementById('spResult');
+const spResultTier = document.getElementById('spResultTier');
+const spResultText = document.getElementById('spResultText');
+
+function rateSmooth(acc){
+  if(acc >= 90) return ['Außergewöhnliches Tracking', 'Du hast fast jedes Aufblitzen erfasst — du gehörst zu den Besten.'];
+  if(acc >= 75) return ['Ausgezeichnetes Tracking', 'Überdurchschnittliche Fähigkeit, die Aufmerksamkeit auf einem bewegten Ziel zu halten.'];
+  if(acc >= 55) return ['Durchschnittliches Tracking', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  return ['Unterdurchschnittliches Tracking', 'Die Aufmerksamkeit schwankt bei längerem Tracking — das lässt sich trainieren.'];
+}
+
+const SP_FLASH_COUNT = 10;
+const SP_RESPONSE_WINDOW_MS = 1000;
+const SP_MIN_GAP_MS = 1600;
+const SP_MAX_GAP_MS = 3200;
+const SP_FLASH_DURATION_MS = 350;
+
+let spRunning = false;
+let spStartTime = null;
+let spFlashActive = false, spFlashShownAt = 0;
+let spHits = 0, spMisses = 0, spFalseAlarms = 0, spRts = [];
+let spFlashesScheduled = 0;
+let spCanClick = true;
+let spRafId = null;
+let spFlashTimer = null;
+
+function updateSpStats(){
+  spScoreEl.textContent = spHits;
+  spAccEl.textContent = SP_FLASH_COUNT ? Math.round((spHits/SP_FLASH_COUNT)*100)+'%' : '—';
+  spAvgEl.textContent = spRts.length ? Math.round(spRts.reduce((a,b)=>a+b,0)/spRts.length) : '—';
+}
+
+function startSmooth(){
+  spRunning = true;
+  spStartTime = null;
+  spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
+  spFlashesScheduled = 0;
+  spFlashActive = false;
+  updateSpStats();
+  spResult.style.display = 'none';
+  spMsg.style.display = 'none';
+  spTarget.style.display = 'block';
+  spTarget.style.background = 'var(--orange)';
+  spRespondBtn.disabled = false;
+
+  scheduleNextFlash();
+  spRafId = requestAnimationFrame(spLoop);
+}
+
+function scheduleNextFlash(){
+  if(spFlashesScheduled >= SP_FLASH_COUNT) return;
+  spFlashesScheduled++;
+  const gap = SP_MIN_GAP_MS + Math.random()*(SP_MAX_GAP_MS - SP_MIN_GAP_MS);
+  spFlashTimer = setTimeout(triggerFlash, gap);
+}
+
+function triggerFlash(){
+  if(!spRunning) return;
+  spFlashActive = true;
+  spFlashShownAt = performance.now();
+  spTarget.style.background = 'var(--green)';
+  setTimeout(() => {
+    if(spFlashActive){
+      spFlashActive = false;
+      spMisses++;
+      updateSpStats();
+      spTarget.style.background = 'var(--orange)';
+    }
+    if(spFlashesScheduled >= SP_FLASH_COUNT){
+      finishSmooth();
+    } else {
+      scheduleNextFlash();
+    }
+  }, SP_RESPONSE_WINDOW_MS);
+}
+
+function spLoop(timestamp){
+  if(!spRunning) return;
+  if(spStartTime === null) spStartTime = timestamp;
+  const elapsed = (timestamp - spStartTime) / 1000;
+
+  const boxRect = spBox.getBoundingClientRect();
+  const margin = 30;
+  const rx = Math.max(10, boxRect.width/2 - margin);
+  const ry = Math.max(10, boxRect.height/2 - margin);
+  const cx = boxRect.width/2;
+  const cy = boxRect.height/2;
+  const tx = cx + rx*Math.sin(elapsed*0.7);
+  const ty = cy + ry*Math.sin(elapsed*0.5 + 1.1);
+  spTarget.style.left = tx + 'px';
+  spTarget.style.top = ty + 'px';
+
+  spRafId = requestAnimationFrame(spLoop);
+}
+
+function finishSmooth(){
+  spRunning = false;
+  if(spRafId) cancelAnimationFrame(spRafId);
+  clearTimeout(spFlashTimer);
+  spTarget.style.display = 'none';
+  spRespondBtn.disabled = true;
+  spMsg.style.display = 'flex';
+  spMsg.textContent = 'Fertig!';
+
+  const acc = Math.round((spHits/SP_FLASH_COUNT)*100);
+  const [tier, text] = rateSmooth(acc);
+  spResultTier.textContent = tier;
+  spResultText.textContent = text;
+  spResult.style.display = 'block';
+}
+
+spRespondBtn.addEventListener('click', () => {
+  if(!spRunning || !spCanClick) return;
+  spCanClick = false;
+  setTimeout(() => { spCanClick = true; }, 350);
+
+  if(spFlashActive){
+    spFlashActive = false;
+    const rt = Math.round(performance.now() - spFlashShownAt);
+    spHits++; spRts.push(rt);
+    spTarget.style.background = 'var(--orange)';
+    updateSpStats();
+  } else {
+    spFalseAlarms++;
+  }
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

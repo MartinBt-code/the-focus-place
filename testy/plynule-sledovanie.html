@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Plynulé sledovanie — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/plynule-sledovanie.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/plynule-sledovanie.html">EN</a><span>/</span>
+        <a href="/de/testy/plynule-sledovanie.html">DE</a><span>/</span>
+        <a href="/hu/testy/plynule-sledovanie.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Plynulé sledovanie</span></div>
+    <div id="spBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px; overflow:hidden;">
+      <div id="spMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni na Spustiť</div>
+      <div id="spTarget" style="position:absolute; width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:50%; background:var(--orange); display:none; transition:background .08s;"></div>
+    </div>
+    <button class="btn btn-primary" id="spRespondBtn" style="margin-top:16px; width:100%;" disabled>Klikni, keď cieľ zabliká</button>
+    <div class="rt-stats">
+      <div><div class="num" id="spScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="spAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="spAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+    </div>
+    <div class="result-banner" id="spResult" style="display:none;">
+      <div class="result-tier" id="spResultTier"></div>
+      <p id="spResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Sleduj pohybujúci sa terč očami. Keď na chvíľu <strong style="color:var(--orange);">zabliká na zeleno</strong>, klikni na tlačidlo čo najrýchlejšie.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startSmooth()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Sledovať plynulo sa pohybujúci objekt očami a zároveň si všímať jemné zmeny — to je presne to, čo robí obranca sledujúci loptu, alebo brankár čakajúci na zmenu rotácie strely. Tento test meria, ako dlho dokážeš udržať pozornosť na pohybujúcom sa cieli bez straty koncentrácie.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Schopnosť udržať vizuálnu pozornosť na plynulo sa pohybujúcom cieli počas dlhšieho času a zachytiť jemnú zmenu skôr, než zmizne.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom, ktorí musia dlhodobo sledovať pohybujúci sa objekt a súčasne si všímať zmeny (napr. zmenu smeru), aj každému, kto chce trénovať vizuálnu vytrvalosť.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90 %</span><span class="bm-label">Výnimočné sledovanie</span></div>
+        <div class="bm-row"><span class="bm-range">75–89 %</span><span class="bm-label">Výborné sledovanie</span></div>
+        <div class="bm-row"><span class="bm-range">55–74 %</span><span class="bm-label">Priemerné sledovanie</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 55 %</span><span class="bm-label">Podpriemerné sledovanie</span></div>
+        <p class="bm-note">Plynulé sledovanie pohybu (smooth pursuit) je jeden zo základných typov očných pohybov. Udržať pozornosť na cieli počas dlhšieho, nepretržitého sledovania a zároveň zachytiť vloženú zmenu je náročnejšie, než sa zdá — pozornosť má tendenciu "vypnúť sa", keď je úloha zdanlivo monotónna.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const spBox = document.getElementById('spBox');
+const spTarget = document.getElementById('spTarget');
+const spMsg = document.getElementById('spMsg');
+const spRespondBtn = document.getElementById('spRespondBtn');
+const spScoreEl = document.getElementById('spScore');
+const spAccEl = document.getElementById('spAcc');
+const spAvgEl = document.getElementById('spAvg');
+const spResult = document.getElementById('spResult');
+const spResultTier = document.getElementById('spResultTier');
+const spResultText = document.getElementById('spResultText');
+
+function rateSmooth(acc){
+  if(acc >= 90) return ['Výnimočné sledovanie', 'Zachytil(a) si takmer každé zablikanie — patríš medzi najlepších.'];
+  if(acc >= 75) return ['Výborné sledovanie', 'Nadpriemerná schopnosť udržať pozornosť na pohybujúcom sa cieli.'];
+  if(acc >= 55) return ['Priemerné sledovanie', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerné sledovanie', 'Pozornosť pri dlhšom sledovaní kolíše — dá sa to trénovať.'];
+}
+
+const SP_FLASH_COUNT = 10;
+const SP_RESPONSE_WINDOW_MS = 1000;
+const SP_MIN_GAP_MS = 1600;
+const SP_MAX_GAP_MS = 3200;
+const SP_FLASH_DURATION_MS = 350;
+
+let spRunning = false;
+let spStartTime = null;
+let spFlashActive = false, spFlashShownAt = 0;
+let spHits = 0, spMisses = 0, spFalseAlarms = 0, spRts = [];
+let spFlashesScheduled = 0;
+let spCanClick = true;
+let spRafId = null;
+let spFlashTimer = null;
+
+function updateSpStats(){
+  spScoreEl.textContent = spHits;
+  spAccEl.textContent = SP_FLASH_COUNT ? Math.round((spHits/SP_FLASH_COUNT)*100)+'%' : '—';
+  spAvgEl.textContent = spRts.length ? Math.round(spRts.reduce((a,b)=>a+b,0)/spRts.length) : '—';
+}
+
+function startSmooth(){
+  spRunning = true;
+  spStartTime = null;
+  spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
+  spFlashesScheduled = 0;
+  spFlashActive = false;
+  updateSpStats();
+  spResult.style.display = 'none';
+  spMsg.style.display = 'none';
+  spTarget.style.display = 'block';
+  spTarget.style.background = 'var(--orange)';
+  spRespondBtn.disabled = false;
+
+  scheduleNextFlash();
+  spRafId = requestAnimationFrame(spLoop);
+}
+
+function scheduleNextFlash(){
+  if(spFlashesScheduled >= SP_FLASH_COUNT) return;
+  spFlashesScheduled++;
+  const gap = SP_MIN_GAP_MS + Math.random()*(SP_MAX_GAP_MS - SP_MIN_GAP_MS);
+  spFlashTimer = setTimeout(triggerFlash, gap);
+}
+
+function triggerFlash(){
+  if(!spRunning) return;
+  spFlashActive = true;
+  spFlashShownAt = performance.now();
+  spTarget.style.background = 'var(--green)';
+  setTimeout(() => {
+    if(spFlashActive){
+      spFlashActive = false;
+      spMisses++;
+      updateSpStats();
+      spTarget.style.background = 'var(--orange)';
+    }
+    if(spFlashesScheduled >= SP_FLASH_COUNT){
+      finishSmooth();
+    } else {
+      scheduleNextFlash();
+    }
+  }, SP_RESPONSE_WINDOW_MS);
+}
+
+function spLoop(timestamp){
+  if(!spRunning) return;
+  if(spStartTime === null) spStartTime = timestamp;
+  const elapsed = (timestamp - spStartTime) / 1000;
+
+  const boxRect = spBox.getBoundingClientRect();
+  const margin = 30;
+  const rx = Math.max(10, boxRect.width/2 - margin);
+  const ry = Math.max(10, boxRect.height/2 - margin);
+  const cx = boxRect.width/2;
+  const cy = boxRect.height/2;
+  const tx = cx + rx*Math.sin(elapsed*0.7);
+  const ty = cy + ry*Math.sin(elapsed*0.5 + 1.1);
+  spTarget.style.left = tx + 'px';
+  spTarget.style.top = ty + 'px';
+
+  spRafId = requestAnimationFrame(spLoop);
+}
+
+function finishSmooth(){
+  spRunning = false;
+  if(spRafId) cancelAnimationFrame(spRafId);
+  clearTimeout(spFlashTimer);
+  spTarget.style.display = 'none';
+  spRespondBtn.disabled = true;
+  spMsg.style.display = 'flex';
+  spMsg.textContent = 'Hotovo!';
+
+  const acc = Math.round((spHits/SP_FLASH_COUNT)*100);
+  const [tier, text] = rateSmooth(acc);
+  spResultTier.textContent = tier;
+  spResultText.textContent = text;
+  spResult.style.display = 'block';
+}
+
+spRespondBtn.addEventListener('click', () => {
+  if(!spRunning || !spCanClick) return;
+  spCanClick = false;
+  setTimeout(() => { spCanClick = true; }, 350);
+
+  if(spFlashActive){
+    spFlashActive = false;
+    const rt = Math.round(performance.now() - spFlashShownAt);
+    spHits++; spRts.push(rt);
+    spTarget.style.background = 'var(--orange)';
+    updateSpStats();
+  } else {
+    spFalseAlarms++;
+  }
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>
