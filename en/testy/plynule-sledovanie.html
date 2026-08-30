@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Smooth Pursuit</span></div>
+    <div class="diff-select">
+      <button class="diff-btn sp-diff" data-diff="easy" onclick="selectSpDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">slower, more time</span></button>
+      <button class="diff-btn sp-diff active" data-diff="medium" onclick="selectSpDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">normal pace</span></button>
+      <button class="diff-btn sp-diff" data-diff="hard" onclick="selectSpDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">faster, less time</span></button>
+    </div>
     <div id="spBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px; overflow:hidden;">
       <div id="spMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Click Start</div>
       <div id="spTarget" style="position:absolute; width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:50%; background:var(--orange); display:none; transition:background .08s;"></div>
@@ -93,12 +98,23 @@ function rateSmooth(acc){
 }
 
 const SP_FLASH_COUNT = 10;
-const SP_RESPONSE_WINDOW_MS = 1000;
 const SP_MIN_GAP_MS = 1600;
 const SP_MAX_GAP_MS = 3200;
 const SP_FLASH_DURATION_MS = 350;
+const SP_CONFIG = {
+  easy: {speedMult: 0.7, responseWindow: 1300},
+  medium: {speedMult: 1.0, responseWindow: 1000},
+  hard: {speedMult: 1.4, responseWindow: 700}
+};
+let spDiff = 'medium';
 
 let spRunning = false;
+
+function selectSpDiff(d){
+  if(spRunning) return;
+  spDiff = d;
+  document.querySelectorAll('.sp-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 let spStartTime = null;
 let spFlashActive = false, spFlashShownAt = 0;
 let spHits = 0, spMisses = 0, spFalseAlarms = 0, spRts = [];
@@ -125,6 +141,7 @@ function startSmooth(){
   spTarget.style.display = 'block';
   spTarget.style.background = 'var(--orange)';
   spRespondBtn.disabled = false;
+  document.querySelectorAll('.sp-diff').forEach(b => b.disabled = true);
 
   scheduleNextFlash();
   spRafId = requestAnimationFrame(spLoop);
@@ -154,7 +171,7 @@ function triggerFlash(){
     } else {
       scheduleNextFlash();
     }
-  }, SP_RESPONSE_WINDOW_MS);
+  }, SP_CONFIG[spDiff].responseWindow);
 }
 
 function spLoop(timestamp){
@@ -168,8 +185,9 @@ function spLoop(timestamp){
   const ry = Math.max(10, boxRect.height/2 - margin);
   const cx = boxRect.width/2;
   const cy = boxRect.height/2;
-  const tx = cx + rx*Math.sin(elapsed*0.7);
-  const ty = cy + ry*Math.sin(elapsed*0.5 + 1.1);
+  const speedMult = SP_CONFIG[spDiff].speedMult;
+  const tx = cx + rx*Math.sin(elapsed*0.7*speedMult);
+  const ty = cy + ry*Math.sin(elapsed*0.5*speedMult + 1.1);
   spTarget.style.left = tx + 'px';
   spTarget.style.top = ty + 'px';
 
@@ -178,6 +196,7 @@ function spLoop(timestamp){
 
 function finishSmooth(){
   spRunning = false;
+  document.querySelectorAll('.sp-diff').forEach(b => b.disabled = false);
   if(spRafId) cancelAnimationFrame(spRafId);
   clearTimeout(spFlashTimer);
   spTarget.style.display = 'none';
