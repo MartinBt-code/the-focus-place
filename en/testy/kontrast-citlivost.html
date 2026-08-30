@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Contrast Sensitivity</span></div>
+    <div class="diff-select">
+      <button class="diff-btn cs-diff" data-diff="easy" onclick="selectCsDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">slower drop-off</span></button>
+      <button class="diff-btn cs-diff active" data-diff="medium" onclick="selectCsDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">normal drop-off</span></button>
+      <button class="diff-btn cs-diff" data-diff="hard" onclick="selectCsDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">faster drop-off</span></button>
+    </div>
     <div id="csGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px;"></div>
     <div class="rt-stats">
       <div><div class="num" id="csLevel">0</div><div class="lbl">Level</div></div>
@@ -85,16 +90,27 @@ function rateContrast(level){
 
 const CS_GRID_SIZE = 9;
 const CS_BASE_L = 14;
-const CS_START_DELTA = 20;
-const CS_DECAY = 0.85;
 const CS_TIMEOUT_MS = 8000;
+const CS_CONFIG = {
+  easy: {startDelta: 26, decay: 0.90},
+  medium: {startDelta: 20, decay: 0.85},
+  hard: {startDelta: 15, decay: 0.80}
+};
+let csDiff = 'medium';
 
 let csTiles = [];
 let csLevel = 0;
 let csBest = 0;
 let csTargetIdx = -1;
 let csAccepting = false;
+let csRunning = false;
 let csTimer = null;
+
+function selectCsDiff(d){
+  if(csRunning) return;
+  csDiff = d;
+  document.querySelectorAll('.cs-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 for(let i=0;i<CS_GRID_SIZE;i++){
   const t = document.createElement('div');
@@ -109,11 +125,14 @@ function startContrast(){
   csLevel = 0;
   csLevelEl.textContent = csLevel;
   csResult.style.display = 'none';
+  csRunning = true;
+  document.querySelectorAll('.cs-diff').forEach(b => b.disabled = true);
   nextCsRound();
 }
 
 function deltaForLevel(level){
-  return Math.max(0.6, CS_START_DELTA * Math.pow(CS_DECAY, level-1));
+  const cfg = CS_CONFIG[csDiff];
+  return Math.max(0.6, cfg.startDelta * Math.pow(cfg.decay, level-1));
 }
 
 function nextCsRound(){
@@ -156,6 +175,8 @@ function onCsClick(idx){
 }
 
 function endContrastRun(){
+  csRunning = false;
+  document.querySelectorAll('.cs-diff').forEach(b => b.disabled = false);
   const reached = csLevel - 1;
   if(reached > csBest){ csBest = reached; csBestEl.textContent = csBest; }
   if(reached > 0){
