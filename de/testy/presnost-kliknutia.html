@@ -30,11 +30,16 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Präzisionsklick</span></div>
+    <div class="diff-select">
+      <button class="diff-btn pc-diff" data-diff="easy" onclick="selectPcDiff('easy')">Leicht<br><span style="font-size:10px; opacity:0.7;">größeres Ziel</span></button>
+      <button class="diff-btn pc-diff active" data-diff="medium" onclick="selectPcDiff('medium')">Mittel<br><span style="font-size:10px; opacity:0.7;">normales Ziel</span></button>
+      <button class="diff-btn pc-diff" data-diff="hard" onclick="selectPcDiff('hard')">Schwer<br><span style="font-size:10px; opacity:0.7;">kleineres Ziel</span></button>
+    </div>
     <div id="pcBox" class="rt-box" style="cursor:crosshair; position:relative; padding:0; height:420px;">
       <div id="pcMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klicke Start</div>
       <div id="pcTarget" style="position:absolute; width:90px; height:90px; border-radius:50%; border:2px solid var(--orange); display:none; pointer-events:none;">
-        <div style="position:absolute; top:50%; left:50%; width:50px; height:50px; margin:-25px 0 0 -25px; border-radius:50%; border:1px solid var(--orange); opacity:0.5;"></div>
-        <div style="position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--orange);"></div>
+        <div id="pcRing2" style="position:absolute; top:50%; left:50%; width:50px; height:50px; margin:-25px 0 0 -25px; border-radius:50%; border:1px solid var(--orange); opacity:0.5;"></div>
+        <div id="pcDot" style="position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--orange);"></div>
       </div>
     </div>
     <div class="rt-stats">
@@ -85,6 +90,8 @@ function bump(el, good){
 
 const pcBox = document.getElementById('pcBox');
 const pcTarget = document.getElementById('pcTarget');
+const pcRing2 = document.getElementById('pcRing2');
+const pcDot = document.getElementById('pcDot');
 const pcMsg = document.getElementById('pcMsg');
 const pcHitsEl = document.getElementById('pcHits');
 const pcAccEl = document.getElementById('pcAcc');
@@ -101,8 +108,29 @@ function ratePrecision(acc){
 }
 
 const PC_ROUNDS = 12;
-const PC_RADIUS = 45;
+const PC_SIZE_CONFIG = { easy: 120, medium: 90, hard: 60 };
+let pcDiff = 'medium';
+let PC_SIZE = 90;
+let PC_RADIUS = 45;
 let pcRound = 0, pcHits = 0, pcScores = [], pcCenterX = 0, pcCenterY = 0, pcRunning = false, pcWaiting = false;
+
+function selectPcDiff(d){
+  if(pcRunning) return;
+  pcDiff = d;
+  PC_SIZE = PC_SIZE_CONFIG[d];
+  PC_RADIUS = PC_SIZE / 2;
+  pcTarget.style.width = PC_SIZE + 'px';
+  pcTarget.style.height = PC_SIZE + 'px';
+  const ring2Size = Math.round(PC_SIZE * (50/90));
+  pcRing2.style.width = ring2Size + 'px';
+  pcRing2.style.height = ring2Size + 'px';
+  pcRing2.style.margin = -(ring2Size/2) + 'px 0 0 ' + -(ring2Size/2) + 'px';
+  const dotSize = Math.round(PC_SIZE * (10/90));
+  pcDot.style.width = dotSize + 'px';
+  pcDot.style.height = dotSize + 'px';
+  pcDot.style.margin = -(dotSize/2) + 'px 0 0 ' + -(dotSize/2) + 'px';
+  document.querySelectorAll('.pc-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function startPC(){
   pcRound = 0; pcHits = 0; pcScores = [];
@@ -110,6 +138,7 @@ function startPC(){
   pcAccEl.textContent = '—';
   pcResult.style.display = 'none';
   pcRunning = true;
+  document.querySelectorAll('.pc-diff').forEach(b => b.disabled = true);
   pcMsg.style.display = 'flex';
   pcMsg.textContent = 'Bereit machen...';
   setTimeout(() => {
@@ -122,6 +151,7 @@ function nextPcRound(){
   if(pcRound >= PC_ROUNDS){
     pcRunning = false;
     pcWaiting = false;
+    document.querySelectorAll('.pc-diff').forEach(b => b.disabled = false);
     pcTarget.style.display = 'none';
     pcMsg.style.display = 'flex';
     pcMsg.textContent = 'Fertig!';
@@ -138,7 +168,7 @@ function nextPcRound(){
   pcRound++;
   pcRoundEl.textContent = pcRound + '/' + PC_ROUNDS;
   const boxRect = pcBox.getBoundingClientRect();
-  const size = 90;
+  const size = PC_SIZE;
   const maxX = Math.max(0, boxRect.width - size);
   const maxY = Math.max(0, boxRect.height - size);
   const left = Math.random()*maxX;
