@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Periférne videnie</span></div>
+    <div class="diff-select">
+      <button class="diff-btn pv-diff" data-diff="easy" onclick="selectPvDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">dlhšie zobrazenie</span></button>
+      <button class="diff-btn pv-diff active" data-diff="medium" onclick="selectPvDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">bežné zobrazenie</span></button>
+      <button class="diff-btn pv-diff" data-diff="hard" onclick="selectPvDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">kratšie zobrazenie</span></button>
+    </div>
     <div id="pvBox" class="rt-box" style="cursor:default; position:relative;">
       <div id="pvCenterShape" style="font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
       <div id="pvTarget" style="position:absolute; width:16px; height:16px; border-radius:50%; background:var(--orange); opacity:0;"></div>
@@ -135,8 +140,16 @@ const PV_POS = {
   'hore-vlavo':{top:'14%', left:'12%'}
 };
 const PV_ROUNDS = 12;
+const PV_EXPOSURE_CONFIG = { easy: 350, medium: 220, hard: 120 };
+let pvDiff = 'medium';
 let pvRound = 0, pvScore = 0, pvCorrect = 0, pvRunning = false;
 let pvCurrentShape = null, pvCurrentDir = null, pvShapeAnswer = null, pvTimer;
+
+function selectPvDiff(d){
+  if(pvRunning) return;
+  pvDiff = d;
+  document.querySelectorAll('.pv-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function startPV(){
   pvRound = 0; pvScore = 0; pvCorrect = 0;
@@ -144,6 +157,7 @@ function startPV(){
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
+  document.querySelectorAll('.pv-diff').forEach(b => b.disabled = true);
   pvStep1.style.display = 'none';
   pvStep2.style.display = 'none';
   pvMsg.style.display = 'flex';
@@ -154,6 +168,7 @@ function startPV(){
 function nextPvRound(){
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
+    document.querySelectorAll('.pv-diff').forEach(b => b.disabled = false);
     pvMsg.style.display = 'flex';
     pvMsg.textContent = 'Hotovo!';
     const acc = Math.round((pvCorrect/PV_ROUNDS)*100);
@@ -184,7 +199,7 @@ function showPvTarget(){
     pvCenterShape.style.opacity = '0';
     pvTarget.style.opacity = '0';
     pvStep1.style.display = 'grid';
-  }, 220);
+  }, PV_EXPOSURE_CONFIG[pvDiff]);
 }
 
 function pvAnswerShape(shape){
