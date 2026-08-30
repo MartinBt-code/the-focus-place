@@ -397,6 +397,18 @@ footer .mono{color:var(--gray); font-size:12px;}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--gray); font-family:'Space Mono'; font-size:13px; text-transform:uppercase; letter-spacing:1px; transition:color .15s;}
 .back-link:hover{color:var(--orange);}
 
+/* Stroop test */
+#stroopBox .rt-msg{font-family:'Anton'; font-size:52px; letter-spacing:1px;}
+.stroop-options{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px;}
+.stroop-swatch{
+  aspect-ratio:1; border-radius:6px; border:2px solid var(--navy-line); cursor:pointer;
+  transition:transform .12s, border-color .12s, box-shadow .12s; padding:0;
+}
+.stroop-swatch:hover{transform:translateY(-2px);}
+.stroop-swatch:active{transform:scale(0.92);}
+.stroop-swatch.correct{border-color:var(--off-white); box-shadow:0 0 0 3px var(--off-white) inset;}
+.stroop-swatch.wrong{opacity:0.3;}
+
 @media(max-width:860px){
   .hero-grid{grid-template-columns:1fr;}
   .grid-3, .pricing-grid, .workshop-grid{grid-template-columns:1fr;}

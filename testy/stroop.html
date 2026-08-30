@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Stroop test — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/stroop.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/stroop.html">EN</a><span>/</span>
+        <a href="/de/testy/stroop.html">DE</a><span>/</span>
+        <a href="/hu/testy/stroop.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Stroop test</span></div>
+      <div id="stroopBox" class="rt-box" style="flex-direction:column; gap:20px;">
+        <div class="rt-msg" id="stroopMsg">—</div>
+        <div class="stroop-options" id="stroopOptions" style="width:100%; padding:0 20px;">
+          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Červená"></button>
+          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Modrá"></button>
+          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Zelená"></button>
+          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Žltá"></button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="stroopScore">0</div><div class="lbl">Skóre</div></div>
+        <div><div class="num" id="stroopAcc">—</div><div class="lbl">Presnosť</div></div>
+        <div><div class="num" id="stroopAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+        <div><div class="num" id="stroopInterference">—</div><div class="lbl">Rušenie (ms)</div></div>
+      </div>
+      <div class="result-banner" id="stroopResult" style="display:none;">
+        <div class="result-tier" id="stroopResultTier"></div>
+        <p id="stroopResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na farbu, akou je slovo <strong style="color:var(--orange);">vyfarbené</strong> — nie na farbu, ktorú slovo pomenúva.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startStroop()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Mozog automaticky číta slová rýchlejšie, než rozpoznáva farby. Keď si tieto dva procesy protirečia, vzniká tzv. Stroopov efekt — a schopnosť potlačiť automatickú, ale nesprávnu reakciu v prospech tej správnej je základom exekutívnej kontroly. Presne tá istá zručnosť, akú športovec potrebuje, keď musí ignorovať klamlivý pohyb súpera a reagovať na skutočný signál.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Kognitívnu inhibíciu — schopnosť potlačiť automatickú odpoveď (prečítanie slova) v prospech úlohy, ktorá si vyžaduje viac pozornosti (pomenovanie farby).</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom v situáciách s klamlivými signálmi (finty, zmeny smeru), aj každému, kto chce zlepšiť sústredenie a odolnosť voči rušivým podnetom.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 95 %</span><span class="bm-label">Výnimočná kontrola</span></div>
+        <div class="bm-row"><span class="bm-range">85–94 %</span><span class="bm-label">Výborná kontrola</span></div>
+        <div class="bm-row"><span class="bm-range">70–84 %</span><span class="bm-label">Priemerná kontrola</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 70 %</span><span class="bm-label">Podpriemerná kontrola</span></div>
+        <p class="bm-note">Test je založený na klasickom Stroopovom teste (Stroop, 1935) — jednom z najpoužívanejších nástrojov na meranie kognitívnej inhibície v psychológii. Rozdiel v reakčnom čase medzi zhodnými a nezhodnými podnetmi (tzv. Stroopov efekt) je bežne 100–200 ms aj u zdravých dospelých — čím menší je tento rozdiel, tým lepšia je tvoja kognitívna kontrola.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const stroopBox = document.getElementById('stroopBox');
+const stroopMsg = document.getElementById('stroopMsg');
+const stroopScoreEl = document.getElementById('stroopScore');
+const stroopAccEl = document.getElementById('stroopAcc');
+const stroopAvgEl = document.getElementById('stroopAvg');
+const stroopInterferenceEl = document.getElementById('stroopInterference');
+const stroopResult = document.getElementById('stroopResult');
+const stroopResultTier = document.getElementById('stroopResultTier');
+const stroopResultText = document.getElementById('stroopResultText');
+const stroopSwatches = Array.from(document.querySelectorAll('.stroop-swatch'));
+
+function rateStroop(acc){
+  if(acc >= 95) return ['Výnimočná kontrola', 'Takmer žiadne chyby napriek rušivému podnetu — patríš medzi najlepších.'];
+  if(acc >= 85) return ['Výborná kontrola', 'Nadpriemerná odolnosť voči rušivým podnetom.'];
+  if(acc >= 70) return ['Priemerná kontrola', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná kontrola', 'Slovo ťa častejšie oklame — pravidelný tréning túto kontrolu zlepšuje.'];
+}
+
+const STROOP_COLORS = [
+  {key:'red', word:'ČERVENÁ', hex:'#E74C3C'},
+  {key:'blue', word:'MODRÁ', hex:'#3B82F6'},
+  {key:'green', word:'ZELENÁ', hex:'#2ECC71'},
+  {key:'yellow', word:'ŽLTÁ', hex:'#F1C40F'}
+];
+const STROOP_ROUNDS = 24;
+let stroopRound = 0, stroopScore = 0, stroopHits = 0, stroopMisses = 0;
+let stroopCongruentRts = [], stroopIncongruentRts = [];
+let stroopTimer, stroopShownAt, stroopWaitingResponse = false, stroopRunning = false;
+let stroopCurrent = null;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startStroop(){
+  stroopRound = 0; stroopScore = 0; stroopHits = 0; stroopMisses = 0;
+  stroopCongruentRts = []; stroopIncongruentRts = [];
+  updateStroopStats();
+  stroopResult.style.display = 'none';
+  stroopRunning = true;
+  stroopMsg.style.opacity = '0';
+  stroopMsg.textContent = 'Priprav sa...';
+  stroopMsg.style.fontSize = '18px';
+  stroopMsg.style.color = 'var(--off-white)';
+  requestAnimationFrame(() => { stroopMsg.style.opacity = '1'; });
+  stroopTimer = setTimeout(() => {
+    nextStroopRound();
+  }, 900);
+}
+
+function updateStroopStats(){
+  stroopScoreEl.textContent = stroopScore;
+  const total = stroopHits + stroopMisses;
+  stroopAccEl.textContent = total ? Math.round((stroopHits/total)*100)+'%' : '—';
+  const allRts = stroopCongruentRts.concat(stroopIncongruentRts);
+  stroopAvgEl.textContent = allRts.length ? Math.round(allRts.reduce((a,b)=>a+b,0)/allRts.length) : '—';
+  if(stroopCongruentRts.length && stroopIncongruentRts.length){
+    const avgC = stroopCongruentRts.reduce((a,b)=>a+b,0)/stroopCongruentRts.length;
+    const avgI = stroopIncongruentRts.reduce((a,b)=>a+b,0)/stroopIncongruentRts.length;
+    stroopInterferenceEl.textContent = Math.round(avgI - avgC);
+  } else {
+    stroopInterferenceEl.textContent = '—';
+  }
+}
+
+function nextStroopRound(){
+  if(stroopRound >= STROOP_ROUNDS){
+    stroopRunning = false;
+    stroopMsg.style.fontSize = '20px';
+    stroopMsg.style.color = 'var(--off-white)';
+    stroopMsg.textContent = 'Hotovo!';
+    const total = stroopHits + stroopMisses;
+    if(total > 0){
+      const acc = Math.round((stroopHits/total)*100);
+      const [tier, text] = rateStroop(acc);
+      stroopResultTier.textContent = tier;
+      stroopResultText.textContent = text;
+      stroopResult.style.display = 'block';
+    }
+    return;
+  }
+  stroopRound++;
+  stroopWaitingResponse = false;
+  stroopMsg.style.opacity = '0';
+  const delay = 450 + Math.random()*400;
+  stroopTimer = setTimeout(showStroopWord, delay);
+}
+
+function showStroopWord(){
+  const wordObj = STROOP_COLORS[Math.floor(Math.random()*STROOP_COLORS.length)];
+  const congruent = Math.random() < 0.5;
+  let inkObj = wordObj;
+  if(!congruent){
+    const others = STROOP_COLORS.filter(c => c.key !== wordObj.key);
+    inkObj = others[Math.floor(Math.random()*others.length)];
+  }
+  stroopCurrent = { wordObj, inkObj, congruent };
+  stroopMsg.style.fontSize = '52px';
+  stroopMsg.textContent = wordObj.word;
+  stroopMsg.style.color = inkObj.hex;
+  stroopMsg.style.opacity = '1';
+  stroopShownAt = performance.now();
+  stroopWaitingResponse = true;
+  stroopTimer = setTimeout(() => {
+    if(stroopWaitingResponse){
+      stroopWaitingResponse = false;
+      stroopMisses++;
+      updateStroopStats();
+      stroopMsg.style.opacity = '0';
+      setTimeout(nextStroopRound, 300);
+    }
+  }, 3000);
+}
+
+stroopSwatches.forEach(sw => {
+  sw.addEventListener('click', () => {
+    if(!stroopRunning || !stroopWaitingResponse || !stroopCurrent) return;
+    clearTimeout(stroopTimer);
+    stroopWaitingResponse = false;
+    const rt = Math.round(performance.now() - stroopShownAt);
+    const correct = sw.dataset.key === stroopCurrent.inkObj.key;
+    if(correct){
+      stroopHits++; stroopScore++;
+      if(stroopCurrent.congruent) stroopCongruentRts.push(rt); else stroopIncongruentRts.push(rt);
+      sw.classList.add('correct');
+      bump(stroopScoreEl, true);
+    } else {
+      stroopMisses++; stroopScore = Math.max(0, stroopScore - 1);
+      sw.classList.add('wrong');
+      bump(stroopScoreEl, false);
+    }
+    updateStroopStats();
+    setTimeout(() => {
+      sw.classList.remove('correct','wrong');
+      stroopMsg.style.opacity = '0';
+      setTimeout(nextStroopRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>
