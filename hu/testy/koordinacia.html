@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Élő teszt</span><span>Kéz-szem koordináció</span></div>
+    <div class="diff-select">
+      <button class="diff-btn hec-diff" data-diff="easy" onclick="selectHecDiff('easy')">Könnyű<br><span style="font-size:10px; opacity:0.7;">nagyobb célpont</span></button>
+      <button class="diff-btn hec-diff active" data-diff="medium" onclick="selectHecDiff('medium')">Közepes<br><span style="font-size:10px; opacity:0.7;">normál célpont</span></button>
+      <button class="diff-btn hec-diff" data-diff="hard" onclick="selectHecDiff('hard')">Nehéz<br><span style="font-size:10px; opacity:0.7;">kisebb célpont</span></button>
+    </div>
     <div id="hecBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:420px;">
       <div id="hecMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Kattints az Indításra</div>
       <div id="hecTarget" style="position:absolute; width:36px; height:36px; border-radius:50%; background:var(--orange); display:none; cursor:pointer;"></div>
@@ -98,13 +103,26 @@ function rateCoordination(avgMs){
 }
 
 const HEC_ROUNDS = 15;
+const HEC_SIZE_CONFIG = { easy: 48, medium: 36, hard: 24 };
+let hecDiff = 'medium';
+let hecSize = 36;
 let hecRound = 0, hecHits = 0, hecTimes = [], hecShownAt, hecRunning = false;
+
+function selectHecDiff(d){
+  if(hecRunning) return;
+  hecDiff = d;
+  hecSize = HEC_SIZE_CONFIG[d];
+  hecTarget.style.width = hecSize + 'px';
+  hecTarget.style.height = hecSize + 'px';
+  document.querySelectorAll('.hec-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function startHEC(){
   hecRound = 0; hecHits = 0; hecTimes = [];
   hecHitsEl.textContent = '0';
   hecAvgEl.textContent = '—';
   hecRunning = true;
+  document.querySelectorAll('.hec-diff').forEach(b => b.disabled = true);
   hecMsg.style.display = 'flex';
   hecMsg.textContent = 'Készülj...';
   setTimeout(() => {
@@ -116,6 +134,7 @@ function startHEC(){
 function nextHecRound(){
   if(hecRound >= HEC_ROUNDS){
     hecRunning = false;
+    document.querySelectorAll('.hec-diff').forEach(b => b.disabled = false);
     hecTarget.style.display = 'none';
     hecMsg.style.display = 'flex';
     hecMsg.textContent = 'Kész!';
@@ -132,7 +151,7 @@ function nextHecRound(){
   hecRound++;
   hecRoundEl.textContent = hecRound + '/' + HEC_ROUNDS;
   const boxRect = hecBox.getBoundingClientRect();
-  const size = 36;
+  const size = hecSize;
   const maxX = Math.max(0, boxRect.width - size);
   const maxY = Math.max(0, boxRect.height - size);
   hecTarget.style.left = (Math.random()*maxX) + 'px';
@@ -147,10 +166,10 @@ function nextHecRound(){
 function hecPulse(x, y){
   const p = document.createElement('div');
   p.className = 'hec-pulse';
-  p.style.left = (x - 18) + 'px';
-  p.style.top = (y - 18) + 'px';
-  p.style.width = '36px';
-  p.style.height = '36px';
+  p.style.left = (x - hecSize/2) + 'px';
+  p.style.top = (y - hecSize/2) + 'px';
+  p.style.width = hecSize + 'px';
+  p.style.height = hecSize + 'px';
   p.style.animation = 'pulseOut .45s ease-out forwards';
   hecBox.appendChild(p);
   setTimeout(() => p.remove(), 450);
@@ -164,7 +183,7 @@ hecTarget.addEventListener('click', (e) => {
   hecHitsEl.textContent = hecHits;
   bump(hecHitsEl, true);
   hecAvgEl.textContent = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
-  hecPulse(parseFloat(hecTarget.style.left) + 18, parseFloat(hecTarget.style.top) + 18);
+  hecPulse(parseFloat(hecTarget.style.left) + hecSize/2, parseFloat(hecTarget.style.top) + hecSize/2);
   hecTarget.style.display = 'none';
   setTimeout(nextHecRound, 220);
 });
