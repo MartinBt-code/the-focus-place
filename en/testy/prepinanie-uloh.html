@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Task Switching — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/prepinanie-uloh.html">SK</a><span>/</span>
+        <a href="/en/testy/prepinanie-uloh.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/prepinanie-uloh.html">DE</a><span>/</span>
+        <a href="/hu/testy/prepinanie-uloh.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Task Switching</span></div>
+      <div id="tsBox" class="rt-box" style="flex-direction:column; gap:4px;">
+        <span class="ts-cue" id="tsCue">—</span>
+        <div class="rt-msg" id="tsMsg">—</div>
+        <div class="ts-options" id="tsOptions">
+          <button class="ts-btn" data-v="a">—</button>
+          <button class="ts-btn" data-v="b">—</button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="tsScore">0</div><div class="lbl">Score</div></div>
+        <div><div class="num" id="tsAcc">—</div><div class="lbl">Accuracy</div></div>
+        <div><div class="num" id="tsAvg">—</div><div class="lbl">Average (ms)</div></div>
+        <div><div class="num" id="tsCost">—</div><div class="lbl">Switch cost (ms)</div></div>
+      </div>
+      <div class="result-banner" id="tsResult" style="display:none;">
+        <div class="result-tier" id="tsResultTier"></div>
+        <p id="tsResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">The colored tag above the number shows the <strong style="color:var(--orange);">current rule</strong> — alternating between parity and magnitude. Pick the correct answer as fast as you can.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startTaskSwitch()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">The ability to quickly switch between different rules or tasks is a key executive function — in the real world we rarely do just one thing after another, we constantly have to shift context and strategy. The switch cost (the reaction-time gap between "switch" and "repeat" trials) is a reliable marker of cognitive flexibility.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Mental flexibility — the ability to quickly switch between two different rules without losing accuracy or speed.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes in situations requiring a fast strategy change (transitioning from defense to attack), and anyone wanting to train cognitive flexibility.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 95%</span><span class="bm-label">Exceptional flexibility</span></div>
+        <div class="bm-row"><span class="bm-range">85–94%</span><span class="bm-label">Excellent flexibility</span></div>
+        <div class="bm-row"><span class="bm-range">70–84%</span><span class="bm-label">Average flexibility</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 70%</span><span class="bm-label">Below average flexibility</span></div>
+        <p class="bm-note">The test is based on the classic task-switching paradigm (Jersild, 1927; Rogers &amp; Monsell, 1995) — commonly used to measure cognitive flexibility. Healthy adults typically show a "switch cost" of 100–300 ms — reacting that much slower on trials where the rule changed from the previous one.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const tsBox = document.getElementById('tsBox');
+const tsCue = document.getElementById('tsCue');
+const tsMsg = document.getElementById('tsMsg');
+const tsScoreEl = document.getElementById('tsScore');
+const tsAccEl = document.getElementById('tsAcc');
+const tsAvgEl = document.getElementById('tsAvg');
+const tsCostEl = document.getElementById('tsCost');
+const tsResult = document.getElementById('tsResult');
+const tsResultTier = document.getElementById('tsResultTier');
+const tsResultText = document.getElementById('tsResultText');
+const tsButtons = Array.from(document.querySelectorAll('.ts-btn'));
+
+function rateTaskSwitch(acc){
+  if(acc >= 95) return ['Exceptional flexibility', 'Barely any mistakes even when the rule changed — you\'re among the best.'];
+  if(acc >= 85) return ['Excellent flexibility', 'Above-average ability to quickly switch between rules.'];
+  if(acc >= 70) return ['Average flexibility', 'Matches a typical adult result.'];
+  return ['Below average flexibility', 'Rule changes catch you off guard more often — regular training improves this flexibility.'];
+}
+
+const TS_NUMBERS = [1,2,3,4,6,7,8,9];
+const TS_ROUNDS = 24;
+let tsRound = 0, tsScore = 0, tsHits = 0, tsMisses = 0;
+let tsRepeatRts = [], tsSwitchRts = [];
+let tsTimer, tsShownAt, tsWaitingResponse = false, tsRunning = false;
+let tsCurrent = null;
+let tsPrevRule = null;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startTaskSwitch(){
+  tsRound = 0; tsScore = 0; tsHits = 0; tsMisses = 0;
+  tsRepeatRts = []; tsSwitchRts = [];
+  tsPrevRule = null;
+  updateTsStats();
+  tsResult.style.display = 'none';
+  tsRunning = true;
+  tsMsg.style.opacity = '0';
+  tsCue.style.opacity = '0';
+  tsOptionsOpacity(0);
+  tsMsg.textContent = 'Get ready...';
+  tsMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { tsMsg.style.opacity = '1'; });
+  tsTimer = setTimeout(() => {
+    nextTsRound();
+  }, 900);
+}
+
+function tsOptionsOpacity(v){
+  document.getElementById('tsOptions').style.opacity = v;
+}
+
+function updateTsStats(){
+  tsScoreEl.textContent = tsScore;
+  const total = tsHits + tsMisses;
+  tsAccEl.textContent = total ? Math.round((tsHits/total)*100)+'%' : '—';
+  const allRts = tsRepeatRts.concat(tsSwitchRts);
+  tsAvgEl.textContent = allRts.length ? Math.round(allRts.reduce((a,b)=>a+b,0)/allRts.length) : '—';
+  if(tsRepeatRts.length && tsSwitchRts.length){
+    const avgR = tsRepeatRts.reduce((a,b)=>a+b,0)/tsRepeatRts.length;
+    const avgS = tsSwitchRts.reduce((a,b)=>a+b,0)/tsSwitchRts.length;
+    tsCostEl.textContent = Math.round(avgS - avgR);
+  } else {
+    tsCostEl.textContent = '—';
+  }
+}
+
+function nextTsRound(){
+  if(tsRound >= TS_ROUNDS){
+    tsRunning = false;
+    tsMsg.style.fontSize = '20px';
+    tsMsg.textContent = 'Done!';
+    tsCue.style.opacity = '0';
+    tsOptionsOpacity(0);
+    const total = tsHits + tsMisses;
+    if(total > 0){
+      const acc = Math.round((tsHits/total)*100);
+      const [tier, text] = rateTaskSwitch(acc);
+      tsResultTier.textContent = tier;
+      tsResultText.textContent = text;
+      tsResult.style.display = 'block';
+    }
+    return;
+  }
+  tsRound++;
+  tsWaitingResponse = false;
+  tsMsg.style.opacity = '0';
+  tsCue.style.opacity = '0';
+  tsOptionsOpacity(0);
+  const delay = 450 + Math.random()*400;
+  tsTimer = setTimeout(showTsTrial, delay);
+}
+
+function showTsTrial(){
+  const rule = Math.random() < 0.5 ? 'parity' : 'magnitude';
+  const isSwitch = tsPrevRule !== null && rule !== tsPrevRule;
+  const isRepeat = tsPrevRule !== null && rule === tsPrevRule;
+  const number = TS_NUMBERS[Math.floor(Math.random()*TS_NUMBERS.length)];
+  let correct, cueLabel, cueBg, btnALabel, btnBLabel;
+  if(rule === 'parity'){
+    correct = (number % 2 === 0) ? 'a' : 'b';
+    cueLabel = 'EVEN / ODD';
+    cueBg = 'var(--orange-dim)';
+    tsCue.style.color = 'var(--orange)';
+    btnALabel = 'EVEN'; btnBLabel = 'ODD';
+  } else {
+    correct = (number < 5) ? 'a' : 'b';
+    cueLabel = 'LESS / MORE THAN 5';
+    cueBg = '#3B82F622';
+    tsCue.style.color = '#3B82F6';
+    btnALabel = 'LESS THAN 5'; btnBLabel = 'MORE THAN 5';
+  }
+  tsCurrent = { rule, isSwitch, isRepeat, number, correct };
+  tsPrevRule = rule;
+
+  tsCue.textContent = cueLabel;
+  tsCue.style.background = cueBg;
+  tsCue.style.opacity = '1';
+  tsMsg.style.fontSize = '64px';
+  tsMsg.textContent = number;
+  tsMsg.style.color = 'var(--off-white)';
+  tsMsg.style.opacity = '1';
+  tsButtons[0].textContent = btnALabel;
+  tsButtons[1].textContent = btnBLabel;
+  tsOptionsOpacity(1);
+
+  tsShownAt = performance.now();
+  tsWaitingResponse = true;
+  tsTimer = setTimeout(() => {
+    if(tsWaitingResponse){
+      tsWaitingResponse = false;
+      tsMisses++;
+      tsScore = Math.max(0, tsScore - 1);
+      updateTsStats();
+      tsMsg.style.opacity = '0';
+      tsCue.style.opacity = '0';
+      tsOptionsOpacity(0);
+      setTimeout(nextTsRound, 300);
+    }
+  }, 3000);
+}
+
+tsButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!tsRunning || !tsWaitingResponse || !tsCurrent) return;
+    clearTimeout(tsTimer);
+    tsWaitingResponse = false;
+    const rt = Math.round(performance.now() - tsShownAt);
+    const correct = btn.dataset.v === tsCurrent.correct;
+    if(correct){
+      tsHits++; tsScore++;
+      if(tsCurrent.isSwitch) tsSwitchRts.push(rt);
+      else if(tsCurrent.isRepeat) tsRepeatRts.push(rt);
+      btn.classList.add('correct');
+      bump(tsScoreEl, true);
+    } else {
+      tsMisses++; tsScore = Math.max(0, tsScore - 1);
+      btn.classList.add('wrong');
+      bump(tsScoreEl, false);
+    }
+    updateTsStats();
+    setTimeout(() => {
+      btn.classList.remove('correct','wrong');
+      tsMsg.style.opacity = '0';
+      tsCue.style.opacity = '0';
+      tsOptionsOpacity(0);
+      setTimeout(nextTsRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

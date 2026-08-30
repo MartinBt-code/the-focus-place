@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Prepínanie úloh — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/prepinanie-uloh.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/prepinanie-uloh.html">EN</a><span>/</span>
+        <a href="/de/testy/prepinanie-uloh.html">DE</a><span>/</span>
+        <a href="/hu/testy/prepinanie-uloh.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Prepínanie úloh</span></div>
+      <div id="tsBox" class="rt-box" style="flex-direction:column; gap:4px;">
+        <span class="ts-cue" id="tsCue">—</span>
+        <div class="rt-msg" id="tsMsg">—</div>
+        <div class="ts-options" id="tsOptions">
+          <button class="ts-btn" data-v="a">—</button>
+          <button class="ts-btn" data-v="b">—</button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="tsScore">0</div><div class="lbl">Skóre</div></div>
+        <div><div class="num" id="tsAcc">—</div><div class="lbl">Presnosť</div></div>
+        <div><div class="num" id="tsAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+        <div><div class="num" id="tsCost">—</div><div class="lbl">Cena prepnutia (ms)</div></div>
+      </div>
+      <div class="result-banner" id="tsResult" style="display:none;">
+        <div class="result-tier" id="tsResultTier"></div>
+        <p id="tsResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nad číslom je farebne označené <strong style="color:var(--orange);">aktuálne pravidlo</strong> — striedavo párnosť a veľkosť čísla. Vyber správnu odpoveď čo najrýchlejšie.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startTaskSwitch()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Schopnosť rýchlo prepínať medzi rôznymi pravidlami či úlohami je kľúčová exekutívna funkcia — v reálnom svete zriedka robíme len jednu vec za druhou, musíme neustále meniť kontext a stratégiu. Cena prepnutia (rozdiel v reakčnom čase medzi "prepínacími" a "opakujúcimi" pokusmi) je spoľahlivý ukazovateľ kognitívnej flexibility.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Mentálnu flexibilitu — schopnosť rýchlo prepnúť medzi dvoma odlišnými pravidlami bez straty presnosti či rýchlosti.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom v situáciách vyžadujúcich rýchlu zmenu stratégie (prechod z obrany do útoku), aj každému, kto chce trénovať kognitívnu flexibilitu.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 95 %</span><span class="bm-label">Výnimočná flexibilita</span></div>
+        <div class="bm-row"><span class="bm-range">85–94 %</span><span class="bm-label">Výborná flexibilita</span></div>
+        <div class="bm-row"><span class="bm-range">70–84 %</span><span class="bm-label">Priemerná flexibilita</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 70 %</span><span class="bm-label">Podpriemerná flexibilita</span></div>
+        <p class="bm-note">Test je založený na klasickej paradigme prepínania úloh (task-switching paradigm, Jersild 1927; Rogers &amp; Monsell, 1995) — bežne používanej na meranie kognitívnej flexibility. Zdraví dospelí zvyčajne vykazujú "cenu prepnutia" 100–300 ms — teda o toľko pomalšie reagujú na pokusy, kde sa pravidlo zmenilo oproti predchádzajúcemu.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const tsBox = document.getElementById('tsBox');
+const tsCue = document.getElementById('tsCue');
+const tsMsg = document.getElementById('tsMsg');
+const tsScoreEl = document.getElementById('tsScore');
+const tsAccEl = document.getElementById('tsAcc');
+const tsAvgEl = document.getElementById('tsAvg');
+const tsCostEl = document.getElementById('tsCost');
+const tsResult = document.getElementById('tsResult');
+const tsResultTier = document.getElementById('tsResultTier');
+const tsResultText = document.getElementById('tsResultText');
+const tsButtons = Array.from(document.querySelectorAll('.ts-btn'));
+
+function rateTaskSwitch(acc){
+  if(acc >= 95) return ['Výnimočná flexibilita', 'Takmer žiadne chyby ani pri zmene pravidla — patríš medzi najlepších.'];
+  if(acc >= 85) return ['Výborná flexibilita', 'Nadpriemerná schopnosť rýchlo prepínať medzi pravidlami.'];
+  if(acc >= 70) return ['Priemerná flexibilita', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná flexibilita', 'Zmena pravidla ťa častejšie zaskočí — pravidelný tréning túto flexibilitu zlepšuje.'];
+}
+
+const TS_NUMBERS = [1,2,3,4,6,7,8,9];
+const TS_ROUNDS = 24;
+let tsRound = 0, tsScore = 0, tsHits = 0, tsMisses = 0;
+let tsRepeatRts = [], tsSwitchRts = [];
+let tsTimer, tsShownAt, tsWaitingResponse = false, tsRunning = false;
+let tsCurrent = null;
+let tsPrevRule = null;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function startTaskSwitch(){
+  tsRound = 0; tsScore = 0; tsHits = 0; tsMisses = 0;
+  tsRepeatRts = []; tsSwitchRts = [];
+  tsPrevRule = null;
+  updateTsStats();
+  tsResult.style.display = 'none';
+  tsRunning = true;
+  tsMsg.style.opacity = '0';
+  tsCue.style.opacity = '0';
+  tsOptionsOpacity(0);
+  tsMsg.textContent = 'Priprav sa...';
+  tsMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { tsMsg.style.opacity = '1'; });
+  tsTimer = setTimeout(() => {
+    nextTsRound();
+  }, 900);
+}
+
+function tsOptionsOpacity(v){
+  document.getElementById('tsOptions').style.opacity = v;
+}
+
+function updateTsStats(){
+  tsScoreEl.textContent = tsScore;
+  const total = tsHits + tsMisses;
+  tsAccEl.textContent = total ? Math.round((tsHits/total)*100)+'%' : '—';
+  const allRts = tsRepeatRts.concat(tsSwitchRts);
+  tsAvgEl.textContent = allRts.length ? Math.round(allRts.reduce((a,b)=>a+b,0)/allRts.length) : '—';
+  if(tsRepeatRts.length && tsSwitchRts.length){
+    const avgR = tsRepeatRts.reduce((a,b)=>a+b,0)/tsRepeatRts.length;
+    const avgS = tsSwitchRts.reduce((a,b)=>a+b,0)/tsSwitchRts.length;
+    tsCostEl.textContent = Math.round(avgS - avgR);
+  } else {
+    tsCostEl.textContent = '—';
+  }
+}
+
+function nextTsRound(){
+  if(tsRound >= TS_ROUNDS){
+    tsRunning = false;
+    tsMsg.style.fontSize = '20px';
+    tsMsg.textContent = 'Hotovo!';
+    tsCue.style.opacity = '0';
+    tsOptionsOpacity(0);
+    const total = tsHits + tsMisses;
+    if(total > 0){
+      const acc = Math.round((tsHits/total)*100);
+      const [tier, text] = rateTaskSwitch(acc);
+      tsResultTier.textContent = tier;
+      tsResultText.textContent = text;
+      tsResult.style.display = 'block';
+    }
+    return;
+  }
+  tsRound++;
+  tsWaitingResponse = false;
+  tsMsg.style.opacity = '0';
+  tsCue.style.opacity = '0';
+  tsOptionsOpacity(0);
+  const delay = 450 + Math.random()*400;
+  tsTimer = setTimeout(showTsTrial, delay);
+}
+
+function showTsTrial(){
+  const rule = Math.random() < 0.5 ? 'parity' : 'magnitude';
+  const isSwitch = tsPrevRule !== null && rule !== tsPrevRule;
+  const isRepeat = tsPrevRule !== null && rule === tsPrevRule;
+  const number = TS_NUMBERS[Math.floor(Math.random()*TS_NUMBERS.length)];
+  let correct, cueLabel, cueBg, btnALabel, btnBLabel;
+  if(rule === 'parity'){
+    correct = (number % 2 === 0) ? 'a' : 'b';
+    cueLabel = 'PÁRNE / NEPÁRNE';
+    cueBg = 'var(--orange-dim)';
+    tsCue.style.color = 'var(--orange)';
+    btnALabel = 'PÁRNE'; btnBLabel = 'NEPÁRNE';
+  } else {
+    correct = (number < 5) ? 'a' : 'b';
+    cueLabel = 'MENEJ / VIAC AKO 5';
+    cueBg = '#3B82F622';
+    tsCue.style.color = '#3B82F6';
+    btnALabel = 'MENEJ AKO 5'; btnBLabel = 'VIAC AKO 5';
+  }
+  tsCurrent = { rule, isSwitch, isRepeat, number, correct };
+  tsPrevRule = rule;
+
+  tsCue.textContent = cueLabel;
+  tsCue.style.background = cueBg;
+  tsCue.style.opacity = '1';
+  tsMsg.style.fontSize = '64px';
+  tsMsg.textContent = number;
+  tsMsg.style.color = 'var(--off-white)';
+  tsMsg.style.opacity = '1';
+  tsButtons[0].textContent = btnALabel;
+  tsButtons[1].textContent = btnBLabel;
+  tsOptionsOpacity(1);
+
+  tsShownAt = performance.now();
+  tsWaitingResponse = true;
+  tsTimer = setTimeout(() => {
+    if(tsWaitingResponse){
+      tsWaitingResponse = false;
+      tsMisses++;
+      tsScore = Math.max(0, tsScore - 1);
+      updateTsStats();
+      tsMsg.style.opacity = '0';
+      tsCue.style.opacity = '0';
+      tsOptionsOpacity(0);
+      setTimeout(nextTsRound, 300);
+    }
+  }, 3000);
+}
+
+tsButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!tsRunning || !tsWaitingResponse || !tsCurrent) return;
+    clearTimeout(tsTimer);
+    tsWaitingResponse = false;
+    const rt = Math.round(performance.now() - tsShownAt);
+    const correct = btn.dataset.v === tsCurrent.correct;
+    if(correct){
+      tsHits++; tsScore++;
+      if(tsCurrent.isSwitch) tsSwitchRts.push(rt);
+      else if(tsCurrent.isRepeat) tsRepeatRts.push(rt);
+      btn.classList.add('correct');
+      bump(tsScoreEl, true);
+    } else {
+      tsMisses++; tsScore = Math.max(0, tsScore - 1);
+      btn.classList.add('wrong');
+      bump(tsScoreEl, false);
+    }
+    updateTsStats();
+    setTimeout(() => {
+      btn.classList.remove('correct','wrong');
+      tsMsg.style.opacity = '0';
+      tsCue.style.opacity = '0';
+      tsOptionsOpacity(0);
+      setTimeout(nextTsRound, 250);
+    }, 260);
+  });
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>
