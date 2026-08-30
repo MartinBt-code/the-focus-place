@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>N-Back Test — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/n-back.html">SK</a><span>/</span>
+        <a href="/en/testy/n-back.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/n-back.html">DE</a><span>/</span>
+        <a href="/hu/testy/n-back.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>N-Back Test</span></div>
+      <div id="nbBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="nbMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="nbScore">0</div><div class="lbl">Score</div></div>
+        <div><div class="num" id="nbAcc">—</div><div class="lbl">Accuracy</div></div>
+        <div><div class="num" id="nbAvg">—</div><div class="lbl">Average (ms)</div></div>
+      </div>
+      <div class="result-banner" id="nbResult" style="display:none;">
+        <div class="result-tier" id="nbResultTier"></div>
+        <p id="nbResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click the box only when the current letter is the <strong style="color:var(--orange);">same</strong> as the letter <strong style="color:var(--orange);">2 steps back</strong> (2-Back).</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startNBack()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">N-Back is one of the most well-regarded working memory tests in cognitive science. Unlike simply memorizing a sequence, you must constantly compare the current cue to the one you saw N steps back, continuously updating what you're holding in mind. This ability to "juggle" information in real time is key in fast, changing game situations.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Working memory capacity under continuous load — the ability to simultaneously hold and update information, not just passively remember it.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Players in fast game situations who need to track several variables at once, and anyone wanting to train working memory and multitasking.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90%</span><span class="bm-label">Exceptional working memory</span></div>
+        <div class="bm-row"><span class="bm-range">80–89%</span><span class="bm-label">Excellent working memory</span></div>
+        <div class="bm-row"><span class="bm-range">65–79%</span><span class="bm-label">Average working memory</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 65%</span><span class="bm-label">Below average working memory</span></div>
+        <p class="bm-note">The test is based on the classic 2-Back task (Kirchner, 1958) — one of the most widely used tools in cognitive science for measuring working memory capacity. Healthy young adults average 80–90% accuracy on 2-Back — performance drops sharply at harder levels like 3-Back.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const nbBox = document.getElementById('nbBox');
+const nbMsg = document.getElementById('nbMsg');
+const nbScoreEl = document.getElementById('nbScore');
+const nbAccEl = document.getElementById('nbAcc');
+const nbAvgEl = document.getElementById('nbAvg');
+const nbResult = document.getElementById('nbResult');
+const nbResultTier = document.getElementById('nbResultTier');
+const nbResultText = document.getElementById('nbResultText');
+
+function rateNBack(acc){
+  if(acc >= 90) return ['Exceptional working memory', 'This is at the level of trained individuals — the typical average is 80–90%.'];
+  if(acc >= 80) return ['Excellent working memory', 'Matches the average for healthy young adults on the 2-Back task.'];
+  if(acc >= 65) return ['Average working memory', 'A solid base — regular training pushes this higher.'];
+  return ['Below average working memory', '2-Back is a demanding task — try again, performance improves quickly with training.'];
+}
+
+const NB_LETTERS = ['C','F','K','L','R','T'];
+const NB_N = 2;
+const NB_ROUNDS = 22;
+const NB_MATCH_PROB = 0.35;
+
+let nbHistory = [];
+let nbRound = 0;
+let nbScore = 0;
+let nbHits = 0, nbMisses = 0, nbFalseAlarms = 0, nbCorrectRejections = 0;
+let nbRts = [];
+let nbTimer, nbShownAt;
+let nbWaitingResponse = false, nbRunning = false;
+let nbCurrentIsMatch = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function nbFlash(cls){
+  nbBox.classList.add(cls);
+  setTimeout(() => nbBox.classList.remove(cls), 220);
+}
+
+function startNBack(){
+  nbHistory = []; nbRound = 0; nbScore = 0;
+  nbHits = 0; nbMisses = 0; nbFalseAlarms = 0; nbCorrectRejections = 0; nbRts = [];
+  updateNbStats();
+  nbResult.style.display = 'none';
+  nbRunning = true;
+  nbMsg.style.opacity = '0';
+  nbMsg.textContent = 'Get ready...';
+  nbMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { nbMsg.style.opacity = '1'; });
+  nbTimer = setTimeout(() => {
+    nbMsg.style.fontSize = '64px';
+    nbNextRound();
+  }, 900);
+}
+
+function updateNbStats(){
+  nbScoreEl.textContent = nbScore;
+  const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+  nbAccEl.textContent = resolved ? Math.round(((nbHits+nbCorrectRejections)/resolved)*100)+'%' : '—';
+  nbAvgEl.textContent = nbRts.length ? Math.round(nbRts.reduce((a,b)=>a+b,0)/nbRts.length) : '—';
+}
+
+function nbNextRound(){
+  if(nbRound >= NB_ROUNDS){
+    nbRunning = false;
+    nbMsg.style.fontSize = '20px';
+    nbMsg.textContent = 'Done!';
+    const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+    if(resolved > 0){
+      const acc = Math.round(((nbHits+nbCorrectRejections)/resolved)*100);
+      const [tier, text] = rateNBack(acc);
+      nbResultTier.textContent = tier;
+      nbResultText.textContent = text;
+      nbResult.style.display = 'block';
+    }
+    return;
+  }
+  nbRound++;
+  nbWaitingResponse = false;
+  nbMsg.style.opacity = '0';
+  const delay = 500 + Math.random()*500;
+  nbTimer = setTimeout(nbShowLetter, delay);
+}
+
+function nbShowLetter(){
+  const idx = nbHistory.length;
+  let letter;
+  const matchIdx = idx - NB_N;
+  if(matchIdx >= 0 && Math.random() < NB_MATCH_PROB){
+    letter = nbHistory[matchIdx];
+  } else {
+    letter = NB_LETTERS[Math.floor(Math.random()*NB_LETTERS.length)];
+  }
+  nbHistory.push(letter);
+  nbCurrentIsMatch = matchIdx >= 0 && nbHistory[matchIdx] === letter;
+
+  nbMsg.textContent = letter;
+  nbMsg.style.opacity = '1';
+  nbShownAt = performance.now();
+  nbWaitingResponse = true;
+  nbTimer = setTimeout(() => {
+    if(nbWaitingResponse){
+      nbWaitingResponse = false;
+      if(nbCurrentIsMatch){
+        nbMisses++;
+        nbScore = Math.max(0, nbScore - 1);
+        nbFlash('early');
+      } else {
+        nbCorrectRejections++;
+      }
+      updateNbStats();
+      nbMsg.style.opacity = '0';
+      setTimeout(nbNextRound, 300);
+    }
+  }, 1800);
+}
+
+nbBox.addEventListener('click', () => {
+  if(!nbRunning || !nbWaitingResponse) return;
+  clearTimeout(nbTimer);
+  nbWaitingResponse = false;
+  if(nbCurrentIsMatch){
+    nbRts.push(Math.round(performance.now() - nbShownAt));
+    nbHits++; nbScore++;
+    nbFlash('go');
+    bump(nbScoreEl, true);
+  } else {
+    nbFalseAlarms++;
+    nbScore = Math.max(0, nbScore - 1);
+    nbFlash('early');
+    bump(nbScoreEl, false);
+  }
+  updateNbStats();
+  nbMsg.style.opacity = '0';
+  setTimeout(nbNextRound, 300);
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

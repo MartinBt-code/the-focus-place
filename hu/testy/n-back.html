@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>N-Back teszt — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/n-back.html">SK</a><span>/</span>
+        <a href="/en/testy/n-back.html">EN</a><span>/</span>
+        <a href="/de/testy/n-back.html">DE</a><span>/</span>
+        <a href="/hu/testy/n-back.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>N-Back teszt</span></div>
+      <div id="nbBox" class="rt-box" style="cursor:pointer;">
+        <div class="rt-msg" id="nbMsg" style="font-size:64px;">—</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="nbScore">0</div><div class="lbl">Pontszám</div></div>
+        <div><div class="num" id="nbAcc">—</div><div class="lbl">Pontosság</div></div>
+        <div><div class="num" id="nbAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      </div>
+      <div class="result-banner" id="nbResult" style="display:none;">
+        <div class="result-tier" id="nbResultTier"></div>
+        <p id="nbResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Csak akkor kattints a mezőre, ha az aktuális betű <strong style="color:var(--orange);">megegyezik</strong> a <strong style="color:var(--orange);">2 lépéssel korábbi</strong> betűvel (2-Back).</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startNBack()">Indítás</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">Az N-Back a kognitív tudomány egyik legelismertebb munkamemória-tesztje. Egy egyszerű sorozat megjegyzésével ellentétben folyamatosan össze kell hasonlítanod az aktuális ingert azzal, amit N lépéssel korábban láttál, és folyamatosan frissítened kell, amit fejben tartasz. Ez a valós idejű "zsonglőrködés" képessége kulcsfontosságú a gyors, változó játékhelyzetekben.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A munkamemória kapacitását folyamatos terhelés alatt — azt a képességet, hogy egyszerre tartasz fejben és frissítesz információkat, nem csupán passzívan emlékszel rájuk.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Gyors játékhelyzetekben lévő játékosoknak, akiknek egyszerre több változót kell követniük, és mindenkinek, aki szeretné edzeni a munkamemóriáját és a multitaskingot.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Értékelési skála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90%</span><span class="bm-label">Kivételes munkamemória</span></div>
+        <div class="bm-row"><span class="bm-range">80–89%</span><span class="bm-label">Kiváló munkamemória</span></div>
+        <div class="bm-row"><span class="bm-range">65–79%</span><span class="bm-label">Átlagos munkamemória</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 65%</span><span class="bm-label">Átlag alatti munkamemória</span></div>
+        <p class="bm-note">A teszt a klasszikus 2-Back feladaton alapul (Kirchner, 1958) — a kognitív tudomány egyik legszélesebb körben használt eszköze a munkamemória kapacitásának mérésére. Egészséges fiatal felnőttek átlagosan 80–90%-os pontosságot érnek el 2-Back feladatban — a teljesítmény jelentősen csökken nehezebb szinteken, például 3-Backnél.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const nbBox = document.getElementById('nbBox');
+const nbMsg = document.getElementById('nbMsg');
+const nbScoreEl = document.getElementById('nbScore');
+const nbAccEl = document.getElementById('nbAcc');
+const nbAvgEl = document.getElementById('nbAvg');
+const nbResult = document.getElementById('nbResult');
+const nbResultTier = document.getElementById('nbResultTier');
+const nbResultText = document.getElementById('nbResultText');
+
+function rateNBack(acc){
+  if(acc >= 90) return ['Kivételes munkamemória', 'Ez gyakorlott egyének szintjének felel meg — a jellemző átlag 80–90%.'];
+  if(acc >= 80) return ['Kiváló munkamemória', 'Megfelel az egészséges fiatal felnőttek átlagának a 2-Back feladatban.'];
+  if(acc >= 65) return ['Átlagos munkamemória', 'Szilárd alap — a rendszeres gyakorlás tovább növeli ezt az eredményt.'];
+  return ['Átlag alatti munkamemória', 'A 2-Back igényes feladat — próbáld újra, a teljesítmény gyorsan javul gyakorlással.'];
+}
+
+const NB_LETTERS = ['C','F','K','L','R','T'];
+const NB_N = 2;
+const NB_ROUNDS = 22;
+const NB_MATCH_PROB = 0.35;
+
+let nbHistory = [];
+let nbRound = 0;
+let nbScore = 0;
+let nbHits = 0, nbMisses = 0, nbFalseAlarms = 0, nbCorrectRejections = 0;
+let nbRts = [];
+let nbTimer, nbShownAt;
+let nbWaitingResponse = false, nbRunning = false;
+let nbCurrentIsMatch = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function nbFlash(cls){
+  nbBox.classList.add(cls);
+  setTimeout(() => nbBox.classList.remove(cls), 220);
+}
+
+function startNBack(){
+  nbHistory = []; nbRound = 0; nbScore = 0;
+  nbHits = 0; nbMisses = 0; nbFalseAlarms = 0; nbCorrectRejections = 0; nbRts = [];
+  updateNbStats();
+  nbResult.style.display = 'none';
+  nbRunning = true;
+  nbMsg.style.opacity = '0';
+  nbMsg.textContent = 'Készülj...';
+  nbMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { nbMsg.style.opacity = '1'; });
+  nbTimer = setTimeout(() => {
+    nbMsg.style.fontSize = '64px';
+    nbNextRound();
+  }, 900);
+}
+
+function updateNbStats(){
+  nbScoreEl.textContent = nbScore;
+  const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+  nbAccEl.textContent = resolved ? Math.round(((nbHits+nbCorrectRejections)/resolved)*100)+'%' : '—';
+  nbAvgEl.textContent = nbRts.length ? Math.round(nbRts.reduce((a,b)=>a+b,0)/nbRts.length) : '—';
+}
+
+function nbNextRound(){
+  if(nbRound >= NB_ROUNDS){
+    nbRunning = false;
+    nbMsg.style.fontSize = '20px';
+    nbMsg.textContent = 'Kész!';
+    const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+    if(resolved > 0){
+      const acc = Math.round(((nbHits+nbCorrectRejections)/resolved)*100);
+      const [tier, text] = rateNBack(acc);
+      nbResultTier.textContent = tier;
+      nbResultText.textContent = text;
+      nbResult.style.display = 'block';
+    }
+    return;
+  }
+  nbRound++;
+  nbWaitingResponse = false;
+  nbMsg.style.opacity = '0';
+  const delay = 500 + Math.random()*500;
+  nbTimer = setTimeout(nbShowLetter, delay);
+}
+
+function nbShowLetter(){
+  const idx = nbHistory.length;
+  let letter;
+  const matchIdx = idx - NB_N;
+  if(matchIdx >= 0 && Math.random() < NB_MATCH_PROB){
+    letter = nbHistory[matchIdx];
+  } else {
+    letter = NB_LETTERS[Math.floor(Math.random()*NB_LETTERS.length)];
+  }
+  nbHistory.push(letter);
+  nbCurrentIsMatch = matchIdx >= 0 && nbHistory[matchIdx] === letter;
+
+  nbMsg.textContent = letter;
+  nbMsg.style.opacity = '1';
+  nbShownAt = performance.now();
+  nbWaitingResponse = true;
+  nbTimer = setTimeout(() => {
+    if(nbWaitingResponse){
+      nbWaitingResponse = false;
+      if(nbCurrentIsMatch){
+        nbMisses++;
+        nbScore = Math.max(0, nbScore - 1);
+        nbFlash('early');
+      } else {
+        nbCorrectRejections++;
+      }
+      updateNbStats();
+      nbMsg.style.opacity = '0';
+      setTimeout(nbNextRound, 300);
+    }
+  }, 1800);
+}
+
+nbBox.addEventListener('click', () => {
+  if(!nbRunning || !nbWaitingResponse) return;
+  clearTimeout(nbTimer);
+  nbWaitingResponse = false;
+  if(nbCurrentIsMatch){
+    nbRts.push(Math.round(performance.now() - nbShownAt));
+    nbHits++; nbScore++;
+    nbFlash('go');
+    bump(nbScoreEl, true);
+  } else {
+    nbFalseAlarms++;
+    nbScore = Math.max(0, nbScore - 1);
+    nbFlash('early');
+    bump(nbScoreEl, false);
+  }
+  updateNbStats();
+  nbMsg.style.opacity = '0';
+  setTimeout(nbNextRound, 300);
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
