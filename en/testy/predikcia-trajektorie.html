@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Trajectory Prediction</span></div>
+    <div class="diff-select">
+      <button class="diff-btn tp-diff" data-diff="easy" onclick="selectTpDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">visible longer</span></button>
+      <button class="diff-btn tp-diff active" data-diff="medium" onclick="selectTpDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">normal occlusion</span></button>
+      <button class="diff-btn tp-diff" data-diff="hard" onclick="selectTpDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">earlier occlusion</span></button>
+    </div>
     <div id="tpBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px; overflow:hidden;">
       <div id="tpMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Click Start</div>
       <div id="tpGoal" style="position:absolute; top:0; bottom:0; width:2px; border-left:2px dashed var(--navy-line); display:none;"></div>
@@ -95,12 +100,23 @@ function ratePrediction(avgMs){
 }
 
 const TP_ROUNDS = 10;
-const TP_TOLERANCE_MS = 80;
 const TP_MAX_WAIT_MS = 1200;
 const TP_START_X_FRAC = 0.08;
 const TP_GOAL_X_FRAC = 0.85;
+const TP_CONFIG = {
+  easy: {occludeMin: 0.55, occludeMax: 0.75, tolerance: 110},
+  medium: {occludeMin: 0.4, occludeMax: 0.65, tolerance: 80},
+  hard: {occludeMin: 0.25, occludeMax: 0.45, tolerance: 55}
+};
+let tpDiff = 'medium';
 
 let tpRound = 0, tpHits = 0, tpErrors = [];
+
+function selectTpDiff(d){
+  if(tpRunning) return;
+  tpDiff = d;
+  document.querySelectorAll('.tp-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 let tpRunning = false, tpRoundActive = false, tpClickedThisRound = false;
 let tpRoundStartPerf = 0, tpDuration = 0, tpOccludeFrac = 0;
 let tpRafId = null, tpMissTimer = null;
@@ -116,6 +132,7 @@ function startPrediction(){
   updateTpStats();
   tpResult.style.display = 'none';
   tpRunning = true;
+  document.querySelectorAll('.tp-diff').forEach(b => b.disabled = true);
   tpMsg.style.display = 'flex';
   tpMsg.textContent = 'Get ready...';
   tpGoal.style.display = 'none';
@@ -130,6 +147,7 @@ function startPrediction(){
 function nextTpRound(){
   if(tpRound >= TP_ROUNDS){
     tpRunning = false;
+    document.querySelectorAll('.tp-diff').forEach(b => b.disabled = false);
     tpMsg.style.display = 'flex';
     tpMsg.textContent = 'Done!';
     tpRespondBtn.disabled = true;
@@ -142,7 +160,8 @@ function nextTpRound(){
   }
   tpRound++;
   tpDuration = 1400 + Math.random()*1200;
-  tpOccludeFrac = 0.4 + Math.random()*0.25;
+  const occConfig = TP_CONFIG[tpDiff];
+  tpOccludeFrac = occConfig.occludeMin + Math.random()*(occConfig.occludeMax - occConfig.occludeMin);
   tpRoundStartPerf = performance.now();
   tpRoundActive = true;
   tpClickedThisRound = false;
@@ -185,7 +204,7 @@ function resolveTpRound(errorMs){
   tpRespondBtn.disabled = true;
   const absErr = Math.round(Math.abs(errorMs));
   tpErrors.push(absErr);
-  const hit = absErr <= TP_TOLERANCE_MS;
+  const hit = absErr <= TP_CONFIG[tpDiff].tolerance;
   if(hit) tpHits++;
   updateTpStats();
 
