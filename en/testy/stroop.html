@@ -30,14 +30,14 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Stroop Test</span></div>
+      <div class="diff-select">
+        <button class="diff-btn stroop-diff" data-diff="easy" onclick="selectStroopDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">2 colors</span></button>
+        <button class="diff-btn stroop-diff active" data-diff="medium" onclick="selectStroopDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">4 colors</span></button>
+        <button class="diff-btn stroop-diff" data-diff="hard" onclick="selectStroopDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">6 colors</span></button>
+      </div>
       <div id="stroopBox" class="rt-box" style="flex-direction:column; gap:20px;">
         <div class="rt-msg" id="stroopMsg">—</div>
-        <div class="stroop-options" id="stroopOptions" style="width:100%; padding:0 20px;">
-          <button class="stroop-swatch" data-key="red" style="background:#E74C3C;" aria-label="Red"></button>
-          <button class="stroop-swatch" data-key="blue" style="background:#3B82F6;" aria-label="Blue"></button>
-          <button class="stroop-swatch" data-key="green" style="background:#2ECC71;" aria-label="Green"></button>
-          <button class="stroop-swatch" data-key="yellow" style="background:#F1C40F;" aria-label="Yellow"></button>
-        </div>
+        <div class="stroop-options" id="stroopOptions" style="width:100%; padding:0 20px;"></div>
       </div>
       <div class="rt-stats">
         <div><div class="num" id="stroopScore">0</div><div class="lbl">Score</div></div>
@@ -88,7 +88,8 @@ const stroopInterferenceEl = document.getElementById('stroopInterference');
 const stroopResult = document.getElementById('stroopResult');
 const stroopResultTier = document.getElementById('stroopResultTier');
 const stroopResultText = document.getElementById('stroopResultText');
-const stroopSwatches = Array.from(document.querySelectorAll('.stroop-swatch'));
+const stroopOptions = document.getElementById('stroopOptions');
+let stroopSwatches = [];
 
 function rateStroop(acc){
   if(acc >= 95) return ['Exceptional control', 'Barely any mistakes despite the interference — you\'re among the best.'];
@@ -97,13 +98,28 @@ function rateStroop(acc){
   return ['Below average control', 'The word tricks you more often — regular training improves this control.'];
 }
 
-const STROOP_COLORS = [
-  {key:'red', word:'RED', hex:'#E74C3C'},
-  {key:'blue', word:'BLUE', hex:'#3B82F6'},
-  {key:'green', word:'GREEN', hex:'#2ECC71'},
-  {key:'yellow', word:'YELLOW', hex:'#F1C40F'}
-];
+const STROOP_COLOR_SETS = {
+  easy: [
+    {key:'red', word:'RED', hex:'#E74C3C'},
+    {key:'blue', word:'BLUE', hex:'#3B82F6'}
+  ],
+  medium: [
+    {key:'red', word:'RED', hex:'#E74C3C'},
+    {key:'blue', word:'BLUE', hex:'#3B82F6'},
+    {key:'green', word:'GREEN', hex:'#2ECC71'},
+    {key:'yellow', word:'YELLOW', hex:'#F1C40F'}
+  ],
+  hard: [
+    {key:'red', word:'RED', hex:'#E74C3C'},
+    {key:'blue', word:'BLUE', hex:'#3B82F6'},
+    {key:'green', word:'GREEN', hex:'#2ECC71'},
+    {key:'yellow', word:'YELLOW', hex:'#F1C40F'},
+    {key:'orange', word:'ORANGE', hex:'#F39C12'},
+    {key:'purple', word:'PURPLE', hex:'#9B59B6'}
+  ]
+};
 const STROOP_ROUNDS = 24;
+let stroopDiff = 'medium';
 let stroopRound = 0, stroopScore = 0, stroopHits = 0, stroopMisses = 0;
 let stroopCongruentRts = [], stroopIncongruentRts = [];
 let stroopTimer, stroopShownAt, stroopWaitingResponse = false, stroopRunning = false;
@@ -116,12 +132,37 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+function renderStroopOptions(){
+  const colors = STROOP_COLOR_SETS[stroopDiff];
+  stroopOptions.innerHTML = '';
+  stroopOptions.style.gridTemplateColumns = colors.length <= 4 ? `repeat(${colors.length},1fr)` : 'repeat(3,1fr)';
+  colors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'stroop-swatch';
+    btn.dataset.key = c.key;
+    btn.style.background = c.hex;
+    btn.setAttribute('aria-label', c.word);
+    btn.addEventListener('click', () => onStroopSwatchClick(btn));
+    stroopOptions.appendChild(btn);
+  });
+  stroopSwatches = Array.from(stroopOptions.children);
+}
+
+function selectStroopDiff(d){
+  if(stroopRunning) return;
+  stroopDiff = d;
+  document.querySelectorAll('.stroop-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  renderStroopOptions();
+}
+renderStroopOptions();
+
 function startStroop(){
   stroopRound = 0; stroopScore = 0; stroopHits = 0; stroopMisses = 0;
   stroopCongruentRts = []; stroopIncongruentRts = [];
   updateStroopStats();
   stroopResult.style.display = 'none';
   stroopRunning = true;
+  document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = true);
   stroopMsg.style.opacity = '0';
   stroopMsg.textContent = 'Get ready...';
   stroopMsg.style.fontSize = '18px';
@@ -150,6 +191,7 @@ function updateStroopStats(){
 function nextStroopRound(){
   if(stroopRound >= STROOP_ROUNDS){
     stroopRunning = false;
+    document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = false);
     stroopMsg.style.fontSize = '20px';
     stroopMsg.style.color = 'var(--off-white)';
     stroopMsg.textContent = 'Done!';
@@ -171,11 +213,12 @@ function nextStroopRound(){
 }
 
 function showStroopWord(){
-  const wordObj = STROOP_COLORS[Math.floor(Math.random()*STROOP_COLORS.length)];
+  const colors = STROOP_COLOR_SETS[stroopDiff];
+  const wordObj = colors[Math.floor(Math.random()*colors.length)];
   const congruent = Math.random() < 0.5;
   let inkObj = wordObj;
   if(!congruent){
-    const others = STROOP_COLORS.filter(c => c.key !== wordObj.key);
+    const others = colors.filter(c => c.key !== wordObj.key);
     inkObj = others[Math.floor(Math.random()*others.length)];
   }
   stroopCurrent = { wordObj, inkObj, congruent };
@@ -196,31 +239,29 @@ function showStroopWord(){
   }, 3000);
 }
 
-stroopSwatches.forEach(sw => {
-  sw.addEventListener('click', () => {
-    if(!stroopRunning || !stroopWaitingResponse || !stroopCurrent) return;
-    clearTimeout(stroopTimer);
-    stroopWaitingResponse = false;
-    const rt = Math.round(performance.now() - stroopShownAt);
-    const correct = sw.dataset.key === stroopCurrent.inkObj.key;
-    if(correct){
-      stroopHits++; stroopScore++;
-      if(stroopCurrent.congruent) stroopCongruentRts.push(rt); else stroopIncongruentRts.push(rt);
-      sw.classList.add('correct');
-      bump(stroopScoreEl, true);
-    } else {
-      stroopMisses++; stroopScore = Math.max(0, stroopScore - 1);
-      sw.classList.add('wrong');
-      bump(stroopScoreEl, false);
-    }
-    updateStroopStats();
-    setTimeout(() => {
-      sw.classList.remove('correct','wrong');
-      stroopMsg.style.opacity = '0';
-      setTimeout(nextStroopRound, 250);
-    }, 260);
-  });
-});
+function onStroopSwatchClick(sw){
+  if(!stroopRunning || !stroopWaitingResponse || !stroopCurrent) return;
+  clearTimeout(stroopTimer);
+  stroopWaitingResponse = false;
+  const rt = Math.round(performance.now() - stroopShownAt);
+  const correct = sw.dataset.key === stroopCurrent.inkObj.key;
+  if(correct){
+    stroopHits++; stroopScore++;
+    if(stroopCurrent.congruent) stroopCongruentRts.push(rt); else stroopIncongruentRts.push(rt);
+    sw.classList.add('correct');
+    bump(stroopScoreEl, true);
+  } else {
+    stroopMisses++; stroopScore = Math.max(0, stroopScore - 1);
+    sw.classList.add('wrong');
+    bump(stroopScoreEl, false);
+  }
+  updateStroopStats();
+  setTimeout(() => {
+    sw.classList.remove('correct','wrong');
+    stroopMsg.style.opacity = '0';
+    setTimeout(nextStroopRound, 250);
+  }, 260);
+}
 </script>
 
 <script src="../../assets/cookie-consent.js" defer></script>
