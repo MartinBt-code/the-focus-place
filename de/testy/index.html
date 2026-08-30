@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Testbibliothek — the Focus Place</title>
+<meta name="description" content="Reaktionszeit, Gedächtnis, Aufmerksamkeit, Koordination und visuelle Wahrnehmung — teste dich in jeder Kategorie an einem Ort.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html">Tests</a>
+      <a href="../index.html#instagram">Instagram</a>
+      <a href="../index.html#eshop">Shop</a>
+      <a href="../workshop.html">Workshop</a>
+    </div>
+    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('nav-open')" aria-label="Menu">☰</button>
+    <div class="lang-switch">
+      <a href="/testy/index.html">SK</a><span>/</span>
+      <a href="/en/testy/index.html">EN</a><span>/</span>
+      <a href="/de/testy/index.html" class="active">DE</a><span>/</span>
+      <a href="/hu/testy/index.html">HU</a>
+    </div>
+    <a href="../workshop.html" class="nav-cta">Zum Workshop anmelden</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Testbibliothek</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Teste jeden Aspekt<br>deiner <em>Leistung</em>.</h1>
+    <p class="lead" style="max-width:600px;">Reaktionszeit, Gedächtnis, Aufmerksamkeit, Koordination und visuelle Wahrnehmung — alles an einem Ort. Neue Tests kommen laufend dazu.</p>
+    <div class="stats-row">
+      <div class="stat"><span class="n">5</span><span class="l">Live-Tests</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">Kategorien</span></div>
+      <div class="stat"><span class="n">16</span><span class="l">In Entwicklung</span></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="jump-nav">
+      <a href="#reaktion" class="filter-pill">Reaktionszeit</a>
+      <a href="#gedaechtnis" class="filter-pill">Gedächtnis</a>
+      <a href="#kognitiv" class="filter-pill">Kognitive Kontrolle</a>
+      <a href="#koordination" class="filter-pill">Koordination</a>
+      <a href="#visuelle-wahrnehmung" class="filter-pill">Visuelle Wahrnehmung</a>
+      <a href="#visuelles-tracking" class="filter-pill">Visuelles Tracking</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+
+    <div class="category-block" id="reaktion">
+      <div class="category-head">
+        <div>
+          <h2>Reaktionszeit</h2>
+          <p class="category-desc">Wie schnell du auf einen visuellen oder akustischen Reiz reagierst.</p>
+        </div>
+        <span class="category-count">3 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='../index.html#reakcny-test'">
+          <span class="tag live">● Live</span>
+          <h3>Reaktionszeit</h3>
+          <p>Klicke genau in dem Moment, in dem sich das Feld grün färbt. Deine Zeit wird in Millisekunden gemessen.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Auswahlreaktion</h3>
+          <p>Unterscheide den richtigen Reiz von Ablenkungen und reagiere so schnell wie möglich — Choice Reaction Time.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Akustische Reaktion</h3>
+          <p>Reagiere auf ein Tonsignal statt auf einen visuellen Reiz — Vergleich des Reaktionskanals.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="gedaechtnis">
+      <div class="category-head">
+        <div>
+          <h2>Gedächtnis</h2>
+          <p class="category-desc">Kurzzeit-, räumliches und Arbeitsgedächtnis.</p>
+        </div>
+        <span class="category-count">4 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pamat.html'">
+          <span class="tag live">● Live</span>
+          <h3>Gedächtnissequenz</h3>
+          <p>Merke dir eine wachsende Feldsequenz und wiederhole sie. Wie viele Level schaffst du?</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Zahlenspanne</h3>
+          <p>Merke dir eine wachsende Zahlenfolge und wiederhole sie — der klassische Digit-Span-Test.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Rastergedächtnis</h3>
+          <p>Merke dir aufleuchtende Felder auf einem Raster und wiederhole ihre genaue Reihenfolge.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Wortgedächtnis</h3>
+          <p>Präge dir eine Wortliste ein und tippe anschließend so viele Wörter wie möglich.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="kognitiv">
+      <div class="category-head">
+        <div>
+          <h2>Kognitive Kontrolle</h2>
+          <p class="category-desc">Konzentration, Entscheidungsfindung und Widerstand gegen Ablenkung.</p>
+        </div>
+        <span class="category-count">4 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pozornost.html'">
+          <span class="tag live">● Live</span>
+          <h3>Daueraufmerksamkeit</h3>
+          <p>Ein Go/No-Go-Test — misst die Konzentration während einer wiederholten Aufgabe, für Athleten und Alltagsnutzer.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Stroop-Test</h3>
+          <p>Benenne die Schriftfarbe, unabhängig davon, was das Wort sagt — der klassische Test der kognitiven Kontrolle.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>N-Back</h3>
+          <p>Vergleiche den aktuellen Reiz mit dem von vor N Schritten — ein Arbeitsgedächtnistest unter Belastung.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Aufgabenwechsel</h3>
+          <p>Wechsle schnell zwischen zwei Regeln — ein Test der mentalen Flexibilität.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="koordination">
+      <div class="category-head">
+        <div>
+          <h2>Koordination</h2>
+          <p class="category-desc">Hand-Augen-Koordination, Präzision und Richtungsschnelligkeit.</p>
+        </div>
+        <span class="category-count">4 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='koordinacia.html'">
+          <span class="tag live">● Live</span>
+          <h3>Hand-Augen-Koordination</h3>
+          <p>Ein Test der Präzision und Reaktionsgeschwindigkeit auf bewegte Ziele.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Präzisionsklick</h3>
+          <p>Triff so viele Ziele wie möglich mit der geringsten Abweichung von der Mitte.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Cursor-Tracking</h3>
+          <p>Halte den Cursor so lange und präzise wie möglich auf einem bewegten Ziel.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sportagilität</h3>
+          <p>Ein kombinierter Richtungswechsel-Test — in Zusammenarbeit mit Trainern entwickelt.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="visuelle-wahrnehmung">
+      <div class="category-head">
+        <div>
+          <h2>Visuelle Wahrnehmung</h2>
+          <p class="category-desc">Umfang und Geschwindigkeit dessen, was du auf einmal wahrnehmen und verarbeiten kannst.</p>
+        </div>
+        <span class="category-count">3 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='periferne.html'">
+          <span class="tag live">● Live</span>
+          <h3>Peripheres Sehen</h3>
+          <p>Geteilte Aufmerksamkeit zwischen einem zentralen und einem peripheren Reiz — ein UFOV-Test.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sakkadische Erkennung</h3>
+          <p>Erkenne einen kurz aufblitzenden Reiz, bevor er verschwindet.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Kontrastempfindlichkeit</h3>
+          <p>Unterscheide feine Kontrastunterschiede bei eingeschränkter Sichtbarkeit.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="visuelles-tracking">
+      <div class="category-head">
+        <div>
+          <h2>Visuelles Tracking</h2>
+          <p class="category-desc">Folgebewegung und Trajektorienvorhersage — in Entwicklung.</p>
+        </div>
+        <span class="category-count">3 Tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Folgebewegung</h3>
+          <p>Verfolge ein bewegtes Objekt mit gleichmäßiger Augenbewegung, ohne den Kontakt zu verlieren.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Trajektorienvorhersage</h3>
+          <p>Schätze, wo ein Objekt landet, auch wenn es kurz aus dem Blickfeld verschwindet.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Demnächst</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Multi-Object Tracking</h3>
+          <p>Behalte mehrere bewegte Ziele gleichzeitig im Blick — Multi-Object Tracking.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. Alle Rechte vorbehalten.</span>
+  </div>
+  <div class="wrap footer-legal">
+    AOS ZONE s. r. o. · Firmen-ID (IČO): 56338945 · USt-IdNr. (DIČ): 2122277718 · Broskyňova 1198/33, 900 45 Malinovo, Slowakei · Handelsregister: Mestský súd Bratislava III, Abteilung: Sro, Einlage-Nr. 190601/B · Kontakt: <a href="mailto:martin@focusplace.site">martin@focusplace.site</a><br>
+    <a href="/ochrana-osobnych-udajov.html">Datenschutzerklärung</a> · <a href="/obchodne-podmienky.html">AGB</a> <span style="opacity:0.7;">(nur auf Slowakisch)</span>
+  </div>
+</footer>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

@@ -223,6 +223,20 @@ section{padding:100px 0;}
 .card p{color:var(--gray); font-size:14px; line-height:1.5;}
 .card .lock-icon{position:absolute; top:24px; right:24px; font-size:18px; color:var(--gray);}
 
+/* TEST HUB */
+.stats-row{display:flex; gap:40px; margin-top:28px; flex-wrap:wrap;}
+.stats-row .stat .n{font-family:'Anton'; font-size:32px; color:var(--orange); display:block;}
+.stats-row .stat .l{font-family:'Space Mono'; font-size:11px; color:var(--gray); text-transform:uppercase; letter-spacing:1px;}
+.category-block{scroll-margin-top:100px;}
+.category-block + .category-block{margin-top:80px;}
+.category-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:28px; flex-wrap:wrap; gap:8px; border-bottom:1px solid var(--navy-line); padding-bottom:16px;}
+.category-head h2{font-size:clamp(22px,3vw,28px);}
+.category-head .category-desc{color:var(--gray); font-size:13px; margin-top:4px; max-width:480px;}
+.category-count{font-family:'Space Mono'; font-size:12px; color:var(--gray); text-transform:uppercase; letter-spacing:1px; white-space:nowrap;}
+.jump-nav{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.jump-nav a.filter-pill{cursor:pointer;}
+.jump-nav a.filter-pill:hover{border-color:var(--orange); color:var(--orange);}
+
 /* VIDEA */
 .filter-row{display:flex; gap:12px; margin-bottom:36px; flex-wrap:wrap;}
 .filter-pill{

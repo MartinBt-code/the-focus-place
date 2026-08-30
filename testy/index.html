@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Knižnica testov — the Focus Place</title>
+<meta name="description" content="Reakčný čas, pamäť, pozornosť, koordinácia a vizuálne vnímanie — otestuj sa vo všetkých kategóriách na jednom mieste.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html">Testy</a>
+      <a href="../index.html#instagram">Instagram</a>
+      <a href="../index.html#eshop">E-shop</a>
+      <a href="../workshop.html">Workshop</a>
+    </div>
+    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('nav-open')" aria-label="Menu">☰</button>
+    <div class="lang-switch">
+      <a href="/testy/index.html" class="active">SK</a><span>/</span>
+      <a href="/en/testy/index.html">EN</a><span>/</span>
+      <a href="/de/testy/index.html">DE</a><span>/</span>
+      <a href="/hu/testy/index.html">HU</a>
+    </div>
+    <a href="../workshop.html" class="nav-cta">Prihlásiť sa na workshop</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Knižnica testov</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Otestuj každý aspekt<br>svojho <em>výkonu</em>.</h1>
+    <p class="lead" style="max-width:600px;">Reakčný čas, pamäť, pozornosť, koordinácia aj vizuálne vnímanie — všetko na jednom mieste. Nové testy pridávame priebežne.</p>
+    <div class="stats-row">
+      <div class="stat"><span class="n">5</span><span class="l">Testov naživo</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">Kategórií</span></div>
+      <div class="stat"><span class="n">16</span><span class="l">V príprave</span></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="jump-nav">
+      <a href="#reakcny" class="filter-pill">Reakčný čas</a>
+      <a href="#pamat" class="filter-pill">Pamäť</a>
+      <a href="#kognitivna" class="filter-pill">Kognitívna kontrola</a>
+      <a href="#koordinacia" class="filter-pill">Koordinácia</a>
+      <a href="#vizualne-vnimanie" class="filter-pill">Vizuálne vnímanie</a>
+      <a href="#vizualne-sledovanie" class="filter-pill">Vizuálne sledovanie</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+
+    <div class="category-block" id="reakcny">
+      <div class="category-head">
+        <div>
+          <h2>Reakčný čas</h2>
+          <p class="category-desc">Ako rýchlo reaguješ na vizuálny alebo zvukový podnet.</p>
+        </div>
+        <span class="category-count">3 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='../index.html#reakcny-test'">
+          <span class="tag live">● Live</span>
+          <h3>Reakčný čas</h3>
+          <p>Klikni v momente, keď sa plocha zafarbí na zeleno. Meria sa tvoj čas v milisekundách.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Reakcia na výber</h3>
+          <p>Rozlíš správny podnet od rušivých a reaguj čo najrýchlejšie — Choice Reaction Time.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sluchová reakcia</h3>
+          <p>Reaguj na zvukový signál namiesto vizuálneho — porovnanie reakčného kanálu.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="pamat">
+      <div class="category-head">
+        <div>
+          <h2>Pamäť</h2>
+          <p class="category-desc">Krátkodobá, priestorová a pracovná pamäť.</p>
+        </div>
+        <span class="category-count">4 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pamat.html'">
+          <span class="tag live">● Live</span>
+          <h3>Pamäťová sekvencia</h3>
+          <p>Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Číselný rozsah</h3>
+          <p>Zapamätaj si a zopakuj rastúcu postupnosť čísel — klasický Digit Span test.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Priestorová mriežka</h3>
+          <p>Zapamätaj si rozsvietené polia na mriežke a zopakuj ich presné poradie.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Zapamätanie slov</h3>
+          <p>Preštuduj si zoznam slov a potom napíš čo najviac z toho, čo si zapamätal.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="kognitivna">
+      <div class="category-head">
+        <div>
+          <h2>Kognitívna kontrola</h2>
+          <p class="category-desc">Sústredenie, rozhodovanie a odolnosť voči rušivým podnetom.</p>
+        </div>
+        <span class="category-count">4 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pozornost.html'">
+          <span class="tag live">● Live</span>
+          <h3>Udržanie pozornosti</h3>
+          <p>Go/No-Go test — meranie sústredenia počas opakovanej úlohy, pre atlétov aj bežných používateľov.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Stroop test</h3>
+          <p>Pomenuj farbu písma napriek tomu, čo slovo hovorí — klasický test kognitívnej kontroly.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>N-Back</h3>
+          <p>Porovnaj aktuálny podnet s tým spred N krokov — test pracovnej pamäte pod záťažou.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Prepínanie úloh</h3>
+          <p>Rýchlo prepínaj medzi dvoma pravidlami — test mentálnej flexibility.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="koordinacia">
+      <div class="category-head">
+        <div>
+          <h2>Koordinácia</h2>
+          <p class="category-desc">Súhra ruky a oka, presnosť a smerová rýchlosť.</p>
+        </div>
+        <span class="category-count">4 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='koordinacia.html'">
+          <span class="tag live">● Live</span>
+          <h3>Koordinácia rúk a očí</h3>
+          <p>Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Presnosť kliknutia</h3>
+          <p>Zasiahni čo najviac cieľov s čo najmenšou odchýlkou od stredu.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sledovanie cieľa myšou</h3>
+          <p>Udrž kurzor na pohybujúcom sa cieli čo najdlhšie a najpresnejšie.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Športová agilita</h3>
+          <p>Kombinovaný test rýchlosti smerovej zmeny — pripravovaný v spolupráci s trénermi.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="vizualne-vnimanie">
+      <div class="category-head">
+        <div>
+          <h2>Vizuálne vnímanie</h2>
+          <p class="category-desc">Rozsah a rýchlosť toho, čo dokážeš vnímať a spracovať naraz.</p>
+        </div>
+        <span class="category-count">3 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='periferne.html'">
+          <span class="tag live">● Live</span>
+          <h3>Periférne videnie</h3>
+          <p>Rozdelená pozornosť medzi centrálny a periférny podnet — test typu UFOV.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sakadické rozpoznávanie</h3>
+          <p>Rýchlo rozpoznaj bleskový podnet skôr, než zmizne.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Kontrast a citlivosť</h3>
+          <p>Rozlíš jemné rozdiely v kontraste za zhoršených podmienok viditeľnosti.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="vizualne-sledovanie">
+      <div class="category-head">
+        <div>
+          <h2>Vizuálne sledovanie</h2>
+          <p class="category-desc">Plynulé sledovanie pohybu a predikcia trajektórie — pripravujeme.</p>
+        </div>
+        <span class="category-count">3 testy</span>
+      </div>
+      <div class="grid-3">
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Plynulé sledovanie</h3>
+          <p>Sleduj pohybujúci sa objekt plynulým pohybom očí bez straty kontaktu.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Predikcia trajektórie</h3>
+          <p>Odhadni, kam objekt dopadne, aj keď na chvíľu zmizne z dohľadu.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Čoskoro</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sledovanie viacerých objektov</h3>
+          <p>Udrž v pozornosti viacero pohybujúcich sa cieľov naraz — Multi-Object Tracking.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. Všetky práva vyhradené.</span>
+  </div>
+  <div class="wrap footer-legal">
+    AOS ZONE s. r. o. · IČO: 56338945 · DIČ: 2122277718 · Broskyňova 1198/33, 900 45 Malinovo · Obchodný register Mestského súdu Bratislava III, oddiel: Sro, vložka č. 190601/B · Kontakt: <a href="mailto:martin@focusplace.site">martin@focusplace.site</a><br>
+    <a href="/ochrana-osobnych-udajov.html">Ochrana osobných údajov</a> · <a href="/obchodne-podmienky.html">Obchodné podmienky</a>
+  </div>
+</footer>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>

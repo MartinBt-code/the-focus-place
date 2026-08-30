@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Tesztkönyvtár — the Focus Place</title>
+<meta name="description" content="Reakcióidő, memória, figyelem, koordináció és vizuális érzékelés — teszteld magad minden kategóriában, egy helyen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html">Tesztek</a>
+      <a href="../index.html#instagram">Instagram</a>
+      <a href="../index.html#eshop">Bolt</a>
+      <a href="../workshop.html">Workshop</a>
+    </div>
+    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('nav-open')" aria-label="Menu">☰</button>
+    <div class="lang-switch">
+      <a href="/testy/index.html">SK</a><span>/</span>
+      <a href="/en/testy/index.html">EN</a><span>/</span>
+      <a href="/de/testy/index.html">DE</a><span>/</span>
+      <a href="/hu/testy/index.html" class="active">HU</a>
+    </div>
+    <a href="../workshop.html" class="nav-cta">Jelentkezés a workshopra</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Tesztkönyvtár</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Teszteld le teljesítményed<br>minden <em>szeletét</em>.</h1>
+    <p class="lead" style="max-width:600px;">Reakcióidő, memória, figyelem, koordináció és vizuális érzékelés — mind egy helyen. Folyamatosan bővítjük új tesztekkel.</p>
+    <div class="stats-row">
+      <div class="stat"><span class="n">5</span><span class="l">Élő teszt</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">Kategória</span></div>
+      <div class="stat"><span class="n">16</span><span class="l">Fejlesztés alatt</span></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="jump-nav">
+      <a href="#reakcio" class="filter-pill">Reakcióidő</a>
+      <a href="#memoria" class="filter-pill">Memória</a>
+      <a href="#kognitiv" class="filter-pill">Kognitív kontroll</a>
+      <a href="#koordinacio" class="filter-pill">Koordináció</a>
+      <a href="#vizualis-erzekeles" class="filter-pill">Vizuális érzékelés</a>
+      <a href="#vizualis-kovetes" class="filter-pill">Vizuális követés</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+
+    <div class="category-block" id="reakcio">
+      <div class="category-head">
+        <div>
+          <h2>Reakcióidő</h2>
+          <p class="category-desc">Milyen gyorsan reagálsz egy vizuális vagy hangjelzésre.</p>
+        </div>
+        <span class="category-count">3 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='../index.html#reakcny-test'">
+          <span class="tag live">● Élő</span>
+          <h3>Reakcióidő</h3>
+          <p>Kattints abban a pillanatban, amikor a mező zöldre vált. Az időt ezredmásodpercben mérjük.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Választásos reakció</h3>
+          <p>Különböztesd meg a helyes ingert a zavaró ingerektől, és reagálj a lehető leggyorsabban — Choice Reaction Time.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Hallási reakció</h3>
+          <p>Reagálj hangjelzésre vizuális inger helyett — a reakciócsatorna összehasonlítása.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="memoria">
+      <div class="category-head">
+        <div>
+          <h2>Memória</h2>
+          <p class="category-desc">Rövid távú, térbeli és munkamemória.</p>
+        </div>
+        <span class="category-count">4 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pamat.html'">
+          <span class="tag live">● Élő</span>
+          <h3>Memóriaszekvencia</h3>
+          <p>Jegyezd meg és ismételd meg a növekvő mezősorozatot. Hány szintig jutsz el?</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Számterjedelem</h3>
+          <p>Jegyezd meg és ismételd meg a növekvő számsorozatot — a klasszikus Digit Span teszt.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Rácsmemória</h3>
+          <p>Jegyezd meg a rácson felvillanó mezőket, és ismételd meg pontos sorrendjüket.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Szómemória</h3>
+          <p>Tanulmányozz egy szólistát, majd írd le, amennyire csak emlékszel belőle.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="kognitiv">
+      <div class="category-head">
+        <div>
+          <h2>Kognitív kontroll</h2>
+          <p class="category-desc">Koncentráció, döntéshozatal és ellenállás a zavaró ingerekkel szemben.</p>
+        </div>
+        <span class="category-count">4 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pozornost.html'">
+          <span class="tag live">● Élő</span>
+          <h3>Tartós figyelem</h3>
+          <p>Go/No-Go teszt — a koncentráció mérése ismétlődő feladat közben, sportolóknak és hétköznapi felhasználóknak egyaránt.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Stroop-teszt</h3>
+          <p>Nevezd meg a betűszínt, függetlenül attól, mit mond a szó — a kognitív kontroll klasszikus tesztje.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>N-Back</h3>
+          <p>Hasonlítsd össze az aktuális ingert az N lépéssel korábbival — munkamemória-teszt terhelés alatt.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Feladatváltás</h3>
+          <p>Válts gyorsan két szabály között — a mentális rugalmasság tesztje.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="koordinacio">
+      <div class="category-head">
+        <div>
+          <h2>Koordináció</h2>
+          <p class="category-desc">Kéz-szem koordináció, pontosság és irányváltási sebesség.</p>
+        </div>
+        <span class="category-count">4 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='koordinacia.html'">
+          <span class="tag live">● Élő</span>
+          <h3>Kéz-szem koordináció</h3>
+          <p>Pontosság és reakciósebesség tesztje mozgó célpontokkal szemben.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Pontos kattintás</h3>
+          <p>Találj el minél több célpontot a lehető legkisebb eltéréssel a középponttól.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Kurzorkövetés</h3>
+          <p>Tartsd a kurzort egy mozgó célponton a lehető leghosszabb ideig és legpontosabban.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sportagilitás</h3>
+          <p>Kombinált irányváltási sebességteszt — edzőkkel közösen kidolgozva.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="vizualis-erzekeles">
+      <div class="category-head">
+        <div>
+          <h2>Vizuális érzékelés</h2>
+          <p class="category-desc">Amit egyszerre képes vagy érzékelni és feldolgozni — terjedelem és sebesség.</p>
+        </div>
+        <span class="category-count">3 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='periferne.html'">
+          <span class="tag live">● Élő</span>
+          <h3>Perifériás látás</h3>
+          <p>Megosztott figyelem egy központi és egy perifériás inger között — UFOV típusú teszt.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Szakkádikus felismerés</h3>
+          <p>Ismerj fel egy villanásnyi ingert, mielőtt eltűnne.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Kontrasztérzékenység</h3>
+          <p>Különböztesd meg a finom kontrasztkülönbségeket rossz látási viszonyok mellett.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="vizualis-kovetes">
+      <div class="category-head">
+        <div>
+          <h2>Vizuális követés</h2>
+          <p class="category-desc">Folyamatos szemkövetés és pályaívjóslás — fejlesztés alatt.</p>
+        </div>
+        <span class="category-count">3 teszt</span>
+      </div>
+      <div class="grid-3">
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Folyamatos követés</h3>
+          <p>Kövess egy mozgó tárgyat folyamatos szemmozgással, a kapcsolat elvesztése nélkül.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Pályaívjóslás</h3>
+          <p>Becsüld meg, hova érkezik egy tárgy, még akkor is, ha rövid időre eltűnik a látóterből.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Hamarosan</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Több objektum követése</h3>
+          <p>Tarts szemmel egyszerre több mozgó célpontot — Multi-Object Tracking.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. Minden jog fenntartva.</span>
+  </div>
+  <div class="wrap footer-legal">
+    AOS ZONE s. r. o. · Cégjegyzékszám (IČO): 56338945 · Adószám (DIČ): 2122277718 · Broskyňova 1198/33, 900 45 Malinovo, Szlovákia · Cégbíróság: Mestský súd Bratislava III, részleg: Sro, betétszám: 190601/B · Kapcsolat: <a href="mailto:martin@focusplace.site">martin@focusplace.site</a><br>
+    <a href="/ochrana-osobnych-udajov.html">Adatvédelmi tájékoztató</a> · <a href="/obchodne-podmienky.html">Általános Szerződési Feltételek</a> <span style="opacity:0.7;">(csak szlovákul)</span>
+  </div>
+</footer>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Test Library — the Focus Place</title>
+<meta name="description" content="Reaction time, memory, attention, coordination and visual perception — test yourself across every category in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav id="top">
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div class="navlinks">
+      <a href="index.html">Tests</a>
+      <a href="../index.html#instagram">Instagram</a>
+      <a href="../index.html#eshop">Shop</a>
+      <a href="../workshop.html">Workshop</a>
+    </div>
+    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('nav-open')" aria-label="Menu">☰</button>
+    <div class="lang-switch">
+      <a href="/testy/index.html">SK</a><span>/</span>
+      <a href="/en/testy/index.html" class="active">EN</a><span>/</span>
+      <a href="/de/testy/index.html">DE</a><span>/</span>
+      <a href="/hu/testy/index.html">HU</a>
+    </div>
+    <a href="../workshop.html" class="nav-cta">Register for the workshop</a>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:50px;">
+  <div class="wrap">
+    <span class="eyebrow">Test Library</span>
+    <h1 style="font-size:clamp(34px,5vw,58px); margin-bottom:16px;">Test every part<br>of your <em>performance</em>.</h1>
+    <p class="lead" style="max-width:600px;">Reaction time, memory, attention, coordination and visual perception — all in one place. New tests are added continuously.</p>
+    <div class="stats-row">
+      <div class="stat"><span class="n">5</span><span class="l">Live tests</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">Categories</span></div>
+      <div class="stat"><span class="n">16</span><span class="l">In development</span></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="jump-nav">
+      <a href="#reaction" class="filter-pill">Reaction Speed</a>
+      <a href="#memory" class="filter-pill">Memory</a>
+      <a href="#cognitive" class="filter-pill">Cognitive Control</a>
+      <a href="#coordination" class="filter-pill">Coordination</a>
+      <a href="#visual-perception" class="filter-pill">Visual Perception</a>
+      <a href="#visual-tracking" class="filter-pill">Visual Tracking</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+
+    <div class="category-block" id="reaction">
+      <div class="category-head">
+        <div>
+          <h2>Reaction Speed</h2>
+          <p class="category-desc">How fast you react to a visual or audio cue.</p>
+        </div>
+        <span class="category-count">3 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='../index.html#reakcny-test'">
+          <span class="tag live">● Live</span>
+          <h3>Reaction Time</h3>
+          <p>Click the moment the box turns green. Your time is measured in milliseconds.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Choice Reaction</h3>
+          <p>Tell the correct cue apart from distractors and react as fast as possible — Choice Reaction Time.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Auditory Reaction</h3>
+          <p>React to a sound signal instead of a visual one — comparing your reaction channel.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="memory">
+      <div class="category-head">
+        <div>
+          <h2>Memory</h2>
+          <p class="category-desc">Short-term, spatial and working memory.</p>
+        </div>
+        <span class="category-count">4 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pamat.html'">
+          <span class="tag live">● Live</span>
+          <h3>Memory Sequence</h3>
+          <p>Memorize and repeat a growing sequence of tiles. How many levels can you reach?</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Digit Span</h3>
+          <p>Memorize and repeat a growing sequence of numbers — the classic Digit Span test.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Grid Memorization</h3>
+          <p>Memorize lit cells on a grid and repeat their exact order.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Word Recall</h3>
+          <p>Study a list of words, then type out as many as you can remember.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="cognitive">
+      <div class="category-head">
+        <div>
+          <h2>Cognitive Control</h2>
+          <p class="category-desc">Focus, decision-making and resistance to distraction.</p>
+        </div>
+        <span class="category-count">4 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='pozornost.html'">
+          <span class="tag live">● Live</span>
+          <h3>Sustained Attention</h3>
+          <p>A Go/No-Go test — measuring focus during a repeated task, for athletes and everyday users alike.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Stroop Test</h3>
+          <p>Name the ink color despite what the word says — the classic test of cognitive control.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>N-Back</h3>
+          <p>Compare the current cue to the one N steps back — a working memory test under load.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Task Switching</h3>
+          <p>Rapidly switch between two rule sets — a test of mental flexibility.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="coordination">
+      <div class="category-head">
+        <div>
+          <h2>Coordination</h2>
+          <p class="category-desc">Hand-eye coordination, precision and directional speed.</p>
+        </div>
+        <span class="category-count">4 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='koordinacia.html'">
+          <span class="tag live">● Live</span>
+          <h3>Hand-Eye Coordination</h3>
+          <p>A test of precision and reaction speed against moving targets.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Precision Click</h3>
+          <p>Hit as many targets as possible with the smallest deviation from center.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Cursor Tracking</h3>
+          <p>Keep the cursor on a moving target for as long and as precisely as possible.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Sport Agility</h3>
+          <p>A combined change-of-direction speed test — developed together with coaches.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="visual-perception">
+      <div class="category-head">
+        <div>
+          <h2>Visual Perception</h2>
+          <p class="category-desc">The range and speed of what you can perceive and process at once.</p>
+        </div>
+        <span class="category-count">3 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card active" onclick="location.href='periferne.html'">
+          <span class="tag live">● Live</span>
+          <h3>Peripheral Vision</h3>
+          <p>Divided attention between a central and a peripheral cue — a UFOV-style test.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Saccadic Recognition</h3>
+          <p>Quickly recognize a flashed cue before it disappears.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Contrast Sensitivity</h3>
+          <p>Tell apart subtle contrast differences under degraded visibility.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-block" id="visual-tracking">
+      <div class="category-head">
+        <div>
+          <h2>Visual Tracking</h2>
+          <p class="category-desc">Smooth pursuit and trajectory prediction — in development.</p>
+        </div>
+        <span class="category-count">3 tests</span>
+      </div>
+      <div class="grid-3">
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Smooth Pursuit</h3>
+          <p>Track a moving object with smooth eye movement, without losing contact.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Trajectory Prediction</h3>
+          <p>Estimate where an object will land, even after it briefly disappears from view.</p>
+        </div>
+        <div class="card locked">
+          <span class="tag soon">Coming soon</span>
+          <span class="lock-icon">🔒</span>
+          <h3>Multi-Object Tracking</h3>
+          <p>Keep track of several moving targets at once — Multi-Object Tracking.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_claim_white.png" alt="the Focus Place — Focus in motion" style="height:40px; width:auto;"></a>
+    <span class="mono">© 2026 the Focus Place. All rights reserved.</span>
+  </div>
+  <div class="wrap footer-legal">
+    AOS ZONE s. r. o. · Company ID (IČO): 56338945 · VAT ID (DIČ): 2122277718 · Broskyňova 1198/33, 900 45 Malinovo, Slovakia · Registered: Mestský súd Bratislava III, section: Sro, file no. 190601/B · Contact: <a href="mailto:martin@focusplace.site">martin@focusplace.site</a><br>
+    <a href="/ochrana-osobnych-udajov.html">Privacy Policy</a> · <a href="/obchodne-podmienky.html">Terms &amp; Conditions</a> <span style="opacity:0.7;">(Slovak only)</span>
+  </div>
+</footer>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
