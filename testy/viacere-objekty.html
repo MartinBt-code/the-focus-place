@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Sledovanie viacerých objektov — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/viacere-objekty.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/viacere-objekty.html">EN</a><span>/</span>
+        <a href="/de/testy/viacere-objekty.html">DE</a><span>/</span>
+        <a href="/hu/testy/viacere-objekty.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Sledovanie viacerých objektov</span></div>
+    <div id="motBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:300px; overflow:hidden;">
+      <div id="motMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni na Spustiť</div>
+    </div>
+    <button class="btn btn-primary" id="motConfirmBtn" style="margin-top:16px; width:100%; display:none;" disabled>Potvrdiť výber</button>
+    <div class="rt-stats">
+      <div><div class="num" id="motScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="motAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="motRound">0/5</div><div class="lbl">Kolo</div></div>
+    </div>
+    <div class="result-banner" id="motResult" style="display:none;">
+      <div class="result-tier" id="motResultTier"></div>
+      <p id="motResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si <strong style="color:var(--orange);">3 zvýraznené bodky</strong>. Po tom, čo sa všetky rozpohybujú a zastavia, klikni na tie, ktoré si si zapamätal.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startMOT()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">V kolektívnych športoch nikdy nesleduješ len jedného hráča — musíš mať v hlave súčasne pozície viacerých spoluhráčov aj súperov, zatiaľ čo sa všetci pohybujú. Táto schopnosť rozdeliť pozornosť medzi viacero cieľov naraz sa dá trénovať a merať.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Schopnosť súčasne sledovať viacero pohybujúcich sa cieľov v mysli, aj keď sa vizuálne stanú nerozoznateľnými od ostatných.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom v kolektívnych športoch, ktorí musia sledovať pohyb viacerých spoluhráčov a súperov naraz, aj každému, kto chce trénovať rozdelenú pozornosť.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90 %</span><span class="bm-label">Výnimočná pozornosť</span></div>
+        <div class="bm-row"><span class="bm-range">70–89 %</span><span class="bm-label">Výborná pozornosť</span></div>
+        <div class="bm-row"><span class="bm-range">50–69 %</span><span class="bm-label">Priemerná pozornosť</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 50 %</span><span class="bm-label">Podpriemerná pozornosť</span></div>
+        <p class="bm-note">Test je založený na klasickej paradigme Multi-Object Tracking (Pylyshyn &amp; Storm, 1988), bežne používanej vo výskume pozornosti aj v tréningu športovej vízie. Zdraví dospelí dokážu súčasne sledovať približne 3–4 pohybujúce sa objekty — nad touto hranicou presnosť prudko klesá.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const motBox = document.getElementById('motBox');
+const motMsg = document.getElementById('motMsg');
+const motConfirmBtn = document.getElementById('motConfirmBtn');
+const motScoreEl = document.getElementById('motScore');
+const motAccEl = document.getElementById('motAcc');
+const motRoundEl = document.getElementById('motRound');
+const motResult = document.getElementById('motResult');
+const motResultTier = document.getElementById('motResultTier');
+const motResultText = document.getElementById('motResultText');
+
+function rateMOT(acc){
+  if(acc >= 90) return ['Výnimočná pozornosť', 'Dokázal(a) si súčasne sledovať všetky ciele takmer bezchybne — patríš medzi najlepších.'];
+  if(acc >= 70) return ['Výborná pozornosť', 'Nadpriemerná schopnosť rozdeliť pozornosť medzi viacero cieľov.'];
+  if(acc >= 50) return ['Priemerná pozornosť', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná pozornosť', 'Sledovanie viacerých cieľov naraz je náročné pre každého — dá sa to trénovať.'];
+}
+
+const MOT_ROUNDS = 5;
+const MOT_TOTAL_DOTS = 8;
+const MOT_TARGET_COUNT = 3;
+const MOT_CUE_MS = 2500;
+const MOT_MOVE_MS = 8000;
+const MOT_DOT_RADIUS = 12;
+const MOT_MIN_DIST = 55;
+
+let motRound = 0, motScore = 0;
+let motDots = [];
+let motSelecting = false;
+let motRafId = null;
+
+function updateMotStats(){
+  motScoreEl.textContent = motScore;
+  const totalPossible = (motRound) * MOT_TARGET_COUNT;
+  motAccEl.textContent = totalPossible ? Math.round((motScore/totalPossible)*100)+'%' : '—';
+  motRoundEl.textContent = motRound + '/' + MOT_ROUNDS;
+}
+
+function startMOT(){
+  motRound = 0; motScore = 0;
+  updateMotStats();
+  motResult.style.display = 'none';
+  motConfirmBtn.style.display = 'none';
+  nextMotRound();
+}
+
+function randPos(existing){
+  const boxRect = motBox.getBoundingClientRect();
+  const w = boxRect.width, h = boxRect.height;
+  let tries = 0;
+  while(tries < 200){
+    const x = MOT_DOT_RADIUS + Math.random()*(w - MOT_DOT_RADIUS*2);
+    const y = MOT_DOT_RADIUS + Math.random()*(h - MOT_DOT_RADIUS*2);
+    let ok = true;
+    for(const d of existing){
+      if(Math.hypot(d.x-x, d.y-y) < MOT_MIN_DIST){ ok = false; break; }
+    }
+    if(ok) return {x, y};
+    tries++;
+  }
+  return {x: MOT_DOT_RADIUS + Math.random()*(w - MOT_DOT_RADIUS*2), y: MOT_DOT_RADIUS + Math.random()*(h - MOT_DOT_RADIUS*2)};
+}
+
+function nextMotRound(){
+  if(motRound >= MOT_ROUNDS){
+    motBox.innerHTML = '';
+    const msgEl = document.createElement('div');
+    msgEl.id = 'motMsg';
+    msgEl.className = 'rt-msg';
+    msgEl.style.cssText = 'font-size:20px;';
+    msgEl.textContent = 'Hotovo!';
+    motBox.appendChild(msgEl);
+    motConfirmBtn.style.display = 'none';
+
+    const totalPossible = MOT_ROUNDS * MOT_TARGET_COUNT;
+    const acc = Math.round((motScore/totalPossible)*100);
+    const [tier, text] = rateMOT(acc);
+    motResultTier.textContent = tier;
+    motResultText.textContent = text;
+    motResult.style.display = 'block';
+    return;
+  }
+  motRound++;
+  updateMotStats();
+  motConfirmBtn.style.display = 'none';
+  motConfirmBtn.disabled = true;
+  motSelecting = false;
+
+  motBox.innerHTML = '';
+  motDots = [];
+  const targetIdx = new Set();
+  while(targetIdx.size < MOT_TARGET_COUNT){
+    targetIdx.add(Math.floor(Math.random()*MOT_TOTAL_DOTS));
+  }
+
+  for(let i=0;i<MOT_TOTAL_DOTS;i++){
+    const pos = randPos(motDots);
+    const angle = Math.random()*Math.PI*2;
+    const speed = 45 + Math.random()*35;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:absolute; width:'+(MOT_DOT_RADIUS*2)+'px; height:'+(MOT_DOT_RADIUS*2)+'px; margin:-'+MOT_DOT_RADIUS+'px 0 0 -'+MOT_DOT_RADIUS+'px; border-radius:50%; cursor:default; transition:background .15s, box-shadow .15s;';
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
+    const isTarget = targetIdx.has(i);
+    el.style.background = isTarget ? 'var(--orange)' : '#3A4452';
+    const dot = {x: pos.x, y: pos.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, isTarget, el, selected: false};
+    el.addEventListener('click', () => onMotDotClick(dot));
+    motBox.appendChild(el);
+    motDots.push(dot);
+  }
+
+  setTimeout(() => {
+    motDots.forEach(d => { d.el.style.background = '#3A4452'; });
+    beginMotMovement();
+  }, MOT_CUE_MS);
+}
+
+function beginMotMovement(){
+  let lastTs = null;
+  const endAt = performance.now() + MOT_MOVE_MS;
+  function frame(ts){
+    if(lastTs === null) lastTs = ts;
+    const dt = Math.min(0.05, (ts - lastTs)/1000);
+    lastTs = ts;
+    const boxRect = motBox.getBoundingClientRect();
+    const w = boxRect.width, h = boxRect.height;
+    motDots.forEach(d => {
+      d.x += d.vx*dt;
+      d.y += d.vy*dt;
+      if(d.x < MOT_DOT_RADIUS){ d.x = MOT_DOT_RADIUS; d.vx = -d.vx; }
+      if(d.x > w-MOT_DOT_RADIUS){ d.x = w-MOT_DOT_RADIUS; d.vx = -d.vx; }
+      if(d.y < MOT_DOT_RADIUS){ d.y = MOT_DOT_RADIUS; d.vy = -d.vy; }
+      if(d.y > h-MOT_DOT_RADIUS){ d.y = h-MOT_DOT_RADIUS; d.vy = -d.vy; }
+      d.el.style.left = d.x + 'px';
+      d.el.style.top = d.y + 'px';
+    });
+    if(performance.now() < endAt){
+      motRafId = requestAnimationFrame(frame);
+    } else {
+      beginMotSelection();
+    }
+  }
+  motRafId = requestAnimationFrame(frame);
+}
+
+function beginMotSelection(){
+  motSelecting = true;
+  motConfirmBtn.style.display = 'block';
+  motConfirmBtn.disabled = true;
+  motDots.forEach(d => { d.el.style.background = '#3A4452'; d.el.style.cursor = 'pointer'; });
+}
+
+function onMotDotClick(dot){
+  if(!motSelecting) return;
+  const selectedCount = motDots.filter(d => d.selected).length;
+  if(dot.selected){
+    dot.selected = false;
+    dot.el.style.boxShadow = 'none';
+    dot.el.style.background = '#3A4452';
+  } else {
+    if(selectedCount >= MOT_TARGET_COUNT) return;
+    dot.selected = true;
+    dot.el.style.boxShadow = '0 0 0 3px var(--off-white)';
+    dot.el.style.background = '#5A6472';
+  }
+  const newCount = motDots.filter(d => d.selected).length;
+  motConfirmBtn.disabled = newCount !== MOT_TARGET_COUNT;
+}
+
+motConfirmBtn.addEventListener('click', () => {
+  if(motConfirmBtn.disabled) return;
+  motSelecting = false;
+  motConfirmBtn.style.display = 'none';
+
+  let correct = 0;
+  motDots.forEach(d => {
+    d.el.style.cursor = 'default';
+    if(d.isTarget){
+      d.el.style.background = 'var(--green)';
+      d.el.style.boxShadow = d.selected ? '0 0 0 3px var(--off-white)' : 'none';
+      if(d.selected) correct++;
+    } else if(d.selected){
+      d.el.style.background = '#C0392B';
+    } else {
+      d.el.style.background = '#3A4452';
+    }
+  });
+  motScore += correct;
+  updateMotStats();
+
+  setTimeout(nextMotRound, 1400);
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>
