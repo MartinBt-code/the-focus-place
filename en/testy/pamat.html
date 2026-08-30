@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Memory sequence</span></div>
+      <div class="diff-select">
+        <button class="diff-btn mem-diff" data-diff="easy" onclick="selectMemDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">slower pace</span></button>
+        <button class="diff-btn mem-diff active" data-diff="medium" onclick="selectMemDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">normal pace</span></button>
+        <button class="diff-btn mem-diff" data-diff="hard" onclick="selectMemDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">faster pace</span></button>
+      </div>
       <div id="memGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px;"></div>
       <div class="rt-stats">
         <div><div class="num" id="memLevel">0</div><div class="lbl">Level</div></div>
@@ -88,6 +93,20 @@ let userStep = 0;
 let memLevel = 0;
 let memBest = 0;
 let accepting = false;
+let memRunning = false;
+
+const MEM_SPEEDS = {
+  easy: {interval: 900, flash: 550},
+  medium: {interval: 650, flash: 350},
+  hard: {interval: 450, flash: 220}
+};
+let memDiff = 'medium';
+
+function selectMemDiff(d){
+  if(memRunning) return;
+  memDiff = d;
+  document.querySelectorAll('.mem-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 for(let i=0;i<9;i++){
   const t = document.createElement('div');
@@ -102,6 +121,9 @@ function startMemoryGame(){
   sequence = [];
   memLevel = 0;
   memLevelEl.textContent = memLevel;
+  memRunning = true;
+  document.querySelectorAll('.mem-diff').forEach(b => b.disabled = true);
+  memResult.style.display = 'none';
   nextRound();
 }
 
@@ -115,6 +137,7 @@ function nextRound(){
 }
 
 function playSequence(){
+  const speed = MEM_SPEEDS[memDiff];
   let i = 0;
   const interval = setInterval(() => {
     flashTile(sequence[i]);
@@ -123,13 +146,13 @@ function playSequence(){
       clearInterval(interval);
       setTimeout(()=>{ accepting = true; }, 500);
     }
-  }, 650);
+  }, speed.interval);
 }
 
 function flashTile(idx){
   const t = memTiles[idx];
   t.style.background = 'var(--orange)';
-  setTimeout(()=>{ t.style.background = '#1A2029'; }, 350);
+  setTimeout(()=>{ t.style.background = '#1A2029'; }, MEM_SPEEDS[memDiff].flash);
 }
 
 function onTileClick(idx){
@@ -144,6 +167,8 @@ function onTileClick(idx){
     }
   } else {
     accepting = false;
+    memRunning = false;
+    document.querySelectorAll('.mem-diff').forEach(b => b.disabled = false);
     const reached = memLevel - 1;
     if(reached > memBest){ memBest = reached; memBestEl.textContent = memBest; }
     memTiles.forEach(t=>{ t.style.background = '#C0392B'; });
