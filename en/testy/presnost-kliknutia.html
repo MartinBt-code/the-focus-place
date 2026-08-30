@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Precision Click — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/presnost-kliknutia.html">SK</a><span>/</span>
+        <a href="/en/testy/presnost-kliknutia.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/presnost-kliknutia.html">DE</a><span>/</span>
+        <a href="/hu/testy/presnost-kliknutia.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Precision Click</span></div>
+    <div id="pcBox" class="rt-box" style="cursor:crosshair; position:relative; padding:0; height:420px;">
+      <div id="pcMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Click Start</div>
+      <div id="pcTarget" style="position:absolute; width:90px; height:90px; border-radius:50%; border:2px solid var(--orange); display:none; pointer-events:none;">
+        <div style="position:absolute; top:50%; left:50%; width:50px; height:50px; margin:-25px 0 0 -25px; border-radius:50%; border:1px solid var(--orange); opacity:0.5;"></div>
+        <div style="position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--orange);"></div>
+      </div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="pcHits">0</div><div class="lbl">Hits</div></div>
+      <div><div class="num" id="pcAcc">—</div><div class="lbl">Accuracy</div></div>
+      <div><div class="num" id="pcRound">0/12</div><div class="lbl">Round</div></div>
+    </div>
+    <div class="result-banner" id="pcResult" style="display:none;">
+      <div class="result-tier" id="pcResultTier"></div>
+      <p id="pcResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Click as close as possible to the <strong style="color:var(--orange);">center of the target</strong> — speed doesn't matter, only precision.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPC()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">Precision is a different skill from speed — a shot at the basket, a strike on goal, or a tennis serve isn't just about how fast you react, but how accurately you hit the target. This test isolates exactly that component of sensorimotor control.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Sensorimotor precision — how accurately you can place a click on the center of a target, regardless of speed.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes in disciplines where accuracy decides the outcome (shooting, throwing, serving), and anyone wanting to sharpen fine motor control.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 90%</span><span class="bm-label">Elite precision</span></div>
+        <div class="bm-row"><span class="bm-range">75–89%</span><span class="bm-label">Excellent precision</span></div>
+        <div class="bm-row"><span class="bm-range">55–74%</span><span class="bm-label">Average precision</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 55%</span><span class="bm-label">Below average precision</span></div>
+        <p class="bm-note">The relationship between movement speed and accuracy is described by Fitts's law (Fitts, 1954) — a foundational model of motor control still used today to design speed/precision tradeoffs. The score here is based on the average deviation of each click from the target's center across all rounds.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+const pcBox = document.getElementById('pcBox');
+const pcTarget = document.getElementById('pcTarget');
+const pcMsg = document.getElementById('pcMsg');
+const pcHitsEl = document.getElementById('pcHits');
+const pcAccEl = document.getElementById('pcAcc');
+const pcRoundEl = document.getElementById('pcRound');
+const pcResult = document.getElementById('pcResult');
+const pcResultTier = document.getElementById('pcResultTier');
+const pcResultText = document.getElementById('pcResultText');
+
+function ratePrecision(acc){
+  if(acc >= 90) return ['Elite precision', 'You hit almost dead-center on most attempts — you\'re among the best.'];
+  if(acc >= 75) return ['Excellent precision', 'Above-average movement accuracy.'];
+  if(acc >= 55) return ['Average precision', 'Matches a typical adult result.'];
+  return ['Below average precision', 'Room to improve — precision can be trained just like speed.'];
+}
+
+const PC_ROUNDS = 12;
+const PC_RADIUS = 45;
+let pcRound = 0, pcHits = 0, pcScores = [], pcCenterX = 0, pcCenterY = 0, pcRunning = false, pcWaiting = false;
+
+function startPC(){
+  pcRound = 0; pcHits = 0; pcScores = [];
+  pcHitsEl.textContent = '0';
+  pcAccEl.textContent = '—';
+  pcResult.style.display = 'none';
+  pcRunning = true;
+  pcMsg.style.display = 'flex';
+  pcMsg.textContent = 'Get ready...';
+  setTimeout(() => {
+    pcMsg.style.display = 'none';
+    nextPcRound();
+  }, 700);
+}
+
+function nextPcRound(){
+  if(pcRound >= PC_ROUNDS){
+    pcRunning = false;
+    pcWaiting = false;
+    pcTarget.style.display = 'none';
+    pcMsg.style.display = 'flex';
+    pcMsg.textContent = 'Done!';
+    pcRoundEl.textContent = PC_ROUNDS + '/' + PC_ROUNDS;
+    if(pcScores.length > 0){
+      const acc = Math.round((pcScores.reduce((a,b)=>a+b,0)/pcScores.length)*100);
+      const [tier, text] = ratePrecision(acc);
+      pcResultTier.textContent = tier;
+      pcResultText.textContent = text;
+      pcResult.style.display = 'block';
+    }
+    return;
+  }
+  pcRound++;
+  pcRoundEl.textContent = pcRound + '/' + PC_ROUNDS;
+  const boxRect = pcBox.getBoundingClientRect();
+  const size = 90;
+  const maxX = Math.max(0, boxRect.width - size);
+  const maxY = Math.max(0, boxRect.height - size);
+  const left = Math.random()*maxX;
+  const top = Math.random()*maxY;
+  pcTarget.style.left = left + 'px';
+  pcTarget.style.top = top + 'px';
+  pcCenterX = left + size/2;
+  pcCenterY = top + size/2;
+  pcTarget.style.display = 'block';
+  pcTarget.classList.remove('show');
+  void pcTarget.offsetWidth;
+  pcTarget.classList.add('show');
+  pcWaiting = true;
+}
+
+pcBox.addEventListener('click', (e) => {
+  if(!pcRunning || !pcWaiting) return;
+  pcWaiting = false;
+  const boxRect = pcBox.getBoundingClientRect();
+  const clickX = e.clientX - boxRect.left;
+  const clickY = e.clientY - boxRect.top;
+  const dist = Math.hypot(clickX - pcCenterX, clickY - pcCenterY);
+  const score = Math.max(0, 1 - dist/PC_RADIUS);
+  pcScores.push(score);
+  if(score > 0){
+    pcHits++;
+    pcHitsEl.textContent = pcHits;
+    bump(pcHitsEl, true);
+  } else {
+    bump(pcHitsEl, false);
+  }
+  const acc = Math.round((pcScores.reduce((a,b)=>a+b,0)/pcScores.length)*100);
+  pcAccEl.textContent = acc + '%';
+  pcTarget.style.display = 'none';
+  setTimeout(nextPcRound, 250);
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

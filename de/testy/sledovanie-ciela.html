@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Cursor-Tracking — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/sledovanie-ciela.html">SK</a><span>/</span>
+        <a href="/en/testy/sledovanie-ciela.html">EN</a><span>/</span>
+        <a href="/de/testy/sledovanie-ciela.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/sledovanie-ciela.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Cursor-Tracking</span></div>
+    <div id="ctBox" class="rt-box" style="cursor:none; position:relative; padding:0; height:340px; overflow:hidden;">
+      <div id="ctMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klicke Start</div>
+      <div id="ctTarget" style="position:absolute; width:28px; height:28px; margin:-14px 0 0 -14px; border-radius:50%; background:var(--orange); display:none; transition:background .1s;"></div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="ctAcc">—</div><div class="lbl">Genauigkeit</div></div>
+      <div><div class="num" id="ctStreak">—</div><div class="lbl">Längste Serie (s)</div></div>
+      <div><div class="num" id="ctTime">20s</div><div class="lbl">Verbleibend</div></div>
+    </div>
+    <div class="result-banner" id="ctResult" style="display:none;">
+      <div class="result-tier" id="ctResultTier"></div>
+      <p id="ctResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Halte deinen Mauszeiger so lange wie möglich auf dem <strong style="color:var(--orange);">beweglichen Ziel</strong> — 20 Sekunden lang.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCursorTrack()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Ein bewegtes Objekt mit den Augen zu verfolgen und es gleichzeitig mit der Hand zu "verfolgen", ist eine grundlegende Fähigkeit in fast jeder Ballsportart — vom Verfolgen des Balls im Flug bis zum Halten des Blickkontakts mit einem Gegner, der die Richtung wechselt.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Folgebewegung (Smooth Pursuit) eines bewegten Ziels in Kombination mit motorischer Kontrolle — die Fähigkeit, den Cursor auf einem Ziel zu halten, das Richtung und Geschwindigkeit ändert.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Athleten, die ein sich schnell bewegendes Objekt mit Augen und Körper verfolgen müssen, und jedem, der Koordination und Konzentration trainieren möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">≥ 85 %</span><span class="bm-label">Außergewöhnliches Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">70–84 %</span><span class="bm-label">Ausgezeichnetes Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">50–69 %</span><span class="bm-label">Durchschnittliches Tracking</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 50 %</span><span class="bm-label">Unterdurchschnittliches Tracking</span></div>
+        <p class="bm-note">Die Folgebewegung (Smooth Pursuit) ist eine der grundlegenden Augenbewegungsarten, die in der Sehforschung untersucht wird, und wird häufig im Rahmen von Sportvisions-Trainingsprogrammen trainiert. Die Tracking-Genauigkeit sinkt mit zunehmender Geschwindigkeit und Unvorhersehbarkeit des Ziels — dieser Test kombiniert beides.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const ctBox = document.getElementById('ctBox');
+const ctTarget = document.getElementById('ctTarget');
+const ctMsg = document.getElementById('ctMsg');
+const ctAccEl = document.getElementById('ctAcc');
+const ctStreakEl = document.getElementById('ctStreak');
+const ctTimeEl = document.getElementById('ctTime');
+const ctResult = document.getElementById('ctResult');
+const ctResultTier = document.getElementById('ctResultTier');
+const ctResultText = document.getElementById('ctResultText');
+
+function rateCursorTrack(pct){
+  if(pct >= 85) return ['Außergewöhnliches Tracking', 'Du bist fast durchgehend in Kontakt mit dem Ziel geblieben — du gehörst zu den Besten.'];
+  if(pct >= 70) return ['Ausgezeichnetes Tracking', 'Überdurchschnittliche Fähigkeit, einem bewegten Ziel flüssig zu folgen.'];
+  if(pct >= 50) return ['Durchschnittliches Tracking', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  return ['Unterdurchschnittliches Tracking', 'Raum für Verbesserung — Smooth Pursuit lässt sich trainieren.'];
+}
+
+const CT_DURATION_MS = 20000;
+const CT_CONTACT_RADIUS = 32;
+let ctRunning = false;
+let ctStartTime = null, ctLastFrameTime = 0;
+let ctMouseX = null, ctMouseY = null;
+let ctContactMs = 0, ctCurrentStreakMs = 0, ctLongestStreakMs = 0;
+let ctRafId = null;
+
+function startCursorTrack(){
+  ctRunning = true;
+  ctStartTime = null;
+  ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
+  ctResult.style.display = 'none';
+  ctAccEl.textContent = '0%';
+  ctStreakEl.textContent = '0.0';
+  ctTimeEl.textContent = '20s';
+  ctMsg.style.display = 'none';
+  ctTarget.style.display = 'block';
+  ctRafId = requestAnimationFrame(ctLoop);
+}
+
+function ctLoop(timestamp){
+  if(!ctRunning) return;
+  if(ctStartTime === null){ ctStartTime = timestamp; ctLastFrameTime = timestamp; }
+  const elapsed = timestamp - ctStartTime;
+  const dt = timestamp - ctLastFrameTime;
+  ctLastFrameTime = timestamp;
+
+  if(elapsed >= CT_DURATION_MS){
+    finishCursorTrack();
+    return;
+  }
+
+  const boxRect = ctBox.getBoundingClientRect();
+  const margin = 40;
+  const rx = Math.max(10, boxRect.width/2 - margin);
+  const ry = Math.max(10, boxRect.height/2 - margin);
+  const cx = boxRect.width/2;
+  const cy = boxRect.height/2;
+  const t = elapsed/1000;
+  const tx = cx + rx*Math.sin(t*0.9);
+  const ty = cy + ry*Math.sin(t*0.6 + 1.3);
+  ctTarget.style.left = tx + 'px';
+  ctTarget.style.top = ty + 'px';
+
+  if(ctMouseX !== null){
+    const dist = Math.hypot(ctMouseX - tx, ctMouseY - ty);
+    if(dist <= CT_CONTACT_RADIUS){
+      ctContactMs += dt;
+      ctCurrentStreakMs += dt;
+      if(ctCurrentStreakMs > ctLongestStreakMs) ctLongestStreakMs = ctCurrentStreakMs;
+      ctTarget.style.background = 'var(--green)';
+    } else {
+      ctCurrentStreakMs = 0;
+      ctTarget.style.background = 'var(--orange)';
+    }
+  }
+
+  const pct = Math.round((ctContactMs/elapsed)*100);
+  ctAccEl.textContent = pct + '%';
+  ctStreakEl.textContent = (ctLongestStreakMs/1000).toFixed(1);
+  ctTimeEl.textContent = Math.max(0, Math.ceil((CT_DURATION_MS-elapsed)/1000)) + 's';
+
+  ctRafId = requestAnimationFrame(ctLoop);
+}
+
+function finishCursorTrack(){
+  ctRunning = false;
+  if(ctRafId) cancelAnimationFrame(ctRafId);
+  ctTarget.style.display = 'none';
+  ctMsg.style.display = 'flex';
+  ctMsg.textContent = 'Fertig!';
+  ctTimeEl.textContent = '0s';
+
+  const pct = Math.round((ctContactMs/CT_DURATION_MS)*100);
+  ctAccEl.textContent = pct + '%';
+  ctStreakEl.textContent = (ctLongestStreakMs/1000).toFixed(1);
+
+  const [tier, text] = rateCursorTrack(pct);
+  ctResultTier.textContent = tier;
+  ctResultText.textContent = text;
+  ctResult.style.display = 'block';
+}
+
+ctBox.addEventListener('mousemove', (e) => {
+  const boxRect = ctBox.getBoundingClientRect();
+  ctMouseX = e.clientX - boxRect.left;
+  ctMouseY = e.clientY - boxRect.top;
+});
+ctBox.addEventListener('mouseleave', () => {
+  ctMouseX = null; ctMouseY = null;
+});
+ctBox.addEventListener('touchmove', (e) => {
+  if(e.touches.length === 0) return;
+  const boxRect = ctBox.getBoundingClientRect();
+  ctMouseX = e.touches[0].clientX - boxRect.left;
+  ctMouseY = e.touches[0].clientY - boxRect.top;
+  e.preventDefault();
+}, {passive:false});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
