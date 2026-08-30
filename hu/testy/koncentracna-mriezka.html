@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Koncentrációs rács — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/koncentracna-mriezka.html">SK</a><span>/</span>
+        <a href="/en/testy/koncentracna-mriezka.html">EN</a><span>/</span>
+        <a href="/de/testy/koncentracna-mriezka.html">DE</a><span>/</span>
+        <a href="/hu/testy/koncentracna-mriezka.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Koncentrációs rács</span></div>
+
+    <div id="cgLevels" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn btn-ghost cg-level" data-size="5" onclick="selectLevel(5)" style="flex:1; min-width:80px;">5×5<br><span style="font-size:11px; opacity:0.7;">Könnyű</span></button>
+      <button class="btn btn-ghost cg-level" data-size="8" onclick="selectLevel(8)" style="flex:1; min-width:80px;">8×8<br><span style="font-size:11px; opacity:0.7;">Közepes</span></button>
+      <button class="btn btn-ghost cg-level" data-size="10" onclick="selectLevel(10)" style="flex:1; min-width:80px;">10×10<br><span style="font-size:11px; opacity:0.7;">Nehéz</span></button>
+      <button class="btn btn-ghost cg-level" data-size="13" onclick="selectLevel(13)" style="flex:1; min-width:80px;">13×13<br><span style="font-size:11px; opacity:0.7;">Expert</span></button>
+    </div>
+
+    <div id="cgWrap" style="position:relative;">
+      <div id="cgMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray); height:220px; display:flex; align-items:center; justify-content:center; text-align:center; border:2px dashed var(--navy-line); border-radius:4px;">Válassz szintet, majd kattints a Start gombra</div>
+      <div id="cgGrid" style="display:none; grid-template-columns:repeat(8,1fr); gap:3px; width:100%; aspect-ratio:1;"></div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="cgTime">0.0s</div><div class="lbl">Idő</div></div>
+      <div><div class="num" id="cgProgress">0 / 64</div><div class="lbl">Haladás</div></div>
+      <div><div class="num" id="cgBest">—</div><div class="lbl">Legjobb idő</div></div>
+    </div>
+    <div class="result-banner" id="cgResult" style="display:none;">
+      <div class="result-tier" id="cgResultTier"></div>
+      <p id="cgResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Keresd meg és kattints a számokra <strong style="color:var(--orange);">növekvő sorrendben, 1-től kezdve</strong> — a lehető leggyorsabban, hiba nélkül.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startGrid()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">A koncentráció fenntartása egy ismétlődő, első pillantásra unalmas feladat közben az egyik legnehezebb mentális készség a sportban — pontosan ez történik egy hosszú teniszmeccsen vagy egy teljes golfkörön, amikor a figyelemnek éles maradnia kell akkor is, amikor nincs mozgás. Egy nagyobb rács azt jelenti, hogy a koncentrációt hosszabb ideig kell tartani a tempó elvesztése nélkül.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A képességet, hogy hosszabb időn át fenntartsuk a fókuszált figyelmet egy ismétlődő vizuális feladaton, anélkül hogy az "kikapcsolna" vagy elterelődne.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Hosszú időtartamú, magas koncentrációs igényű sportágak versenyzőinek (tenisz, golf, lövészet), és mindenkinek, aki szeretné edzeni a figyelem kitartását.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Tájékoztató idők szintenként (gyorsabb = jobb)</h4>
+        <div class="bm-row"><span class="bm-range">5×5</span><span class="bm-label">Kiváló &lt; 20 mp · Átlag 20–40 mp</span></div>
+        <div class="bm-row"><span class="bm-range">8×8</span><span class="bm-label">Kiváló &lt; 45 mp · Átlag 45–80 mp</span></div>
+        <div class="bm-row"><span class="bm-range">10×10</span><span class="bm-label">Kiváló &lt; 75 mp · Átlag 75–120 mp</span></div>
+        <div class="bm-row"><span class="bm-range">13×13</span><span class="bm-label">Kiváló &lt; 140 mp · Átlag 140–220 mp</span></div>
+        <p class="bm-note">A klasszikus Concentration Grid gyakorlaton alapul (Harris &amp; Harris, 1984), amelyet sportolók mentális edzésében használnak, állítható rácsmérettel a digitális megvalósítások mintájára (pl. cgridid.com). A tájékoztató idők közelítő értékek — a legtöbbet a saját korábbi eredményeddel való összehasonlítás mond ugyanazon a szinten.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const cgMsg = document.getElementById('cgMsg');
+const cgGrid = document.getElementById('cgGrid');
+const cgTimeEl = document.getElementById('cgTime');
+const cgProgressEl = document.getElementById('cgProgress');
+const cgBestEl = document.getElementById('cgBest');
+const cgResult = document.getElementById('cgResult');
+const cgResultTier = document.getElementById('cgResultTier');
+const cgResultText = document.getElementById('cgResultText');
+const levelBtns = document.querySelectorAll('.cg-level');
+
+let cgSize = 8;
+let cgTotal = cgSize * cgSize;
+let cgCells = [];
+let cgTarget = 1;
+let cgRunning = false;
+let cgStartTime = 0;
+let cgRafId = null;
+const cgBests = {};
+
+function markActiveLevel(){
+  levelBtns.forEach(b => {
+    const active = parseInt(b.dataset.size) === cgSize;
+    b.style.background = active ? 'var(--orange)' : '';
+    b.style.color = active ? 'var(--navy)' : '';
+    b.style.borderColor = active ? 'var(--orange)' : '';
+  });
+}
+
+function selectLevel(size){
+  if(cgRunning) return;
+  cgSize = size;
+  cgTotal = size * size;
+  cgProgressEl.textContent = '0 / ' + cgTotal;
+  cgBestEl.textContent = cgBests[cgSize] ? cgBests[cgSize].toFixed(1) + 's' : '—';
+  cgTimeEl.textContent = '0.0s';
+  cgResult.style.display = 'none';
+  markActiveLevel();
+}
+selectLevel(8);
+
+function rateGrid(size, time){
+  const thresholds = { 5:[20,40], 8:[45,80], 10:[75,120], 13:[140,220] };
+  const [good, avg] = thresholds[size] || [45,80];
+  if(time < good) return ['Kiváló koncentráció', 'Gyors, folyamatos végigmenetel a teljes rácson habozás nélkül.'];
+  if(time < avg) return ['Átlagos koncentráció', 'Szolid eredmény — próbáld csökkenteni a számok közötti habozási időt.'];
+  return ['Átlag alatti koncentráció', 'Próbáld újra — a koncentráció fenntartásának képessége rendszeres gyakorlással fejleszthető.'];
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGrid(){
+  cgTarget = 1;
+  cgResult.style.display = 'none';
+  cgMsg.style.display = 'none';
+  cgGrid.style.display = 'grid';
+  cgGrid.style.gridTemplateColumns = 'repeat(' + cgSize + ',1fr)';
+  cgGrid.innerHTML = '';
+  cgCells = [];
+  cgProgressEl.textContent = '0 / ' + cgTotal;
+  cgTimeEl.textContent = '0.0s';
+
+  const numbers = shuffle(Array.from({length:cgTotal}, (_, i) => i + 1));
+  numbers.forEach(n => {
+    const cell = document.createElement('div');
+    cell.textContent = n;
+    cell.dataset.num = n;
+    const fontSize = cgSize <= 5 ? 18 : cgSize <= 8 ? 14 : cgSize <= 10 ? 12 : 10;
+    cell.style.cssText = `display:flex; align-items:center; justify-content:center; background:#1A2029; border:1px solid var(--navy-line); border-radius:3px; font-family:'Space Mono'; font-size:${fontSize}px; color:var(--off-white); cursor:pointer; user-select:none; transition:background .1s, color .1s;`;
+    cell.addEventListener('click', () => onCgClick(cell, n));
+    cgGrid.appendChild(cell);
+    cgCells.push(cell);
+  });
+
+  cgRunning = true;
+  cgStartTime = performance.now();
+  tickTimer();
+}
+
+function tickTimer(){
+  if(!cgRunning) return;
+  const elapsed = (performance.now() - cgStartTime) / 1000;
+  cgTimeEl.textContent = elapsed.toFixed(1) + 's';
+  cgRafId = requestAnimationFrame(tickTimer);
+}
+
+function onCgClick(cell, n){
+  if(!cgRunning) return;
+  if(n === cgTarget){
+    cell.style.background = 'var(--green)';
+    cell.style.color = 'var(--navy)';
+    cell.style.cursor = 'default';
+    cgTarget++;
+    cgProgressEl.textContent = (cgTarget - 1) + ' / ' + cgTotal;
+    if(cgTarget > cgTotal){
+      endGrid();
+    }
+  } else {
+    const prevBg = cell.style.background;
+    cell.style.background = '#C0392B';
+    setTimeout(() => { if(parseInt(cell.dataset.num) !== cgTarget - 1){ cell.style.background = prevBg || '#1A2029'; } }, 150);
+  }
+}
+
+function endGrid(){
+  cgRunning = false;
+  cancelAnimationFrame(cgRafId);
+  const finalTime = (performance.now() - cgStartTime) / 1000;
+  cgTimeEl.textContent = finalTime.toFixed(1) + 's';
+  cgCells.forEach(c => { c.style.cursor = 'default'; });
+
+  if(!cgBests[cgSize] || finalTime < cgBests[cgSize]){ cgBests[cgSize] = finalTime; }
+  cgBestEl.textContent = cgBests[cgSize].toFixed(1) + 's';
+
+  const [tier, text] = rateGrid(cgSize, finalTime);
+  cgResultTier.textContent = tier;
+  cgResultText.textContent = text;
+  cgResult.style.display = 'block';
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
