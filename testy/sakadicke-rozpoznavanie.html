@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Sakadické rozpoznávanie</span></div>
+    <div class="diff-select">
+      <button class="diff-btn sr-diff" data-diff="easy" onclick="selectSrDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">200 ms</span></button>
+      <button class="diff-btn sr-diff active" data-diff="medium" onclick="selectSrDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">130 ms</span></button>
+      <button class="diff-btn sr-diff" data-diff="hard" onclick="selectSrDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">80 ms</span></button>
+    </div>
     <div id="srBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:280px;">
       <div id="srMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni na Spustiť</div>
       <div id="srStim" style="position:absolute; font-size:30px; line-height:1; color:var(--orange); opacity:0;">●</div>
@@ -50,7 +55,7 @@
       <div class="result-tier" id="srResultTier"></div>
       <p id="srResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Symbol sa na náhodnom mieste mihne len na <strong style="color:var(--orange);">130 ms</strong>. Vyber, ktorý to bol.</p>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Symbol sa na náhodnom mieste mihne len na <strong style="color:var(--orange);" id="srFlashLabel">130 ms</strong>. Vyber, ktorý to bol.</p>
     <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startSaccadic()">Spustiť</button>
     </div>
 
@@ -107,9 +112,17 @@ const SR_SHAPES = [
   {key:'diamond', glyph:'♦'}
 ];
 const SR_ROUNDS = 16;
-const SR_FLASH_MS = 130;
+const SR_FLASH_CONFIG = { easy: 200, medium: 130, hard: 80 };
+let srDiff = 'medium';
 let srRound = 0, srScore = 0, srHits = 0, srMisses = 0, srRts = [];
 let srTimer, srShownAt, srCurrent = null, srWaitingResponse = false, srRunning = false;
+
+function selectSrDiff(d){
+  if(srRunning) return;
+  srDiff = d;
+  document.querySelectorAll('.sr-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('srFlashLabel').textContent = SR_FLASH_CONFIG[d] + ' ms';
+}
 
 function updateSrStats(){
   srScoreEl.textContent = srScore;
@@ -123,6 +136,7 @@ function startSaccadic(){
   updateSrStats();
   srResult.style.display = 'none';
   srRunning = true;
+  document.querySelectorAll('.sr-diff').forEach(b => b.disabled = true);
   srOptions.style.display = 'none';
   srMsg.style.display = 'flex';
   srMsg.textContent = 'Priprav sa...';
@@ -135,6 +149,7 @@ function startSaccadic(){
 function nextSrRound(){
   if(srRound >= SR_ROUNDS){
     srRunning = false;
+    document.querySelectorAll('.sr-diff').forEach(b => b.disabled = false);
     srOptions.style.display = 'none';
     srMsg.style.display = 'flex';
     srMsg.textContent = 'Hotovo!';
@@ -180,7 +195,7 @@ function showSrStim(){
         setTimeout(nextSrRound, 400);
       }
     }, 3000);
-  }, SR_FLASH_MS);
+  }, SR_FLASH_CONFIG[srDiff]);
 }
 
 function srAnswer(key){
