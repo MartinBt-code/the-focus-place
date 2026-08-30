@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Zapamätanie slov</span></div>
+      <div class="diff-select">
+        <button class="diff-btn wr-diff" data-diff="easy" onclick="selectWrDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">8 slov</span></button>
+        <button class="diff-btn wr-diff active" data-diff="medium" onclick="selectWrDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">12 slov</span></button>
+        <button class="diff-btn wr-diff" data-diff="hard" onclick="selectWrDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">16 slov</span></button>
+      </div>
       <div id="wrBox" class="rt-box" style="flex-direction:column; gap:14px; height:auto; min-height:280px; padding:24px;">
         <div class="rt-msg" id="wrMsg" style="font-size:36px;">—</div>
         <div id="wrRecallArea" style="display:none; width:100%;">
@@ -49,7 +54,7 @@
         <div class="result-tier" id="wrResultTier"></div>
         <p id="wrResultText"></p>
       </div>
-      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Preštuduj si zoznam <strong style="color:var(--orange);">12 slov</strong>, potom napíš čo najviac z toho, čo si zapamätal. Na poradí nezáleží.</p>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Preštuduj si zoznam <strong style="color:var(--orange);" id="wrCountLabel">12 slov</strong>, potom napíš čo najviac z toho, čo si zapamätal. Na poradí nezáleží.</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" id="wrMainBtn" onclick="startWordRecall()">Spustiť</button>
     </div>
 
@@ -67,12 +72,12 @@
         </div>
       </div>
       <div class="benchmark-table">
-        <h4>Hodnotiaca škála</h4>
-        <div class="bm-row"><span class="bm-range">≥ 10 / 12</span><span class="bm-label">Výnimočná pamäť</span></div>
-        <div class="bm-row"><span class="bm-range">7–9 / 12</span><span class="bm-label">Výborná pamäť</span></div>
-        <div class="bm-row"><span class="bm-range">4–6 / 12</span><span class="bm-label">Priemerná pamäť</span></div>
-        <div class="bm-row"><span class="bm-range">&lt; 4 / 12</span><span class="bm-label">Podpriemerná pamäť</span></div>
-        <p class="bm-note">Test je založený na klasickej paradigme voľného vybavenia (free recall), bežne používanej v psychológii pamäte od výskumov Murdocka (1962). Pri zozname 10–15 slov si zdravý dospelý zvyčajne vybaví 5–9 položiek — najlepšie sa pamätajú slová na začiatku a na konci zoznamu (tzv. primacy a recency efekt).</p>
+        <h4>Hodnotiaca škála (podiel vybavených slov)</h4>
+        <div class="bm-row"><span class="bm-range">≥ 85 %</span><span class="bm-label">Výnimočná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">60–84 %</span><span class="bm-label">Výborná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">35–59 %</span><span class="bm-label">Priemerná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 35 %</span><span class="bm-label">Podpriemerná pamäť</span></div>
+        <p class="bm-note">Test je založený na klasickej paradigme voľného vybavenia (free recall), bežne používanej v psychológii pamäte od výskumov Murdocka (1962). Dĺžka zoznamu (8–16 slov) sa mení podľa zvolenej náročnosti — pri 10–15 slovách si zdravý dospelý zvyčajne vybaví 5–9 položiek, teda zhruba 40–60 %. Najlepšie sa pamätajú slová na začiatku a na konci zoznamu (tzv. primacy a recency efekt).</p>
       </div>
     </div>
   </div>
@@ -94,16 +99,38 @@ const wrResultText = document.getElementById('wrResultText');
 const wrMainBtn = document.getElementById('wrMainBtn');
 
 function rateWordRecall(score, total){
-  if(score >= 10) return ['Výnimočná pamäť', 'Vybavil si si takmer celý zoznam — patríš medzi najlepších.'];
-  if(score >= 7) return ['Výborná pamäť', 'Nadpriemerný výsledok — bežný priemer je 5–9 slov z 12.'];
-  if(score >= 4) return ['Priemerná pamäť', 'Zodpovedá bežnému výsledku dospelého.'];
+  const pct = (score/total)*100;
+  if(pct >= 85) return ['Výnimočná pamäť', 'Vybavil si si takmer celý zoznam — patríš medzi najlepších.'];
+  if(pct >= 60) return ['Výborná pamäť', 'Nadpriemerný výsledok — bežný priemer je zhruba 40–60 % zoznamu.'];
+  if(pct >= 35) return ['Priemerná pamäť', 'Zodpovedá bežnému výsledku dospelého.'];
   return ['Podpriemerná pamäť', 'Skús to znova — voľné vybavenie sa dá pravidelným tréningom zlepšiť.'];
 }
 
-const WR_WORDS = ['STROM','LOPTA','OKNO','RIEKA','STOLIČKA','MESIAC','KVET','CESTA','HODINY','OHEŇ','KĽÚČ','OBLAK'];
-const WR_STUDY_MS = 1000;
-const WR_GAP_MS = 300;
+const WR_WORD_POOL = ['STROM','LOPTA','OKNO','RIEKA','STOLIČKA','MESIAC','KVET','CESTA','HODINY','OHEŇ','KĽÚČ','OBLAK','MOST','LAMPA','PIESOK','ZVON','VLAK','HORA','SNEH','LES'];
+const WR_DIFF_CONFIG = {
+  easy: {count: 8, studyMs: 1300, gapMs: 400},
+  medium: {count: 12, studyMs: 1000, gapMs: 300},
+  hard: {count: 16, studyMs: 750, gapMs: 220}
+};
+let wrDiff = 'medium';
+let wrRunning = false;
 
+function shuffle(arr){
+  for(let i=arr.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function selectWrDiff(d){
+  if(wrRunning) return;
+  wrDiff = d;
+  document.querySelectorAll('.wr-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('wrCountLabel').textContent = WR_DIFF_CONFIG[d].count + ' slov';
+}
+
+let WR_WORDS = [];
 let wrTargetsNorm = [];
 let wrFoundNorm = new Set();
 let wrSubmittedNorm = new Set();
@@ -121,6 +148,8 @@ function updateWrStats(){
 }
 
 function startWordRecall(){
+  const cfg = WR_DIFF_CONFIG[wrDiff];
+  WR_WORDS = shuffle(WR_WORD_POOL.slice()).slice(0, cfg.count);
   wrTargetsNorm = WR_WORDS.map(normalize);
   wrFoundNorm = new Set();
   wrSubmittedNorm = new Set();
@@ -131,6 +160,8 @@ function startWordRecall(){
   wrRecallArea.style.display = 'none';
   wrPhase = 'study';
   wrMainBtn.style.display = 'none';
+  wrRunning = true;
+  document.querySelectorAll('.wr-diff').forEach(b => b.disabled = true);
 
   wrMsg.style.fontSize = '18px';
   wrMsg.textContent = 'Priprav sa...';
@@ -150,8 +181,8 @@ function startWordRecall(){
       i++;
       setTimeout(() => {
         wrMsg.style.opacity = '0';
-        setTimeout(showNext, WR_GAP_MS);
-      }, WR_STUDY_MS);
+        setTimeout(showNext, cfg.gapMs);
+      }, cfg.studyMs);
     }
     showNext();
   }, 900);
@@ -204,6 +235,8 @@ wrInput.addEventListener('keydown', (e) => {
 
 function finishRecall(){
   wrPhase = 'done';
+  wrRunning = false;
+  document.querySelectorAll('.wr-diff').forEach(b => b.disabled = false);
   wrRecallArea.style.display = 'none';
   wrMsg.style.fontSize = '20px';
   wrMsg.textContent = 'Hotovo!';

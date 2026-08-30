@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Wortgedächtnis</span></div>
+      <div class="diff-select">
+        <button class="diff-btn wr-diff" data-diff="easy" onclick="selectWrDiff('easy')">Leicht<br><span style="font-size:10px; opacity:0.7;">8 Wörter</span></button>
+        <button class="diff-btn wr-diff active" data-diff="medium" onclick="selectWrDiff('medium')">Mittel<br><span style="font-size:10px; opacity:0.7;">12 Wörter</span></button>
+        <button class="diff-btn wr-diff" data-diff="hard" onclick="selectWrDiff('hard')">Schwer<br><span style="font-size:10px; opacity:0.7;">16 Wörter</span></button>
+      </div>
       <div id="wrBox" class="rt-box" style="flex-direction:column; gap:14px; height:auto; min-height:280px; padding:24px;">
         <div class="rt-msg" id="wrMsg" style="font-size:36px;">—</div>
         <div id="wrRecallArea" style="display:none; width:100%;">
@@ -49,7 +54,7 @@
         <div class="result-tier" id="wrResultTier"></div>
         <p id="wrResultText"></p>
       </div>
-      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Präge dir eine Liste von <strong style="color:var(--orange);">12 Wörtern</strong> ein und tippe anschließend so viele wie möglich. Die Reihenfolge spielt keine Rolle.</p>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Präge dir eine Liste von <strong style="color:var(--orange);" id="wrCountLabel">12 Wörtern</strong> ein und tippe anschließend so viele wie möglich. Die Reihenfolge spielt keine Rolle.</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" id="wrMainBtn" onclick="startWordRecall()">Start</button>
     </div>
 
@@ -67,12 +72,12 @@
         </div>
       </div>
       <div class="benchmark-table">
-        <h4>Bewertungsskala</h4>
-        <div class="bm-row"><span class="bm-range">≥ 10 / 12</span><span class="bm-label">Außergewöhnliches Gedächtnis</span></div>
-        <div class="bm-row"><span class="bm-range">7–9 / 12</span><span class="bm-label">Ausgezeichnetes Gedächtnis</span></div>
-        <div class="bm-row"><span class="bm-range">4–6 / 12</span><span class="bm-label">Durchschnittliches Gedächtnis</span></div>
-        <div class="bm-row"><span class="bm-range">&lt; 4 / 12</span><span class="bm-label">Unterdurchschnittliches Gedächtnis</span></div>
-        <p class="bm-note">Der Test basiert auf dem klassischen Paradigma des freien Erinnerns (free recall), das in der Gedächtnisforschung seit Murdocks Arbeiten (1962) verbreitet ist. Bei einer Liste von 10–15 Wörtern erinnert sich ein gesunder Erwachsener typischerweise an 5–9 Elemente — Wörter am Anfang und Ende der Liste werden am besten behalten (Primacy- und Recency-Effekt).</p>
+        <h4>Bewertungsskala (Anteil erinnerter Wörter)</h4>
+        <div class="bm-row"><span class="bm-range">≥ 85 %</span><span class="bm-label">Außergewöhnliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">60–84 %</span><span class="bm-label">Ausgezeichnetes Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">35–59 %</span><span class="bm-label">Durchschnittliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 35 %</span><span class="bm-label">Unterdurchschnittliches Gedächtnis</span></div>
+        <p class="bm-note">Der Test basiert auf dem klassischen Paradigma des freien Erinnerns (free recall), das in der Gedächtnisforschung seit Murdocks Arbeiten (1962) verbreitet ist. Die Listenlänge (8–16 Wörter) richtet sich nach der gewählten Schwierigkeit — bei einer Liste von 10–15 Wörtern erinnert sich ein gesunder Erwachsener typischerweise an 5–9 Elemente, also etwa 40–60 %. Wörter am Anfang und Ende der Liste werden am besten behalten (Primacy- und Recency-Effekt).</p>
       </div>
     </div>
   </div>
@@ -94,16 +99,38 @@ const wrResultText = document.getElementById('wrResultText');
 const wrMainBtn = document.getElementById('wrMainBtn');
 
 function rateWordRecall(score, total){
-  if(score >= 10) return ['Außergewöhnliches Gedächtnis', 'Du hast fast die gesamte Liste erinnert — du gehörst zu den Besten.'];
-  if(score >= 7) return ['Ausgezeichnetes Gedächtnis', 'Überdurchschnittliches Ergebnis — der typische Durchschnitt liegt bei 5–9 von 12 Wörtern.'];
-  if(score >= 4) return ['Durchschnittliches Gedächtnis', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  const pct = (score/total)*100;
+  if(pct >= 85) return ['Außergewöhnliches Gedächtnis', 'Du hast fast die gesamte Liste erinnert — du gehörst zu den Besten.'];
+  if(pct >= 60) return ['Ausgezeichnetes Gedächtnis', 'Überdurchschnittliches Ergebnis — der typische Durchschnitt liegt bei etwa 40–60 % der Liste.'];
+  if(pct >= 35) return ['Durchschnittliches Gedächtnis', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
   return ['Unterdurchschnittliches Gedächtnis', 'Versuch es nochmal — freies Erinnern verbessert sich durch regelmäßiges Training.'];
 }
 
-const WR_WORDS = ['BAUM','BALL','FENSTER','FLUSS','STUHL','MOND','BLUME','STRASSE','UHR','FEUER','SCHLÜSSEL','WOLKE'];
-const WR_STUDY_MS = 1000;
-const WR_GAP_MS = 300;
+const WR_WORD_POOL = ['BAUM','BALL','FENSTER','FLUSS','STUHL','MOND','BLUME','STRASSE','UHR','FEUER','SCHLÜSSEL','WOLKE','BRÜCKE','LAMPE','SAND','GLOCKE','ZUG','BERG','SCHNEE','WALD'];
+const WR_DIFF_CONFIG = {
+  easy: {count: 8, studyMs: 1300, gapMs: 400},
+  medium: {count: 12, studyMs: 1000, gapMs: 300},
+  hard: {count: 16, studyMs: 750, gapMs: 220}
+};
+let wrDiff = 'medium';
+let wrRunning = false;
 
+function shuffle(arr){
+  for(let i=arr.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function selectWrDiff(d){
+  if(wrRunning) return;
+  wrDiff = d;
+  document.querySelectorAll('.wr-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('wrCountLabel').textContent = WR_DIFF_CONFIG[d].count + ' Wörtern';
+}
+
+let WR_WORDS = [];
 let wrTargetsNorm = [];
 let wrFoundNorm = new Set();
 let wrSubmittedNorm = new Set();
@@ -121,6 +148,8 @@ function updateWrStats(){
 }
 
 function startWordRecall(){
+  const cfg = WR_DIFF_CONFIG[wrDiff];
+  WR_WORDS = shuffle(WR_WORD_POOL.slice()).slice(0, cfg.count);
   wrTargetsNorm = WR_WORDS.map(normalize);
   wrFoundNorm = new Set();
   wrSubmittedNorm = new Set();
@@ -131,6 +160,8 @@ function startWordRecall(){
   wrRecallArea.style.display = 'none';
   wrPhase = 'study';
   wrMainBtn.style.display = 'none';
+  wrRunning = true;
+  document.querySelectorAll('.wr-diff').forEach(b => b.disabled = true);
 
   wrMsg.style.fontSize = '18px';
   wrMsg.textContent = 'Bereit machen...';
@@ -150,8 +181,8 @@ function startWordRecall(){
       i++;
       setTimeout(() => {
         wrMsg.style.opacity = '0';
-        setTimeout(showNext, WR_GAP_MS);
-      }, WR_STUDY_MS);
+        setTimeout(showNext, cfg.gapMs);
+      }, cfg.studyMs);
     }
     showNext();
   }, 900);
@@ -204,6 +235,8 @@ wrInput.addEventListener('keydown', (e) => {
 
 function finishRecall(){
   wrPhase = 'done';
+  wrRunning = false;
+  document.querySelectorAll('.wr-diff').forEach(b => b.disabled = false);
   wrRecallArea.style.display = 'none';
   wrMsg.style.fontSize = '20px';
   wrMsg.textContent = 'Fertig!';
