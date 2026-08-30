@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Rácsmemória — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/priestorova-mriezka.html">SK</a><span>/</span>
+        <a href="/en/testy/priestorova-mriezka.html">EN</a><span>/</span>
+        <a href="/de/testy/priestorova-mriezka.html">DE</a><span>/</span>
+        <a href="/hu/testy/priestorova-mriezka.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Rácsmemória</span></div>
+      <div id="gridBox" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="gridLevel">0</div><div class="lbl">Szint</div></div>
+        <div><div class="num" id="gridBest">0</div><div class="lbl">Legjobb</div></div>
+      </div>
+      <div class="result-banner" id="gridResult" style="display:none;">
+        <div class="result-tier" id="gridResultTier"></div>
+        <p id="gridResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Jegyezd meg a felvillanó mezőket, és kattints <strong style="color:var(--orange);">ugyanazokra</strong> — a sorrend nem számít.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startGridMemory()">Indítás</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">Egy lépéssorozat megjegyzésével ellentétben itt egy teljes vizuális mintázatot kell egyszerre befogadnod — pontosan úgy, ahogy egy játékosnak egy pillanat alatt meg kell jegyeznie az ellenfél felállását a pályán, vagy az akadályok elrendezését a pályán.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A vizuospaciális memória kapacitását egyszerre bemutatott mintázatokra — hány mezőt tudsz egyszerre megjegyezni, a sorrendtől függetlenül.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Sportolóknak, akiknek gyorsan kell "lefényképezniük" egy felállást a pályán, és mindenkinek, aki szeretné edzeni a vizuális memóriáját.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Értékelési skála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 8 mező</span><span class="bm-label">Kivételes térbeli memória</span></div>
+        <div class="bm-row"><span class="bm-range">6–7 mező</span><span class="bm-label">Kiváló térbeli memória</span></div>
+        <div class="bm-row"><span class="bm-range">4–5 mező</span><span class="bm-label">Átlagos térbeli memória</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 4 mező</span><span class="bm-label">Átlag alatti térbeli memória</span></div>
+        <p class="bm-note">A teszt a Visual Patterns Test (Della Sala és mtsai, 1997) ihlette, amely a vizuospaciális memória kapacitását méri egyszerre bemutatott mintázatokra — a szekvenciális tesztekkel (pl. Corsi-teszt) ellentétben itt a sorrend nem számít, csak az, hogy a helyes mezőkre emlékszel-e. Egy átlagos felnőtt egyszerre kb. 4–5 mezőt jegyez meg, gyakorlott egyéneknél ez 8 vagy több is lehet.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const gridBox = document.getElementById('gridBox');
+const gridLevelEl = document.getElementById('gridLevel');
+const gridBestEl = document.getElementById('gridBest');
+const gridResult = document.getElementById('gridResult');
+const gridResultTier = document.getElementById('gridResultTier');
+const gridResultText = document.getElementById('gridResultText');
+
+function rateGridMemory(level){
+  if(level >= 8) return ['Kivételes térbeli memória', 'Ez gyakorlott egyének szintjének felel meg — a jellemző átlag 4–5 mező.'];
+  if(level >= 6) return ['Kiváló térbeli memória', 'Átlag feletti eredmény — a legtöbben a 4–5. szint körül állnak meg.'];
+  if(level >= 4) return ['Átlagos térbeli memória', 'Megfelel egy tipikus felnőtt eredménynek.'];
+  return ['Átlag alatti térbeli memória', 'Próbáld újra — a vizuális memória rendszeres gyakorlással javítható.'];
+}
+
+const GRID_SIZE = 16;
+let gridTiles = [];
+let gridTargets = new Set();
+let gridFound = new Set();
+let gridLevel = 0;
+let gridBest = 0;
+let gridAccepting = false;
+
+for(let i=0;i<GRID_SIZE;i++){
+  const t = document.createElement('div');
+  t.style.cssText = 'aspect-ratio:1;background:#1A2029;border:2px solid var(--navy-line);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s;';
+  t.dataset.idx = i;
+  t.addEventListener('click', () => onGridClick(i, t));
+  gridBox.appendChild(t);
+  gridTiles.push(t);
+}
+
+function startGridMemory(){
+  gridLevel = 0;
+  gridLevelEl.textContent = gridLevel;
+  gridResult.style.display = 'none';
+  nextGridRound();
+}
+
+function cellsForLevel(level){
+  return level + 2;
+}
+
+function nextGridRound(){
+  gridLevel++;
+  gridLevelEl.textContent = gridLevel;
+  gridFound = new Set();
+  gridAccepting = false;
+  resetTiles();
+
+  const n = cellsForLevel(gridLevel);
+  gridTargets = new Set();
+  while(gridTargets.size < n){
+    gridTargets.add(Math.floor(Math.random()*GRID_SIZE));
+  }
+  gridTargets.forEach(idx => { gridTiles[idx].style.background = 'var(--orange)'; });
+
+  const viewMs = 1000 + n*150;
+  setTimeout(() => {
+    resetTiles();
+    gridAccepting = true;
+  }, viewMs);
+}
+
+function resetTiles(){
+  gridTiles.forEach(t => { t.style.background = '#1A2029'; t.style.borderColor = 'var(--navy-line)'; });
+}
+
+function onGridClick(idx, tile){
+  if(!gridAccepting) return;
+  if(gridFound.has(idx)) return;
+
+  if(gridTargets.has(idx)){
+    gridFound.add(idx);
+    tile.style.background = 'var(--green)';
+    if(gridFound.size === gridTargets.size){
+      gridAccepting = false;
+      if(gridLevel > gridBest){ gridBest = gridLevel; gridBestEl.textContent = gridBest; }
+      setTimeout(nextGridRound, 800);
+    }
+  } else {
+    gridAccepting = false;
+    tile.style.background = '#C0392B';
+    gridTargets.forEach(i => { if(!gridFound.has(i)) gridTiles[i].style.background = 'var(--orange)'; });
+    const reached = gridLevel - 1;
+    if(reached > gridBest){ gridBest = reached; gridBestEl.textContent = gridBest; }
+    if(reached > 0){
+      const [tier, text] = rateGridMemory(reached);
+      gridResultTier.textContent = tier;
+      gridResultText.textContent = text;
+      gridResult.style.display = 'block';
+    }
+  }
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

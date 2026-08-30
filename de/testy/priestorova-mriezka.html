@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Rastergedächtnis — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/priestorova-mriezka.html">SK</a><span>/</span>
+        <a href="/en/testy/priestorova-mriezka.html">EN</a><span>/</span>
+        <a href="/de/testy/priestorova-mriezka.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/priestorova-mriezka.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Rastergedächtnis</span></div>
+      <div id="gridBox" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="gridLevel">0</div><div class="lbl">Level</div></div>
+        <div><div class="num" id="gridBest">0</div><div class="lbl">Bestwert</div></div>
+      </div>
+      <div class="result-banner" id="gridResult" style="display:none;">
+        <div class="result-tier" id="gridResultTier"></div>
+        <p id="gridResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Merke dir die aufleuchtenden Felder und klicke die <strong style="color:var(--orange);">gleichen</strong> an — die Reihenfolge spielt keine Rolle.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startGridMemory()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Anders als beim Merken einer Schrittfolge geht es hier darum, ein ganzes visuelles Muster auf einmal zu erfassen — genau so, wie ein Spieler sich in Sekundenbruchteilen die Aufstellung des Gegners auf dem Feld oder die Anordnung von Hindernissen auf der Strecke einprägen muss.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Kapazität des visuospatialen Gedächtnisses für gleichzeitig präsentierte Muster — wie viele Felder du dir auf einmal merken kannst, unabhängig von der Reihenfolge.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Athleten, die eine Aufstellung auf dem Feld schnell "fotografieren" müssen, und jedem, der das visuelle Gedächtnis trainieren möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">≥ 8 Felder</span><span class="bm-label">Außergewöhnliches räumliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">6–7 Felder</span><span class="bm-label">Ausgezeichnetes räumliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">4–5 Felder</span><span class="bm-label">Durchschnittliches räumliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 4 Felder</span><span class="bm-label">Unterdurchschnittliches räumliches Gedächtnis</span></div>
+        <p class="bm-note">Der Test ist vom Visual Patterns Test (Della Sala et al., 1997) inspiriert, der die visuospatiale Gedächtniskapazität für gleichzeitig präsentierte Muster misst — anders als bei sequenziellen Tests (z. B. dem Corsi-Test) spielt hier die Reihenfolge keine Rolle, nur ob du die richtigen Felder erinnerst. Der durchschnittliche Erwachsene merkt sich auf einmal etwa 4–5 Felder, trainierte Personen erreichen 8 oder mehr.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const gridBox = document.getElementById('gridBox');
+const gridLevelEl = document.getElementById('gridLevel');
+const gridBestEl = document.getElementById('gridBest');
+const gridResult = document.getElementById('gridResult');
+const gridResultTier = document.getElementById('gridResultTier');
+const gridResultText = document.getElementById('gridResultText');
+
+function rateGridMemory(level){
+  if(level >= 8) return ['Außergewöhnliches räumliches Gedächtnis', 'Das entspricht dem Niveau trainierter Personen — der typische Durchschnitt liegt bei 4–5 Feldern.'];
+  if(level >= 6) return ['Ausgezeichnetes räumliches Gedächtnis', 'Überdurchschnittliches Ergebnis — die meisten Menschen kommen bis etwa Level 4–5.'];
+  if(level >= 4) return ['Durchschnittliches räumliches Gedächtnis', 'Entspricht einem typischen Ergebnis eines Erwachsenen.'];
+  return ['Unterdurchschnittliches räumliches Gedächtnis', 'Versuch es nochmal — das visuelle Gedächtnis verbessert sich durch regelmäßiges Training.'];
+}
+
+const GRID_SIZE = 16;
+let gridTiles = [];
+let gridTargets = new Set();
+let gridFound = new Set();
+let gridLevel = 0;
+let gridBest = 0;
+let gridAccepting = false;
+
+for(let i=0;i<GRID_SIZE;i++){
+  const t = document.createElement('div');
+  t.style.cssText = 'aspect-ratio:1;background:#1A2029;border:2px solid var(--navy-line);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s;';
+  t.dataset.idx = i;
+  t.addEventListener('click', () => onGridClick(i, t));
+  gridBox.appendChild(t);
+  gridTiles.push(t);
+}
+
+function startGridMemory(){
+  gridLevel = 0;
+  gridLevelEl.textContent = gridLevel;
+  gridResult.style.display = 'none';
+  nextGridRound();
+}
+
+function cellsForLevel(level){
+  return level + 2;
+}
+
+function nextGridRound(){
+  gridLevel++;
+  gridLevelEl.textContent = gridLevel;
+  gridFound = new Set();
+  gridAccepting = false;
+  resetTiles();
+
+  const n = cellsForLevel(gridLevel);
+  gridTargets = new Set();
+  while(gridTargets.size < n){
+    gridTargets.add(Math.floor(Math.random()*GRID_SIZE));
+  }
+  gridTargets.forEach(idx => { gridTiles[idx].style.background = 'var(--orange)'; });
+
+  const viewMs = 1000 + n*150;
+  setTimeout(() => {
+    resetTiles();
+    gridAccepting = true;
+  }, viewMs);
+}
+
+function resetTiles(){
+  gridTiles.forEach(t => { t.style.background = '#1A2029'; t.style.borderColor = 'var(--navy-line)'; });
+}
+
+function onGridClick(idx, tile){
+  if(!gridAccepting) return;
+  if(gridFound.has(idx)) return;
+
+  if(gridTargets.has(idx)){
+    gridFound.add(idx);
+    tile.style.background = 'var(--green)';
+    if(gridFound.size === gridTargets.size){
+      gridAccepting = false;
+      if(gridLevel > gridBest){ gridBest = gridLevel; gridBestEl.textContent = gridBest; }
+      setTimeout(nextGridRound, 800);
+    }
+  } else {
+    gridAccepting = false;
+    tile.style.background = '#C0392B';
+    gridTargets.forEach(i => { if(!gridFound.has(i)) gridTiles[i].style.background = 'var(--orange)'; });
+    const reached = gridLevel - 1;
+    if(reached > gridBest){ gridBest = reached; gridBestEl.textContent = gridBest; }
+    if(reached > 0){
+      const [tier, text] = rateGridMemory(reached);
+      gridResultTier.textContent = tier;
+      gridResultText.textContent = text;
+      gridResult.style.display = 'block';
+    }
+  }
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Grid Memorization — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Back to tests</a>
+      <div class="lang-switch">
+        <a href="/testy/priestorova-mriezka.html">SK</a><span>/</span>
+        <a href="/en/testy/priestorova-mriezka.html" class="active">EN</a><span>/</span>
+        <a href="/de/testy/priestorova-mriezka.html">DE</a><span>/</span>
+        <a href="/hu/testy/priestorova-mriezka.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Grid Memorization</span></div>
+      <div id="gridBox" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px;"></div>
+      <div class="rt-stats">
+        <div><div class="num" id="gridLevel">0</div><div class="lbl">Level</div></div>
+        <div><div class="num" id="gridBest">0</div><div class="lbl">Best</div></div>
+      </div>
+      <div class="result-banner" id="gridResult" style="display:none;">
+        <div class="result-tier" id="gridResultTier"></div>
+        <p id="gridResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Memorize the lit cells and click the <strong style="color:var(--orange);">same</strong> ones — order doesn't matter.</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startGridMemory()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Why it matters</h3>
+      <p class="lead-text">Unlike memorizing a sequence of steps, this is about capturing an entire visual pattern at once — exactly how a player has to memorize the opponent's formation on the field in a split second, or the layout of obstacles on a track.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>What it measures</strong>
+          <p>Visuospatial memory capacity for simultaneously presented patterns — how many cells you can memorize at once, regardless of order.</p>
+        </div>
+        <div>
+          <strong>Who it helps</strong>
+          <p>Athletes who need to quickly "snapshot" a formation on the field, and anyone wanting to train visual memory.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Rating scale</h4>
+        <div class="bm-row"><span class="bm-range">≥ 8 cells</span><span class="bm-label">Exceptional spatial memory</span></div>
+        <div class="bm-row"><span class="bm-range">6–7 cells</span><span class="bm-label">Excellent spatial memory</span></div>
+        <div class="bm-row"><span class="bm-range">4–5 cells</span><span class="bm-label">Average spatial memory</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 4 cells</span><span class="bm-label">Below average spatial memory</span></div>
+        <p class="bm-note">The test is inspired by the Visual Patterns Test (Della Sala et al., 1997), which measures visuospatial memory capacity for simultaneously presented patterns — unlike sequential tests (e.g. the Corsi test), order doesn't matter here, only whether you remember the correct cells. The average adult can memorize around 4–5 cells at once, trained individuals reach 8 or more.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const gridBox = document.getElementById('gridBox');
+const gridLevelEl = document.getElementById('gridLevel');
+const gridBestEl = document.getElementById('gridBest');
+const gridResult = document.getElementById('gridResult');
+const gridResultTier = document.getElementById('gridResultTier');
+const gridResultText = document.getElementById('gridResultText');
+
+function rateGridMemory(level){
+  if(level >= 8) return ['Exceptional spatial memory', 'This is at the level of trained individuals — the typical average is 4–5 cells.'];
+  if(level >= 6) return ['Excellent spatial memory', 'Above-average result — most people stop around level 4–5.'];
+  if(level >= 4) return ['Average spatial memory', 'Matches a typical adult result.'];
+  return ['Below average spatial memory', 'Try again — visual memory improves with regular training.'];
+}
+
+const GRID_SIZE = 16;
+let gridTiles = [];
+let gridTargets = new Set();
+let gridFound = new Set();
+let gridLevel = 0;
+let gridBest = 0;
+let gridAccepting = false;
+
+for(let i=0;i<GRID_SIZE;i++){
+  const t = document.createElement('div');
+  t.style.cssText = 'aspect-ratio:1;background:#1A2029;border:2px solid var(--navy-line);border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s;';
+  t.dataset.idx = i;
+  t.addEventListener('click', () => onGridClick(i, t));
+  gridBox.appendChild(t);
+  gridTiles.push(t);
+}
+
+function startGridMemory(){
+  gridLevel = 0;
+  gridLevelEl.textContent = gridLevel;
+  gridResult.style.display = 'none';
+  nextGridRound();
+}
+
+function cellsForLevel(level){
+  return level + 2;
+}
+
+function nextGridRound(){
+  gridLevel++;
+  gridLevelEl.textContent = gridLevel;
+  gridFound = new Set();
+  gridAccepting = false;
+  resetTiles();
+
+  const n = cellsForLevel(gridLevel);
+  gridTargets = new Set();
+  while(gridTargets.size < n){
+    gridTargets.add(Math.floor(Math.random()*GRID_SIZE));
+  }
+  gridTargets.forEach(idx => { gridTiles[idx].style.background = 'var(--orange)'; });
+
+  const viewMs = 1000 + n*150;
+  setTimeout(() => {
+    resetTiles();
+    gridAccepting = true;
+  }, viewMs);
+}
+
+function resetTiles(){
+  gridTiles.forEach(t => { t.style.background = '#1A2029'; t.style.borderColor = 'var(--navy-line)'; });
+}
+
+function onGridClick(idx, tile){
+  if(!gridAccepting) return;
+  if(gridFound.has(idx)) return;
+
+  if(gridTargets.has(idx)){
+    gridFound.add(idx);
+    tile.style.background = 'var(--green)';
+    if(gridFound.size === gridTargets.size){
+      gridAccepting = false;
+      if(gridLevel > gridBest){ gridBest = gridLevel; gridBestEl.textContent = gridBest; }
+      setTimeout(nextGridRound, 800);
+    }
+  } else {
+    gridAccepting = false;
+    tile.style.background = '#C0392B';
+    gridTargets.forEach(i => { if(!gridFound.has(i)) gridTiles[i].style.background = 'var(--orange)'; });
+    const reached = gridLevel - 1;
+    if(reached > gridBest){ gridBest = reached; gridBestEl.textContent = gridBest; }
+    if(reached > 0){
+      const [tier, text] = rateGridMemory(reached);
+      gridResultTier.textContent = tier;
+      gridResultText.textContent = text;
+      gridResult.style.display = 'block';
+    }
+  }
+}
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
