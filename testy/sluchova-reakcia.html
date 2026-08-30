@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Sluchová reakcia — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/sluchova-reakcia.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/sluchova-reakcia.html">EN</a><span>/</span>
+        <a href="/de/testy/sluchova-reakcia.html">DE</a><span>/</span>
+        <a href="/hu/testy/sluchova-reakcia.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Sluchová reakcia</span></div>
+      <div id="arBox" class="rt-box">
+        <div class="rt-msg" id="arMsg">🔊 Klikni pre štart</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="arLast">—</div><div class="lbl">Posledný (ms)</div></div>
+        <div><div class="num" id="arBest">—</div><div class="lbl">Najlepší (ms)</div></div>
+        <div><div class="num" id="arAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:8px;">Hodnotenie vychádza z priemeru všetkých pokusov — pre objektívnejší výsledok odporúčame vykonať aspoň 5 opakovaní. Zapni si zvuk.</p>
+      <div class="result-banner" id="arResult" style="display:none;">
+        <div class="result-tier" id="arResultTier"></div>
+        <p id="arResultText"></p>
+      </div>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Nie každý dôležitý signál v športe je vizuálny — píšťalka rozhodcu, pokyn spoluhráča, zvuk štartu. Sluchová reakcia je zvyčajne rýchlejšia než vizuálna, pretože zvukový signál prechádza k mozgu kratšou nervovou dráhou. Tento test ti umožní porovnať oba reakčné kanály.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Rýchlosť, akou reaguješ na jednoduchý zvukový podnet — čas medzi zvukovým signálom a tvojím kliknutím, meraný v milisekundách.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Športovcom reagujúcim na zvukové signály (štart, píšťalka, pokyny), aj každému, kto chce porovnať svoju vizuálnu a sluchovú reakciu.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 140 ms</span><span class="bm-label">Špičková úroveň</span></div>
+        <div class="bm-row"><span class="bm-range">140–179 ms</span><span class="bm-label">Výborná reakcia</span></div>
+        <div class="bm-row"><span class="bm-range">180–229 ms</span><span class="bm-label">Priemerná reakcia</span></div>
+        <div class="bm-row"><span class="bm-range">230–279 ms</span><span class="bm-label">Mierne podpriemerná</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 280 ms</span><span class="bm-label">Pomalšia reakcia</span></div>
+        <p class="bm-note">Sluchová reakcia je v priemere o 30–50 ms rýchlejšia než vizuálna — zvukový signál prechádza z ucha do motorickej kôry kratšou nervovou dráhou než obraz zo sietnice. Bežný zdravý dospelý dosahuje priemer okolo 140–160 ms.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const arBox = document.getElementById('arBox');
+const arMsg = document.getElementById('arMsg');
+const arLast = document.getElementById('arLast');
+const arBest = document.getElementById('arBest');
+const arAvg = document.getElementById('arAvg');
+const arResult = document.getElementById('arResult');
+const arResultTier = document.getElementById('arResultTier');
+const arResultText = document.getElementById('arResultText');
+
+let arState = 'idle'; // idle, waiting, go
+let arTimeout, arStart;
+let arResults = [];
+let arAudioCtx = null;
+
+function rateAuditory(ms){
+  if(ms < 140) return ['Špičková úroveň', 'Toto zodpovedá reakciám špičkových športovcov na zvukový štartovací signál.'];
+  if(ms < 180) return ['Výborná reakcia', 'Nadpriemerný výsledok — blízko úrovni trénovaných športovcov.'];
+  if(ms < 230) return ['Priemerná reakcia', 'Zodpovedá bežnému zdravému dospelému — priemer sa pohybuje okolo 140–160 ms.'];
+  if(ms < 280) return ['Mierne podpriemerná', 'Priestor na zlepšenie — pravidelný tréning reakcie pomáha.'];
+  return ['Pomalšia reakcia', 'Reakčný čas sa dá pravidelným tréningom zlepšiť — skús to znova o pár dní.'];
+}
+
+function playBeep(){
+  if(!arAudioCtx) return;
+  if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+  const osc = arAudioCtx.createOscillator();
+  const gain = arAudioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 880;
+  const now = arAudioCtx.currentTime;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.35, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+  osc.connect(gain);
+  gain.connect(arAudioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.2);
+}
+
+arBox.addEventListener('click', () => {
+  if(arState === 'idle'){
+    if(!arAudioCtx){
+      arAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+    arState = 'waiting';
+    arBox.classList.remove('go','early');
+    arMsg.textContent = '🔈 Čakaj na zvuk...';
+    const delay = 1200 + Math.random()*2800;
+    arTimeout = setTimeout(() => {
+      arState = 'go';
+      playBeep();
+      arStart = performance.now();
+    }, delay);
+  } else if(arState === 'waiting'){
+    clearTimeout(arTimeout);
+    arState = 'idle';
+    arBox.classList.add('early');
+    arMsg.textContent = 'Príliš skoro! Klikni pre reštart.';
+    setTimeout(()=>{ arBox.classList.remove('early'); arMsg.textContent='🔊 Klikni pre štart'; }, 1200);
+  } else if(arState === 'go'){
+    const time = Math.round(performance.now() - arStart);
+    arResults.push(time);
+    arLast.textContent = time;
+    arBest.textContent = Math.min(...arResults);
+    const avg = Math.round(arResults.reduce((a,b)=>a+b,0)/arResults.length);
+    arAvg.textContent = avg;
+    arState = 'idle';
+    arMsg.textContent = '🔊 Klikni pre ďalší pokus';
+    const [tier, text] = rateAuditory(avg);
+    arResultTier.textContent = tier;
+    arResultText.textContent = text;
+    arResult.style.display = 'block';
+  }
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>

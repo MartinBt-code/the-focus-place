@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Hallási reakció — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/sluchova-reakcia.html">SK</a><span>/</span>
+        <a href="/en/testy/sluchova-reakcia.html">EN</a><span>/</span>
+        <a href="/de/testy/sluchova-reakcia.html">DE</a><span>/</span>
+        <a href="/hu/testy/sluchova-reakcia.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Hallási reakció</span></div>
+      <div id="arBox" class="rt-box">
+        <div class="rt-msg" id="arMsg">🔊 Kattints az indításhoz</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="arLast">—</div><div class="lbl">Utolsó (ms)</div></div>
+        <div><div class="num" id="arBest">—</div><div class="lbl">Legjobb (ms)</div></div>
+        <div><div class="num" id="arAvg">—</div><div class="lbl">Átlag (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:8px;">Az értékelés az összes próbálkozás átlagán alapul — az objektívebb eredményhez legalább 5 ismétlést javaslunk. Kapcsold be a hangot.</p>
+      <div class="result-banner" id="arResult" style="display:none;">
+        <div class="result-tier" id="arResultTier"></div>
+        <p id="arResultText"></p>
+      </div>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">Nem minden fontos jel a sportban vizuális — a bíró sípja, a csapattárs kiáltása, a rajtjel hangja. A hallási reakció általában gyorsabb, mint a vizuális, mert a hangjel rövidebb idegpályán jut el az agyba. Ez a teszt lehetővé teszi, hogy összehasonlítsd a két reakciócsatornát.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>Milyen gyorsan reagálsz egy egyszerű hangingerre — a hangjel és a kattintásod közötti időt, ezredmásodpercben mérve.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Sportolóknak, akik hangjelekre reagálnak (rajt, síp, kiáltás), és mindenkinek, aki össze szeretné hasonlítani vizuális és hallási reakcióját.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Értékelési skála</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 140 ms</span><span class="bm-label">Elit szint</span></div>
+        <div class="bm-row"><span class="bm-range">140–179 ms</span><span class="bm-label">Kiváló reakció</span></div>
+        <div class="bm-row"><span class="bm-range">180–229 ms</span><span class="bm-label">Átlagos reakció</span></div>
+        <div class="bm-row"><span class="bm-range">230–279 ms</span><span class="bm-label">Kissé átlag alatti</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 280 ms</span><span class="bm-label">Lassabb reakció</span></div>
+        <p class="bm-note">A hallási reakció átlagosan 30–50 ms-mal gyorsabb, mint a vizuális — a hangjel rövidebb idegpályán jut el a fültől a motoros kéregig, mint a retináról érkező kép. Egy egészséges felnőtt átlagosan kb. 140–160 ms-ot ér el.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const arBox = document.getElementById('arBox');
+const arMsg = document.getElementById('arMsg');
+const arLast = document.getElementById('arLast');
+const arBest = document.getElementById('arBest');
+const arAvg = document.getElementById('arAvg');
+const arResult = document.getElementById('arResult');
+const arResultTier = document.getElementById('arResultTier');
+const arResultText = document.getElementById('arResultText');
+
+let arState = 'idle'; // idle, waiting, go
+let arTimeout, arStart;
+let arResults = [];
+let arAudioCtx = null;
+
+function rateAuditory(ms){
+  if(ms < 140) return ['Elit szint', 'Ez megfelel az elit sportolók reakciójának egy hangalapú rajtjelre.'];
+  if(ms < 180) return ['Kiváló reakció', 'Átlag feletti eredmény — közel a gyakorlott sportolók szintjéhez.'];
+  if(ms < 230) return ['Átlagos reakció', 'Megfelel egy egészséges felnőttnek — az átlag kb. 140–160 ms.'];
+  if(ms < 280) return ['Kissé átlag alatti', 'Van hova fejlődni — a rendszeres reakcióedzés segít.'];
+  return ['Lassabb reakció', 'A reakcióidő rendszeres gyakorlással javul — próbáld újra pár nap múlva.'];
+}
+
+function playBeep(){
+  if(!arAudioCtx) return;
+  if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+  const osc = arAudioCtx.createOscillator();
+  const gain = arAudioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 880;
+  const now = arAudioCtx.currentTime;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.35, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+  osc.connect(gain);
+  gain.connect(arAudioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.2);
+}
+
+arBox.addEventListener('click', () => {
+  if(arState === 'idle'){
+    if(!arAudioCtx){
+      arAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+    arState = 'waiting';
+    arBox.classList.remove('go','early');
+    arMsg.textContent = '🔈 Várj a hangra...';
+    const delay = 1200 + Math.random()*2800;
+    arTimeout = setTimeout(() => {
+      arState = 'go';
+      playBeep();
+      arStart = performance.now();
+    }, delay);
+  } else if(arState === 'waiting'){
+    clearTimeout(arTimeout);
+    arState = 'idle';
+    arBox.classList.add('early');
+    arMsg.textContent = 'Túl korán! Kattints az újrakezdéshez.';
+    setTimeout(()=>{ arBox.classList.remove('early'); arMsg.textContent='🔊 Kattints az indításhoz'; }, 1200);
+  } else if(arState === 'go'){
+    const time = Math.round(performance.now() - arStart);
+    arResults.push(time);
+    arLast.textContent = time;
+    arBest.textContent = Math.min(...arResults);
+    const avg = Math.round(arResults.reduce((a,b)=>a+b,0)/arResults.length);
+    arAvg.textContent = avg;
+    arState = 'idle';
+    arMsg.textContent = '🔊 Kattints a következő próbához';
+    const [tier, text] = rateAuditory(avg);
+    arResultTier.textContent = tier;
+    arResultText.textContent = text;
+    arResult.style.display = 'block';
+  }
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

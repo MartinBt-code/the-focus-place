@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Akustische Reaktion — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/sluchova-reakcia.html">SK</a><span>/</span>
+        <a href="/en/testy/sluchova-reakcia.html">EN</a><span>/</span>
+        <a href="/de/testy/sluchova-reakcia.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/sluchova-reakcia.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Akustische Reaktion</span></div>
+      <div id="arBox" class="rt-box">
+        <div class="rt-msg" id="arMsg">🔊 Zum Start klicken</div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="arLast">—</div><div class="lbl">Letzte (ms)</div></div>
+        <div><div class="num" id="arBest">—</div><div class="lbl">Beste (ms)</div></div>
+        <div><div class="num" id="arAvg">—</div><div class="lbl">Durchschnitt (ms)</div></div>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:8px;">Die Bewertung basiert auf dem Durchschnitt aller Versuche — für ein objektiveres Ergebnis empfehlen wir mindestens 5 Wiederholungen. Schalte deinen Ton ein.</p>
+      <div class="result-banner" id="arResult" style="display:none;">
+        <div class="result-tier" id="arResultTier"></div>
+        <p id="arResultText"></p>
+      </div>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Nicht jedes wichtige Signal im Sport ist visuell — die Pfeife des Schiedsrichters, ein Zuruf des Mitspielers, das Startsignal. Die akustische Reaktion ist normalerweise schneller als die visuelle, da ein Tonsignal auf einer kürzeren Nervenbahn zum Gehirn gelangt. Dieser Test lässt dich beide Reaktionskanäle vergleichen.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Wie schnell du auf einen einfachen Tonreiz reagierst — die Zeit zwischen dem Tonsignal und deinem Klick, gemessen in Millisekunden.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Athleten, die auf Tonsignale reagieren (Start, Pfiff, Zurufe), und jedem, der seine visuelle und akustische Reaktion vergleichen möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">&lt; 140 ms</span><span class="bm-label">Spitzenniveau</span></div>
+        <div class="bm-row"><span class="bm-range">140–179 ms</span><span class="bm-label">Ausgezeichnete Reaktion</span></div>
+        <div class="bm-row"><span class="bm-range">180–229 ms</span><span class="bm-label">Durchschnittliche Reaktion</span></div>
+        <div class="bm-row"><span class="bm-range">230–279 ms</span><span class="bm-label">Leicht unterdurchschnittlich</span></div>
+        <div class="bm-row"><span class="bm-range">≥ 280 ms</span><span class="bm-label">Langsamere Reaktion</span></div>
+        <p class="bm-note">Die akustische Reaktion ist im Durchschnitt 30–50 ms schneller als die visuelle — ein Tonsignal gelangt vom Ohr zum motorischen Kortex über eine kürzere Nervenbahn als ein Bild von der Netzhaut. Ein gesunder Erwachsener erreicht im Durchschnitt etwa 140–160 ms.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const arBox = document.getElementById('arBox');
+const arMsg = document.getElementById('arMsg');
+const arLast = document.getElementById('arLast');
+const arBest = document.getElementById('arBest');
+const arAvg = document.getElementById('arAvg');
+const arResult = document.getElementById('arResult');
+const arResultTier = document.getElementById('arResultTier');
+const arResultText = document.getElementById('arResultText');
+
+let arState = 'idle'; // idle, waiting, go
+let arTimeout, arStart;
+let arResults = [];
+let arAudioCtx = null;
+
+function rateAuditory(ms){
+  if(ms < 140) return ['Spitzenniveau', 'Das entspricht den Reaktionen von Spitzenathleten auf ein akustisches Startsignal.'];
+  if(ms < 180) return ['Ausgezeichnete Reaktion', 'Überdurchschnittliches Ergebnis — nahe am Niveau trainierter Athleten.'];
+  if(ms < 230) return ['Durchschnittliche Reaktion', 'Entspricht einem gesunden Erwachsenen — der Durchschnitt liegt bei etwa 140–160 ms.'];
+  if(ms < 280) return ['Leicht unterdurchschnittlich', 'Raum für Verbesserung — regelmäßiges Reaktionstraining hilft.'];
+  return ['Langsamere Reaktion', 'Die Reaktionszeit verbessert sich durch regelmäßiges Training — versuch es in ein paar Tagen erneut.'];
+}
+
+function playBeep(){
+  if(!arAudioCtx) return;
+  if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+  const osc = arAudioCtx.createOscillator();
+  const gain = arAudioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 880;
+  const now = arAudioCtx.currentTime;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.35, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+  osc.connect(gain);
+  gain.connect(arAudioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.2);
+}
+
+arBox.addEventListener('click', () => {
+  if(arState === 'idle'){
+    if(!arAudioCtx){
+      arAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(arAudioCtx.state === 'suspended') arAudioCtx.resume();
+    arState = 'waiting';
+    arBox.classList.remove('go','early');
+    arMsg.textContent = '🔈 Warte auf den Ton...';
+    const delay = 1200 + Math.random()*2800;
+    arTimeout = setTimeout(() => {
+      arState = 'go';
+      playBeep();
+      arStart = performance.now();
+    }, delay);
+  } else if(arState === 'waiting'){
+    clearTimeout(arTimeout);
+    arState = 'idle';
+    arBox.classList.add('early');
+    arMsg.textContent = 'Zu früh! Klicke zum Neustart.';
+    setTimeout(()=>{ arBox.classList.remove('early'); arMsg.textContent='🔊 Zum Start klicken'; }, 1200);
+  } else if(arState === 'go'){
+    const time = Math.round(performance.now() - arStart);
+    arResults.push(time);
+    arLast.textContent = time;
+    arBest.textContent = Math.min(...arResults);
+    const avg = Math.round(arResults.reduce((a,b)=>a+b,0)/arResults.length);
+    arAvg.textContent = avg;
+    arState = 'idle';
+    arMsg.textContent = '🔊 Klick für weiteren Versuch';
+    const [tier, text] = rateAuditory(avg);
+    arResultTier.textContent = tier;
+    arResultText.textContent = text;
+    arResult.style.display = 'block';
+  }
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
