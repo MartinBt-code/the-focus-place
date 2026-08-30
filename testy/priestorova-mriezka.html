@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Priestorová mriežka</span></div>
+      <div class="diff-select">
+        <button class="diff-btn grid-diff" data-diff="easy" onclick="selectGridDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">dlhší pohľad</span></button>
+        <button class="diff-btn grid-diff active" data-diff="medium" onclick="selectGridDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">bežný pohľad</span></button>
+        <button class="diff-btn grid-diff" data-diff="hard" onclick="selectGridDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">kratší pohľad</span></button>
+      </div>
       <div id="gridBox" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px;"></div>
       <div class="rt-stats">
         <div><div class="num" id="gridLevel">0</div><div class="lbl">Úroveň</div></div>
@@ -90,6 +95,16 @@ let gridFound = new Set();
 let gridLevel = 0;
 let gridBest = 0;
 let gridAccepting = false;
+let gridRunning = false;
+
+const GRID_VIEW_MULT = { easy: 1.4, medium: 1.0, hard: 0.65 };
+let gridDiff = 'medium';
+
+function selectGridDiff(d){
+  if(gridRunning) return;
+  gridDiff = d;
+  document.querySelectorAll('.grid-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 for(let i=0;i<GRID_SIZE;i++){
   const t = document.createElement('div');
@@ -104,6 +119,8 @@ function startGridMemory(){
   gridLevel = 0;
   gridLevelEl.textContent = gridLevel;
   gridResult.style.display = 'none';
+  gridRunning = true;
+  document.querySelectorAll('.grid-diff').forEach(b => b.disabled = true);
   nextGridRound();
 }
 
@@ -125,7 +142,7 @@ function nextGridRound(){
   }
   gridTargets.forEach(idx => { gridTiles[idx].style.background = 'var(--orange)'; });
 
-  const viewMs = 1000 + n*150;
+  const viewMs = (1000 + n*150) * GRID_VIEW_MULT[gridDiff];
   setTimeout(() => {
     resetTiles();
     gridAccepting = true;
@@ -150,6 +167,8 @@ function onGridClick(idx, tile){
     }
   } else {
     gridAccepting = false;
+    gridRunning = false;
+    document.querySelectorAll('.grid-diff').forEach(b => b.disabled = false);
     tile.style.background = '#C0392B';
     gridTargets.forEach(i => { if(!gridFound.has(i)) gridTiles[i].style.background = 'var(--orange)'; });
     const reached = gridLevel - 1;
