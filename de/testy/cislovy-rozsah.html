@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Zahlenspanne — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Zurück zu den Tests</a>
+      <div class="lang-switch">
+        <a href="/testy/cislovy-rozsah.html">SK</a><span>/</span>
+        <a href="/en/testy/cislovy-rozsah.html">EN</a><span>/</span>
+        <a href="/de/testy/cislovy-rozsah.html" class="active">DE</a><span>/</span>
+        <a href="/hu/testy/cislovy-rozsah.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Zahlenspanne</span></div>
+      <div id="dsBox" class="rt-box" style="flex-direction:column; gap:8px;">
+        <div class="rt-msg" id="dsMsg">—</div>
+        <div class="digit-keypad" id="dsKeypad" style="padding:0 20px;">
+          <button class="digit-btn" data-d="1">1</button>
+          <button class="digit-btn" data-d="2">2</button>
+          <button class="digit-btn" data-d="3">3</button>
+          <button class="digit-btn" data-d="4">4</button>
+          <button class="digit-btn" data-d="5">5</button>
+          <button class="digit-btn" data-d="6">6</button>
+          <button class="digit-btn" data-d="7">7</button>
+          <button class="digit-btn" data-d="8">8</button>
+          <button class="digit-btn" data-d="9">9</button>
+          <button class="digit-btn" data-d="0">0</button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="dsLevel">0</div><div class="lbl">Level</div></div>
+        <div><div class="num" id="dsBest">0</div><div class="lbl">Bestwert</div></div>
+      </div>
+      <div class="result-banner" id="dsResult" style="display:none;">
+        <div class="result-tier" id="dsResultTier"></div>
+        <p id="dsResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Merke dir die Zahlenfolge und wiederhole sie in der <strong style="color:var(--orange);">gleichen Reihenfolge</strong>. Wie viele Ziffern schaffst du?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startDigitSpan()">Start</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Warum das wichtig ist</h3>
+      <p class="lead-text">Die Zahlenspanne ist ein klassisches Maß für die Kapazität des kurzfristigen Arbeitsgedächtnisses — die Fähigkeit, eine Informationsfolge vorübergehend zu speichern und zu verarbeiten. Diese Kapazität ist die Grundlage für das Merken von Spielkombinationen, Signalen und taktischen Anweisungen in Zahlenform.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Was es misst</strong>
+          <p>Die Kapazität des Kurzzeitgedächtnisses für sequenzielle numerische Informationen — wie viele Ziffern du dir merken und in der richtigen Reihenfolge wiedergeben kannst.</p>
+        </div>
+        <div>
+          <strong>Wem es hilft</strong>
+          <p>Spielern, die sich Spielkombinationen und Signale merken müssen, Trainern bei der Beurteilung der kognitiven Kapazität und jedem, der sein Arbeitsgedächtnis trainieren möchte.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Bewertungsskala</h4>
+        <div class="bm-row"><span class="bm-range">≥ 9 Ziffern</span><span class="bm-label">Außergewöhnliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">7–8 Ziffern</span><span class="bm-label">Ausgezeichnetes Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">5–6 Ziffern</span><span class="bm-label">Durchschnittliches Gedächtnis</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 5 Ziffern</span><span class="bm-label">Unterdurchschnittliches Gedächtnis</span></div>
+        <p class="bm-note">Der Test basiert auf dem klassischen Digit-Span-Test (Teil der Wechsler-Intelligenzskalen) — einem der ältesten Instrumente der Psychologie zur Messung des Arbeitsgedächtnisses. Der durchschnittliche Erwachsene merkt sich 7±2 Ziffern in der richtigen Reihenfolge (die sogenannte "magische Zahl sieben", Miller, 1956) — erfahrene Personen erreichen 9 oder mehr.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const dsMsg = document.getElementById('dsMsg');
+const dsLevelEl = document.getElementById('dsLevel');
+const dsBestEl = document.getElementById('dsBest');
+const dsResult = document.getElementById('dsResult');
+const dsResultTier = document.getElementById('dsResultTier');
+const dsResultText = document.getElementById('dsResultText');
+const dsButtons = Array.from(document.querySelectorAll('.digit-btn'));
+
+function rateDigitSpan(level){
+  if(level >= 9) return ['Außergewöhnliches Gedächtnis', 'Das liegt am oberen Rand der allgemeinen Bevölkerung — der Durchschnitt liegt bei 7±2 Ziffern.'];
+  if(level >= 7) return ['Ausgezeichnetes Gedächtnis', 'Überdurchschnittliches Ergebnis — entspricht dem oberen Ende des typischen Bereichs.'];
+  if(level >= 5) return ['Durchschnittliches Gedächtnis', 'Entspricht einem typischen Ergebnis eines Erwachsenen — der Durchschnitt liegt bei etwa 7±2 Ziffern.'];
+  return ['Unterdurchschnittliches Gedächtnis', 'Versuch es nochmal — das Arbeitsgedächtnis verbessert sich durch regelmäßiges Training.'];
+}
+
+let dsSequence = [];
+let dsUserStep = 0;
+let dsLevel = 0;
+let dsBest = 0;
+let dsAccepting = false;
+
+function startDigitSpan(){
+  dsSequence = [];
+  dsLevel = 0;
+  dsLevelEl.textContent = dsLevel;
+  dsResult.style.display = 'none';
+  dsNextRound();
+}
+
+function dsNextRound(){
+  dsLevel++;
+  dsLevelEl.textContent = dsLevel;
+  dsUserStep = 0;
+  dsSequence.push(Math.floor(Math.random()*10));
+  dsAccepting = false;
+  dsPlaySequence();
+}
+
+function dsPlaySequence(){
+  let i = 0;
+  dsMsg.style.fontSize = '56px';
+  const interval = setInterval(() => {
+    dsMsg.textContent = dsSequence[i];
+    dsMsg.style.opacity = '1';
+    setTimeout(() => { dsMsg.style.opacity = '0'; }, 500);
+    i++;
+    if(i >= dsSequence.length){
+      clearInterval(interval);
+      setTimeout(() => {
+        dsMsg.textContent = '?';
+        dsMsg.style.opacity = '1';
+        dsAccepting = true;
+      }, 600);
+    }
+  }, 750);
+}
+
+function dsFlashBtn(btn, good){
+  btn.classList.add(good ? 'correct' : 'wrong');
+  setTimeout(() => btn.classList.remove('correct','wrong'), 300);
+}
+
+dsButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!dsAccepting) return;
+    const digit = parseInt(btn.dataset.d, 10);
+    if(digit === dsSequence[dsUserStep]){
+      dsFlashBtn(btn, true);
+      dsUserStep++;
+      if(dsUserStep === dsSequence.length){
+        dsAccepting = false;
+        if(dsLevel > dsBest){ dsBest = dsLevel; dsBestEl.textContent = dsBest; }
+        dsMsg.style.opacity = '0';
+        setTimeout(dsNextRound, 700);
+      }
+    } else {
+      dsFlashBtn(btn, false);
+      dsAccepting = false;
+      const reached = dsLevel - 1;
+      if(reached > dsBest){ dsBest = reached; dsBestEl.textContent = dsBest; }
+      dsMsg.style.fontSize = '20px';
+      dsMsg.textContent = 'Fertig';
+      dsMsg.style.opacity = '1';
+      if(reached > 0){
+        const [tier, text] = rateDigitSpan(reached);
+        dsResultTier.textContent = tier;
+        dsResultText.textContent = text;
+        dsResult.style.display = 'block';
+      }
+    }
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>

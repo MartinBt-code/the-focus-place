@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../assets/thePlace_icon_color.png">
+<title>Číselný rozsah — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Späť na testy</a>
+      <div class="lang-switch">
+        <a href="/testy/cislovy-rozsah.html" class="active">SK</a><span>/</span>
+        <a href="/en/testy/cislovy-rozsah.html">EN</a><span>/</span>
+        <a href="/de/testy/cislovy-rozsah.html">DE</a><span>/</span>
+        <a href="/hu/testy/cislovy-rozsah.html">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Live test</span><span>Číselný rozsah</span></div>
+      <div id="dsBox" class="rt-box" style="flex-direction:column; gap:8px;">
+        <div class="rt-msg" id="dsMsg">—</div>
+        <div class="digit-keypad" id="dsKeypad" style="padding:0 20px;">
+          <button class="digit-btn" data-d="1">1</button>
+          <button class="digit-btn" data-d="2">2</button>
+          <button class="digit-btn" data-d="3">3</button>
+          <button class="digit-btn" data-d="4">4</button>
+          <button class="digit-btn" data-d="5">5</button>
+          <button class="digit-btn" data-d="6">6</button>
+          <button class="digit-btn" data-d="7">7</button>
+          <button class="digit-btn" data-d="8">8</button>
+          <button class="digit-btn" data-d="9">9</button>
+          <button class="digit-btn" data-d="0">0</button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="dsLevel">0</div><div class="lbl">Úroveň</div></div>
+        <div><div class="num" id="dsBest">0</div><div class="lbl">Najlepšie</div></div>
+      </div>
+      <div class="result-banner" id="dsResult" style="display:none;">
+        <div class="result-tier" id="dsResultTier"></div>
+        <p id="dsResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si postupnosť čísel a zopakuj ju v <strong style="color:var(--orange);">rovnakom poradí</strong>. Koľko číslic zvládneš?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startDigitSpan()">Spustiť</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Prečo je to dôležité</h3>
+      <p class="lead-text">Číselný rozsah je klasický ukazovateľ kapacity krátkodobej pracovnej pamäte — schopnosti dočasne uchovať a spracovať postupnosť informácií. Táto kapacita je základom pre zapamätanie herných kombinácií, signálov aj taktických pokynov vyjadrených číslami.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Čo meria</strong>
+          <p>Kapacitu krátkodobej pamäte pre sekvenčné číselné informácie — koľko číslic si vieš zapamätať a zopakovať v správnom poradí.</p>
+        </div>
+        <div>
+          <strong>Komu pomôže</strong>
+          <p>Hráčom, ktorí si musia pamätať herné kombinácie a signály, trénerom pri hodnotení kognitívnej kapacity aj každému, kto chce trénovať pracovnú pamäť.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Hodnotiaca škála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 9 číslic</span><span class="bm-label">Výnimočná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">7–8 číslic</span><span class="bm-label">Výborná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">5–6 číslic</span><span class="bm-label">Priemerná pamäť</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 5 číslic</span><span class="bm-label">Podpriemerná pamäť</span></div>
+        <p class="bm-note">Test je založený na klasickom Digit Span teste (súčasť Wechslerových inteligenčných škál) — jednom z najstarších nástrojov na meranie pracovnej pamäte v psychológii. Priemerný dospelý si zapamätá 7±2 číslice v správnom poradí (tzv. "magické číslo sedem", Miller, 1956) — skúsení jedinci dosahujú 9 a viac.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const dsMsg = document.getElementById('dsMsg');
+const dsLevelEl = document.getElementById('dsLevel');
+const dsBestEl = document.getElementById('dsBest');
+const dsResult = document.getElementById('dsResult');
+const dsResultTier = document.getElementById('dsResultTier');
+const dsResultText = document.getElementById('dsResultText');
+const dsButtons = Array.from(document.querySelectorAll('.digit-btn'));
+
+function rateDigitSpan(level){
+  if(level >= 9) return ['Výnimočná pamäť', 'Toto je výsledok na hornej hranici bežnej populácie — priemer je 7±2 číslic.'];
+  if(level >= 7) return ['Výborná pamäť', 'Nadpriemerný výsledok — zodpovedá hornej hranici typického rozsahu.'];
+  if(level >= 5) return ['Priemerná pamäť', 'Zodpovedá bežnému výsledku dospelého — priemer je približne 7±2 číslic.'];
+  return ['Podpriemerná pamäť', 'Skús to znova — pracovná pamäť sa dá pravidelným tréningom zlepšiť.'];
+}
+
+let dsSequence = [];
+let dsUserStep = 0;
+let dsLevel = 0;
+let dsBest = 0;
+let dsAccepting = false;
+
+function startDigitSpan(){
+  dsSequence = [];
+  dsLevel = 0;
+  dsLevelEl.textContent = dsLevel;
+  dsResult.style.display = 'none';
+  dsNextRound();
+}
+
+function dsNextRound(){
+  dsLevel++;
+  dsLevelEl.textContent = dsLevel;
+  dsUserStep = 0;
+  dsSequence.push(Math.floor(Math.random()*10));
+  dsAccepting = false;
+  dsPlaySequence();
+}
+
+function dsPlaySequence(){
+  let i = 0;
+  dsMsg.style.fontSize = '56px';
+  const interval = setInterval(() => {
+    dsMsg.textContent = dsSequence[i];
+    dsMsg.style.opacity = '1';
+    setTimeout(() => { dsMsg.style.opacity = '0'; }, 500);
+    i++;
+    if(i >= dsSequence.length){
+      clearInterval(interval);
+      setTimeout(() => {
+        dsMsg.textContent = '?';
+        dsMsg.style.opacity = '1';
+        dsAccepting = true;
+      }, 600);
+    }
+  }, 750);
+}
+
+function dsFlashBtn(btn, good){
+  btn.classList.add(good ? 'correct' : 'wrong');
+  setTimeout(() => btn.classList.remove('correct','wrong'), 300);
+}
+
+dsButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!dsAccepting) return;
+    const digit = parseInt(btn.dataset.d, 10);
+    if(digit === dsSequence[dsUserStep]){
+      dsFlashBtn(btn, true);
+      dsUserStep++;
+      if(dsUserStep === dsSequence.length){
+        dsAccepting = false;
+        if(dsLevel > dsBest){ dsBest = dsLevel; dsBestEl.textContent = dsBest; }
+        dsMsg.style.opacity = '0';
+        setTimeout(dsNextRound, 700);
+      }
+    } else {
+      dsFlashBtn(btn, false);
+      dsAccepting = false;
+      const reached = dsLevel - 1;
+      if(reached > dsBest){ dsBest = reached; dsBestEl.textContent = dsBest; }
+      dsMsg.style.fontSize = '20px';
+      dsMsg.textContent = 'Koniec';
+      dsMsg.style.opacity = '1';
+      if(reached > 0){
+        const [tier, text] = rateDigitSpan(reached);
+        dsResultTier.textContent = tier;
+        dsResultText.textContent = text;
+        dsResult.style.display = 'block';
+      }
+    }
+  });
+});
+</script>
+
+<script src="../assets/cookie-consent.js" defer></script>
+</body>
+</html>

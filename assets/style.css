@@ -397,6 +397,19 @@ footer .mono{color:var(--gray); font-size:12px;}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--gray); font-family:'Space Mono'; font-size:13px; text-transform:uppercase; letter-spacing:1px; transition:color .15s;}
 .back-link:hover{color:var(--orange);}
 
+/* Digit Span */
+.digit-keypad{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:16px; width:100%;}
+.digit-btn{
+  aspect-ratio:1; border-radius:6px; border:2px solid var(--navy-line); background:#1A2029;
+  color:var(--off-white); font-family:'Anton'; font-size:22px; cursor:pointer; padding:0;
+  transition:transform .12s, border-color .12s, background .12s, color .12s;
+}
+.digit-btn:hover{border-color:var(--orange); transform:translateY(-2px);}
+.digit-btn:active{transform:scale(0.92);}
+.digit-btn.correct{background:var(--green); border-color:var(--green); color:var(--navy);}
+.digit-btn.wrong{background:#C0392B; border-color:#C0392B; color:var(--off-white);}
+#dsBox .rt-msg{font-family:'Anton'; font-size:56px; letter-spacing:4px;}
+
 /* Stroop test */
 #stroopBox .rt-msg{font-family:'Anton'; font-size:52px; letter-spacing:1px;}
 .stroop-options{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px;}

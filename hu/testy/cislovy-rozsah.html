@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../../assets/thePlace_icon_color.png">
+<title>Számterjedelem — the Focus Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="../index.html#top"><img src="../../assets/thePlace_logo_white.png" alt="the Focus Place" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="index.html" class="back-link">← Vissza a tesztekhez</a>
+      <div class="lang-switch">
+        <a href="/testy/cislovy-rozsah.html">SK</a><span>/</span>
+        <a href="/en/testy/cislovy-rozsah.html">EN</a><span>/</span>
+        <a href="/de/testy/cislovy-rozsah.html">DE</a><span>/</span>
+        <a href="/hu/testy/cislovy-rozsah.html" class="active">HU</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="test-page">
+  <div class="test-page-inner">
+    <div class="test-card test-card-xl">
+      <div class="test-label"><span>Élő teszt</span><span>Számterjedelem</span></div>
+      <div id="dsBox" class="rt-box" style="flex-direction:column; gap:8px;">
+        <div class="rt-msg" id="dsMsg">—</div>
+        <div class="digit-keypad" id="dsKeypad" style="padding:0 20px;">
+          <button class="digit-btn" data-d="1">1</button>
+          <button class="digit-btn" data-d="2">2</button>
+          <button class="digit-btn" data-d="3">3</button>
+          <button class="digit-btn" data-d="4">4</button>
+          <button class="digit-btn" data-d="5">5</button>
+          <button class="digit-btn" data-d="6">6</button>
+          <button class="digit-btn" data-d="7">7</button>
+          <button class="digit-btn" data-d="8">8</button>
+          <button class="digit-btn" data-d="9">9</button>
+          <button class="digit-btn" data-d="0">0</button>
+        </div>
+      </div>
+      <div class="rt-stats">
+        <div><div class="num" id="dsLevel">0</div><div class="lbl">Szint</div></div>
+        <div><div class="num" id="dsBest">0</div><div class="lbl">Legjobb</div></div>
+      </div>
+      <div class="result-banner" id="dsResult" style="display:none;">
+        <div class="result-tier" id="dsResultTier"></div>
+        <p id="dsResultText"></p>
+      </div>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Jegyezd meg a számsorozatot, és ismételd meg <strong style="color:var(--orange);">ugyanabban a sorrendben</strong>. Hány számjegyig jutsz el?</p>
+      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startDigitSpan()">Indítás</button>
+    </div>
+
+    <div class="test-info">
+      <h3>Miért fontos ez</h3>
+      <p class="lead-text">A számterjedelem a rövid távú munkamemória kapacitásának klasszikus mérőszáma — annak a képességnek, hogy egy információsorozatot átmenetileg megőrizz és feldolgozz. Ez a kapacitás áll a számokkal kifejezett játékkombinációk, jelek és taktikai utasítások megjegyzésének hátterében.</p>
+      <div class="test-info-grid">
+        <div>
+          <strong>Mit mér</strong>
+          <p>A rövid távú memória kapacitását szekvenciális numerikus információkra — hány számjegyet tudsz megjegyezni és helyes sorrendben visszamondani.</p>
+        </div>
+        <div>
+          <strong>Kinek segít</strong>
+          <p>Játékosoknak, akiknek meg kell jegyezniük játékkombinációkat és jeleket, edzőknek a kognitív kapacitás felmérésében, és mindenkinek, aki szeretné edzeni a munkamemóriáját.</p>
+        </div>
+      </div>
+      <div class="benchmark-table">
+        <h4>Értékelési skála</h4>
+        <div class="bm-row"><span class="bm-range">≥ 9 számjegy</span><span class="bm-label">Kivételes memória</span></div>
+        <div class="bm-row"><span class="bm-range">7–8 számjegy</span><span class="bm-label">Kiváló memória</span></div>
+        <div class="bm-row"><span class="bm-range">5–6 számjegy</span><span class="bm-label">Átlagos memória</span></div>
+        <div class="bm-row"><span class="bm-range">&lt; 5 számjegy</span><span class="bm-label">Átlag alatti memória</span></div>
+        <p class="bm-note">A teszt a klasszikus Digit Span teszten alapul (a Wechsler-féle intelligenciaskálák része) — a pszichológia egyik legrégebbi eszköze a munkamemória mérésére. Egy átlagos felnőtt 7±2 számjegyet jegyez meg helyes sorrendben (az úgynevezett "hetes varázsszám", Miller, 1956) — tapasztalt egyéneknél ez 9 vagy több is lehet.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const dsMsg = document.getElementById('dsMsg');
+const dsLevelEl = document.getElementById('dsLevel');
+const dsBestEl = document.getElementById('dsBest');
+const dsResult = document.getElementById('dsResult');
+const dsResultTier = document.getElementById('dsResultTier');
+const dsResultText = document.getElementById('dsResultText');
+const dsButtons = Array.from(document.querySelectorAll('.digit-btn'));
+
+function rateDigitSpan(level){
+  if(level >= 9) return ['Kivételes memória', 'Ez az általános populáció felső határán van — az átlag 7±2 számjegy.'];
+  if(level >= 7) return ['Kiváló memória', 'Átlag feletti eredmény — a tipikus tartomány felső végének felel meg.'];
+  if(level >= 5) return ['Átlagos memória', 'Megfelel egy tipikus felnőtt eredménynek — az átlag körülbelül 7±2 számjegy.'];
+  return ['Átlag alatti memória', 'Próbáld újra — a munkamemória rendszeres gyakorlással javítható.'];
+}
+
+let dsSequence = [];
+let dsUserStep = 0;
+let dsLevel = 0;
+let dsBest = 0;
+let dsAccepting = false;
+
+function startDigitSpan(){
+  dsSequence = [];
+  dsLevel = 0;
+  dsLevelEl.textContent = dsLevel;
+  dsResult.style.display = 'none';
+  dsNextRound();
+}
+
+function dsNextRound(){
+  dsLevel++;
+  dsLevelEl.textContent = dsLevel;
+  dsUserStep = 0;
+  dsSequence.push(Math.floor(Math.random()*10));
+  dsAccepting = false;
+  dsPlaySequence();
+}
+
+function dsPlaySequence(){
+  let i = 0;
+  dsMsg.style.fontSize = '56px';
+  const interval = setInterval(() => {
+    dsMsg.textContent = dsSequence[i];
+    dsMsg.style.opacity = '1';
+    setTimeout(() => { dsMsg.style.opacity = '0'; }, 500);
+    i++;
+    if(i >= dsSequence.length){
+      clearInterval(interval);
+      setTimeout(() => {
+        dsMsg.textContent = '?';
+        dsMsg.style.opacity = '1';
+        dsAccepting = true;
+      }, 600);
+    }
+  }, 750);
+}
+
+function dsFlashBtn(btn, good){
+  btn.classList.add(good ? 'correct' : 'wrong');
+  setTimeout(() => btn.classList.remove('correct','wrong'), 300);
+}
+
+dsButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!dsAccepting) return;
+    const digit = parseInt(btn.dataset.d, 10);
+    if(digit === dsSequence[dsUserStep]){
+      dsFlashBtn(btn, true);
+      dsUserStep++;
+      if(dsUserStep === dsSequence.length){
+        dsAccepting = false;
+        if(dsLevel > dsBest){ dsBest = dsLevel; dsBestEl.textContent = dsBest; }
+        dsMsg.style.opacity = '0';
+        setTimeout(dsNextRound, 700);
+      }
+    } else {
+      dsFlashBtn(btn, false);
+      dsAccepting = false;
+      const reached = dsLevel - 1;
+      if(reached > dsBest){ dsBest = reached; dsBestEl.textContent = dsBest; }
+      dsMsg.style.fontSize = '20px';
+      dsMsg.textContent = 'Vége';
+      dsMsg.style.opacity = '1';
+      if(reached > 0){
+        const [tier, text] = rateDigitSpan(reached);
+        dsResultTier.textContent = tier;
+        dsResultText.textContent = text;
+        dsResult.style.display = 'block';
+      }
+    }
+  });
+});
+</script>
+
+<script src="../../assets/cookie-consent.js" defer></script>
+</body>
+</html>
