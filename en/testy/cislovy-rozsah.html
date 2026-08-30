@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Digit Span</span></div>
+      <div class="diff-select">
+        <button class="diff-btn ds-diff" data-diff="easy" onclick="selectDsDiff('easy')">Easy<br><span style="font-size:10px; opacity:0.7;">slower pace</span></button>
+        <button class="diff-btn ds-diff active" data-diff="medium" onclick="selectDsDiff('medium')">Medium<br><span style="font-size:10px; opacity:0.7;">normal pace</span></button>
+        <button class="diff-btn ds-diff" data-diff="hard" onclick="selectDsDiff('hard')">Hard<br><span style="font-size:10px; opacity:0.7;">faster pace</span></button>
+      </div>
       <div id="dsBox" class="rt-box" style="flex-direction:column; gap:8px;">
         <div class="rt-msg" id="dsMsg">—</div>
         <div class="digit-keypad" id="dsKeypad" style="padding:0 20px;">
@@ -103,12 +108,28 @@ let dsUserStep = 0;
 let dsLevel = 0;
 let dsBest = 0;
 let dsAccepting = false;
+let dsRunning = false;
+
+const DS_SPEEDS = {
+  easy: {interval: 1000, visible: 650},
+  medium: {interval: 750, visible: 500},
+  hard: {interval: 500, visible: 320}
+};
+let dsDiff = 'medium';
+
+function selectDsDiff(d){
+  if(dsRunning) return;
+  dsDiff = d;
+  document.querySelectorAll('.ds-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
 
 function startDigitSpan(){
   dsSequence = [];
   dsLevel = 0;
   dsLevelEl.textContent = dsLevel;
   dsResult.style.display = 'none';
+  dsRunning = true;
+  document.querySelectorAll('.ds-diff').forEach(b => b.disabled = true);
   dsNextRound();
 }
 
@@ -122,12 +143,13 @@ function dsNextRound(){
 }
 
 function dsPlaySequence(){
+  const speed = DS_SPEEDS[dsDiff];
   let i = 0;
   dsMsg.style.fontSize = '56px';
   const interval = setInterval(() => {
     dsMsg.textContent = dsSequence[i];
     dsMsg.style.opacity = '1';
-    setTimeout(() => { dsMsg.style.opacity = '0'; }, 500);
+    setTimeout(() => { dsMsg.style.opacity = '0'; }, speed.visible);
     i++;
     if(i >= dsSequence.length){
       clearInterval(interval);
@@ -137,7 +159,7 @@ function dsPlaySequence(){
         dsAccepting = true;
       }, 600);
     }
-  }, 750);
+  }, speed.interval);
 }
 
 function dsFlashBtn(btn, good){
@@ -161,6 +183,8 @@ dsButtons.forEach(btn => {
     } else {
       dsFlashBtn(btn, false);
       dsAccepting = false;
+      dsRunning = false;
+      document.querySelectorAll('.ds-diff').forEach(b => b.disabled = false);
       const reached = dsLevel - 1;
       if(reached > dsBest){ dsBest = reached; dsBestEl.textContent = dsBest; }
       dsMsg.style.fontSize = '20px';
