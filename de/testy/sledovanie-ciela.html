@@ -30,6 +30,11 @@
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
     <div class="test-label"><span>Live test</span><span>Cursor-Tracking</span></div>
+    <div class="diff-select">
+      <button class="diff-btn ct-diff" data-diff="easy" onclick="selectCtDiff('easy')">Leicht<br><span style="font-size:10px; opacity:0.7;">langsamer, weiter</span></button>
+      <button class="diff-btn ct-diff active" data-diff="medium" onclick="selectCtDiff('medium')">Mittel<br><span style="font-size:10px; opacity:0.7;">normales Tempo</span></button>
+      <button class="diff-btn ct-diff" data-diff="hard" onclick="selectCtDiff('hard')">Schwer<br><span style="font-size:10px; opacity:0.7;">schneller, enger</span></button>
+    </div>
     <div id="ctBox" class="rt-box" style="cursor:none; position:relative; padding:0; height:340px; overflow:hidden;">
       <div id="ctMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klicke Start</div>
       <div id="ctTarget" style="position:absolute; width:28px; height:28px; margin:-14px 0 0 -14px; border-radius:50%; background:var(--orange); display:none; transition:background .1s;"></div>
@@ -91,15 +96,27 @@ function rateCursorTrack(pct){
 }
 
 const CT_DURATION_MS = 20000;
-const CT_CONTACT_RADIUS = 32;
+const CT_CONFIG = {
+  easy: {speedMult: 0.65, radius: 44},
+  medium: {speedMult: 1.0, radius: 32},
+  hard: {speedMult: 1.5, radius: 22}
+};
+let ctDiff = 'medium';
 let ctRunning = false;
 let ctStartTime = null, ctLastFrameTime = 0;
 let ctMouseX = null, ctMouseY = null;
 let ctContactMs = 0, ctCurrentStreakMs = 0, ctLongestStreakMs = 0;
 let ctRafId = null;
 
+function selectCtDiff(d){
+  if(ctRunning) return;
+  ctDiff = d;
+  document.querySelectorAll('.ct-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
+
 function startCursorTrack(){
   ctRunning = true;
+  document.querySelectorAll('.ct-diff').forEach(b => b.disabled = true);
   ctStartTime = null;
   ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
   ctResult.style.display = 'none';
@@ -129,15 +146,16 @@ function ctLoop(timestamp){
   const ry = Math.max(10, boxRect.height/2 - margin);
   const cx = boxRect.width/2;
   const cy = boxRect.height/2;
+  const speedMult = CT_CONFIG[ctDiff].speedMult;
   const t = elapsed/1000;
-  const tx = cx + rx*Math.sin(t*0.9);
-  const ty = cy + ry*Math.sin(t*0.6 + 1.3);
+  const tx = cx + rx*Math.sin(t*0.9*speedMult);
+  const ty = cy + ry*Math.sin(t*0.6*speedMult + 1.3);
   ctTarget.style.left = tx + 'px';
   ctTarget.style.top = ty + 'px';
 
   if(ctMouseX !== null){
     const dist = Math.hypot(ctMouseX - tx, ctMouseY - ty);
-    if(dist <= CT_CONTACT_RADIUS){
+    if(dist <= CT_CONFIG[ctDiff].radius){
       ctContactMs += dt;
       ctCurrentStreakMs += dt;
       if(ctCurrentStreakMs > ctLongestStreakMs) ctLongestStreakMs = ctCurrentStreakMs;
@@ -158,6 +176,7 @@ function ctLoop(timestamp){
 
 function finishCursorTrack(){
   ctRunning = false;
+  document.querySelectorAll('.ct-diff').forEach(b => b.disabled = false);
   if(ctRafId) cancelAnimationFrame(ctRafId);
   ctTarget.style.display = 'none';
   ctMsg.style.display = 'flex';
