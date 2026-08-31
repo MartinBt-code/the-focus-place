@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{background:var(--navy); height:1920px; margin:0; display:flex; align-items:center;}
+  .record-wrap{width:1080px; margin:0 auto; padding:0 90px; display:flex; flex-direction:column; align-items:center;}
+  .record-brand{display:flex; align-items:center; gap:16px; margin-bottom:70px;}
+  .record-brand img{height:52px; width:auto;}
+  .test-card-xl{width:100%; max-width:900px; padding:56px;}
+  .test-card-xl .test-label{font-size:20px; margin-bottom:32px;}
+  .test-card-xl .diff-select{margin-bottom:28px; gap:14px;}
+  .test-card-xl .diff-btn{padding:20px 10px; font-size:20px;}
+  .test-card-xl .rt-box{height:460px;}
+  #nbMsg{font-size:140px !important;}
+  .test-card-xl .rt-stats{margin-top:34px; gap:20px;}
+  .test-card-xl .rt-stats .num{font-size:46px;}
+  .test-card-xl .rt-stats .lbl{font-size:16px;}
+  .test-card-xl .result-banner{padding:26px 30px; margin-top:26px;}
+  .test-card-xl .result-tier{font-size:20px;}
+  .test-card-xl .result-banner p{font-size:20px;}
+  .test-card-xl > p.mono{font-size:19px !important; margin-top:22px !important;}
+  .test-card-xl > .btn{font-size:20px !important; padding:24px !important; margin-top:26px !important;}
+</style>
+</head>
+<body>
+
+<div class="record-wrap">
+  <div class="record-brand">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+  </div>
+
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>N-Back test</span></div>
+    <div class="diff-select">
+      <button class="diff-btn nb-diff" data-diff="easy">Ľahká<br><span style="font-size:14px; opacity:0.7;">1-Back</span></button>
+      <button class="diff-btn nb-diff active" data-diff="medium">Stredná<br><span style="font-size:14px; opacity:0.7;">2-Back</span></button>
+      <button class="diff-btn nb-diff" data-diff="hard">Ťažká<br><span style="font-size:14px; opacity:0.7;">3-Back</span></button>
+    </div>
+    <div id="nbBox" class="rt-box" style="cursor:pointer;">
+      <div class="rt-msg" id="nbMsg" style="font-size:64px;">—</div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="nbScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="nbAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="nbAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+    </div>
+    <div class="result-banner" id="nbResult" style="display:none;">
+      <div class="result-tier" id="nbResultTier"></div>
+      <p id="nbResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len vtedy, keď je aktuálne písmeno <strong style="color:var(--orange);">rovnaké</strong> ako písmeno spred <strong style="color:var(--orange);" id="nbNLabel">2 krokov</strong> (<span id="nbNBackLabel">2-Back</span>).</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startNBack()">Spustiť</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let seed = 7;
+  Math.random = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000000) / 1000000;
+  };
+})();
+</script>
+
+<script>
+const nbBox = document.getElementById('nbBox');
+const nbMsg = document.getElementById('nbMsg');
+const nbScoreEl = document.getElementById('nbScore');
+const nbAccEl = document.getElementById('nbAcc');
+const nbAvgEl = document.getElementById('nbAvg');
+const nbResult = document.getElementById('nbResult');
+const nbResultTier = document.getElementById('nbResultTier');
+const nbResultText = document.getElementById('nbResultText');
+
+function rateNBack(acc){
+  if(acc >= 90) return ['Výnimočná pracovná pamäť', 'Toto je výsledok na úrovni trénovaných jedincov — bežný priemer je 80–90 %.'];
+  if(acc >= 80) return ['Výborná pracovná pamäť', 'Zodpovedá priemeru zdravých mladých dospelých na 2-Back úlohe.'];
+  if(acc >= 65) return ['Priemerná pracovná pamäť', 'Solídny základ — pravidelný tréning tento výkon posúva vyššie.'];
+  return ['Podpriemerná pracovná pamäť', '2-Back je náročná úloha — skús to znova, výkon sa rýchlo zlepšuje s tréningom.'];
+}
+
+const NB_LETTERS = ['C','F','K','L','R','T'];
+const NB_N_CONFIG = { easy: 1, medium: 2, hard: 3 };
+let nbDiff = 'medium';
+let NB_N = 2;
+const NB_ROUNDS = 22;
+const NB_MATCH_PROB = 0.35;
+
+function nbStepWord(n){ return n === 1 ? 'krok' : 'kroky'; }
+
+function selectNbDiff(d){
+  if(nbRunning) return;
+  nbDiff = d;
+  NB_N = NB_N_CONFIG[d];
+  document.querySelectorAll('.nb-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('nbNLabel').textContent = NB_N + ' ' + nbStepWord(NB_N);
+  document.getElementById('nbNBackLabel').textContent = NB_N + '-Back';
+}
+
+let nbHistory = [];
+let nbRound = 0;
+let nbScore = 0;
+let nbHits = 0, nbMisses = 0, nbFalseAlarms = 0, nbCorrectRejections = 0;
+let nbRts = [];
+let nbTimer, nbShownAt;
+let nbWaitingResponse = false, nbRunning = false;
+let nbCurrentIsMatch = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+function nbFlash(cls){
+  nbBox.classList.add(cls);
+  setTimeout(() => nbBox.classList.remove(cls), 220);
+}
+
+function startNBack(){
+  nbHistory = []; nbRound = 0; nbScore = 0;
+  nbHits = 0; nbMisses = 0; nbFalseAlarms = 0; nbCorrectRejections = 0; nbRts = [];
+  updateNbStats();
+  nbResult.style.display = 'none';
+  nbRunning = true;
+  document.querySelectorAll('.nb-diff').forEach(b => b.disabled = true);
+  nbMsg.style.opacity = '0';
+  nbMsg.textContent = 'Priprav sa...';
+  nbMsg.style.fontSize = '28px';
+  requestAnimationFrame(() => { nbMsg.style.opacity = '1'; });
+  nbTimer = setTimeout(() => {
+    nbMsg.style.fontSize = '64px';
+    nbNextRound();
+  }, 900);
+}
+
+function updateNbStats(){
+  nbScoreEl.textContent = nbScore;
+  const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+  nbAccEl.textContent = resolved ? Math.round(((nbHits+nbCorrectRejections)/resolved)*100)+'%' : '—';
+  nbAvgEl.textContent = nbRts.length ? Math.round(nbRts.reduce((a,b)=>a+b,0)/nbRts.length) : '—';
+}
+
+function nbNextRound(){
+  if(nbRound >= NB_ROUNDS){
+    nbRunning = false;
+    document.querySelectorAll('.nb-diff').forEach(b => b.disabled = false);
+    nbMsg.style.fontSize = '36px';
+    nbMsg.textContent = 'Hotovo!';
+    const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
+    if(resolved > 0){
+      const acc = Math.round(((nbHits+nbCorrectRejections)/resolved)*100);
+      const [tier, text] = rateNBack(acc);
+      nbResultTier.textContent = tier;
+      nbResultText.textContent = text;
+      nbResult.style.display = 'block';
+    }
+    return;
+  }
+  nbRound++;
+  nbWaitingResponse = false;
+  nbMsg.style.opacity = '0';
+  const delay = 500 + Math.random()*500;
+  nbTimer = setTimeout(nbShowLetter, delay);
+}
+
+function nbShowLetter(){
+  const idx = nbHistory.length;
+  let letter;
+  const matchIdx = idx - NB_N;
+  if(matchIdx >= 0 && Math.random() < NB_MATCH_PROB){
+    letter = nbHistory[matchIdx];
+  } else {
+    letter = NB_LETTERS[Math.floor(Math.random()*NB_LETTERS.length)];
+  }
+  nbHistory.push(letter);
+  nbCurrentIsMatch = matchIdx >= 0 && nbHistory[matchIdx] === letter;
+
+  nbMsg.textContent = letter;
+  nbMsg.style.opacity = '1';
+  nbShownAt = performance.now();
+  nbWaitingResponse = true;
+  nbTimer = setTimeout(() => {
+    if(nbWaitingResponse){
+      nbWaitingResponse = false;
+      if(nbCurrentIsMatch){
+        nbMisses++;
+        nbScore = Math.max(0, nbScore - 1);
+        nbFlash('early');
+      } else {
+        nbCorrectRejections++;
+      }
+      updateNbStats();
+      nbMsg.style.opacity = '0';
+      setTimeout(nbNextRound, 300);
+    }
+  }, 1800);
+}
+
+nbBox.addEventListener('click', () => {
+  if(!nbRunning || !nbWaitingResponse) return;
+  clearTimeout(nbTimer);
+  nbWaitingResponse = false;
+  if(nbCurrentIsMatch){
+    nbRts.push(Math.round(performance.now() - nbShownAt));
+    nbHits++; nbScore++;
+    nbFlash('go');
+    bump(nbScoreEl, true);
+  } else {
+    nbFalseAlarms++;
+    nbScore = Math.max(0, nbScore - 1);
+    nbFlash('early');
+    bump(nbScoreEl, false);
+  }
+  updateNbStats();
+  nbMsg.style.opacity = '0';
+  setTimeout(nbNextRound, 300);
+});
+
+// --- Recording driver: clicks only on true matches, deterministically ---
+setTimeout(startNBack, 900);
+setInterval(function(){
+  if(nbRunning && nbWaitingResponse && nbCurrentIsMatch){
+    nbBox.click();
+  }
+}, 50);
+</script>
+
+</body>
+</html>

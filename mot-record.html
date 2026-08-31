@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{background:var(--navy); height:1920px; margin:0; display:flex; align-items:center;}
+  .record-wrap{width:1080px; margin:0 auto; padding:0 90px; display:flex; flex-direction:column; align-items:center;}
+  .record-brand{display:flex; align-items:center; gap:16px; margin-bottom:56px;}
+  .record-brand img{height:52px; width:auto;}
+  .test-card-xl{width:100%; max-width:900px; padding:56px;}
+  .test-card-xl .test-label{font-size:20px; margin-bottom:32px;}
+  .test-card-xl .diff-select{margin-bottom:28px; gap:14px;}
+  .test-card-xl .diff-btn{padding:20px 10px; font-size:20px;}
+  #motBox{height:700px !important;}
+  #motMsg{font-size:24px !important;}
+  .test-card-xl .rt-stats{margin-top:34px; gap:20px;}
+  .test-card-xl .rt-stats .num{font-size:46px;}
+  .test-card-xl .rt-stats .lbl{font-size:16px;}
+  .test-card-xl .result-banner{padding:26px 30px; margin-top:26px;}
+  .test-card-xl .result-tier{font-size:20px;}
+  .test-card-xl .result-banner p{font-size:20px;}
+  .test-card-xl > p.mono{font-size:19px !important; margin-top:22px !important;}
+  .test-card-xl > .btn{font-size:20px !important; padding:24px !important;}
+  #motConfirmBtn{margin-top:16px !important;}
+</style>
+</head>
+<body>
+
+<div class="record-wrap">
+  <div class="record-brand">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+  </div>
+
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Sledovanie viacerých objektov</span></div>
+    <div class="diff-select">
+      <button class="diff-btn mot-diff" data-diff="easy">Ľahká<br><span style="font-size:14px; opacity:0.7;">2 ciele, pomalšie</span></button>
+      <button class="diff-btn mot-diff active" data-diff="medium">Stredná<br><span style="font-size:14px; opacity:0.7;">3 ciele, bežne</span></button>
+      <button class="diff-btn mot-diff" data-diff="hard">Ťažká<br><span style="font-size:14px; opacity:0.7;">4 ciele, rýchlejšie</span></button>
+    </div>
+    <div id="motBox" class="rt-box" style="cursor:default; position:relative; padding:0; height:300px; overflow:hidden;">
+      <div id="motMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni na Spustiť</div>
+    </div>
+    <button class="btn btn-primary" id="motConfirmBtn" style="margin-top:16px; width:100%; display:none;" disabled>Potvrdiť výber</button>
+    <div class="rt-stats">
+      <div><div class="num" id="motScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="motAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="motRound">0/5</div><div class="lbl">Kolo</div></div>
+    </div>
+    <div class="result-banner" id="motResult" style="display:none;">
+      <div class="result-tier" id="motResultTier"></div>
+      <p id="motResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si <strong style="color:var(--orange);" id="motTargetCountLabel">3 zvýraznené bodky</strong>. Po tom, čo sa všetky rozpohybujú a zastavia, klikni na tie, ktoré si si zapamätal.</p>
+    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startMOT()">Spustiť</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let seed = 99;
+  Math.random = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000000) / 1000000;
+  };
+})();
+</script>
+
+<script>
+const motBox = document.getElementById('motBox');
+const motMsg = document.getElementById('motMsg');
+const motConfirmBtn = document.getElementById('motConfirmBtn');
+const motScoreEl = document.getElementById('motScore');
+const motAccEl = document.getElementById('motAcc');
+const motRoundEl = document.getElementById('motRound');
+const motResult = document.getElementById('motResult');
+const motResultTier = document.getElementById('motResultTier');
+const motResultText = document.getElementById('motResultText');
+
+function rateMOT(acc){
+  if(acc >= 90) return ['Výnimočná pozornosť', 'Dokázal(a) si súčasne sledovať všetky ciele takmer bezchybne — patríš medzi najlepších.'];
+  if(acc >= 70) return ['Výborná pozornosť', 'Nadpriemerná schopnosť rozdeliť pozornosť medzi viacero cieľov.'];
+  if(acc >= 50) return ['Priemerná pozornosť', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná pozornosť', 'Sledovanie viacerých cieľov naraz je náročné pre každého — dá sa to trénovať.'];
+}
+
+const MOT_ROUNDS = 5;
+const MOT_TOTAL_DOTS = 8;
+const MOT_CUE_MS = 2500;
+const MOT_MOVE_MS = 8000;
+const MOT_DOT_RADIUS = 12;
+const MOT_MIN_DIST = 55;
+const MOT_CONFIG = {
+  easy: {targets: 2, speedMin: 35, speedMax: 55},
+  medium: {targets: 3, speedMin: 45, speedMax: 80},
+  hard: {targets: 4, speedMin: 60, speedMax: 100}
+};
+let motDiff = 'medium';
+let MOT_TARGET_COUNT = 3;
+
+let motRound = 0, motScore = 0;
+let motDots = [];
+let motSelecting = false;
+let motRafId = null;
+let motRunning = false;
+
+function selectMotDiff(d){
+  if(motRunning) return;
+  motDiff = d;
+  MOT_TARGET_COUNT = MOT_CONFIG[d].targets;
+  document.querySelectorAll('.mot-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  document.getElementById('motTargetCountLabel').textContent = MOT_TARGET_COUNT + ' zvýraznené bodky';
+}
+
+function updateMotStats(){
+  motScoreEl.textContent = motScore;
+  const totalPossible = (motRound) * MOT_TARGET_COUNT;
+  motAccEl.textContent = totalPossible ? Math.round((motScore/totalPossible)*100)+'%' : '—';
+  motRoundEl.textContent = motRound + '/' + MOT_ROUNDS;
+}
+
+function startMOT(){
+  motLog('startMOT() called');
+  motRound = 0; motScore = 0;
+  motRunning = true;
+  document.querySelectorAll('.mot-diff').forEach(b => b.disabled = true);
+  updateMotStats();
+  motResult.style.display = 'none';
+  motConfirmBtn.style.display = 'none';
+  nextMotRound();
+}
+
+function randPos(existing){
+  const boxRect = motBox.getBoundingClientRect();
+  const w = boxRect.width, h = boxRect.height;
+  let tries = 0;
+  while(tries < 200){
+    const x = MOT_DOT_RADIUS + Math.random()*(w - MOT_DOT_RADIUS*2);
+    const y = MOT_DOT_RADIUS + Math.random()*(h - MOT_DOT_RADIUS*2);
+    let ok = true;
+    for(const d of existing){
+      if(Math.hypot(d.x-x, d.y-y) < MOT_MIN_DIST){ ok = false; break; }
+    }
+    if(ok) return {x, y};
+    tries++;
+  }
+  return {x: MOT_DOT_RADIUS + Math.random()*(w - MOT_DOT_RADIUS*2), y: MOT_DOT_RADIUS + Math.random()*(h - MOT_DOT_RADIUS*2)};
+}
+
+function nextMotRound(){
+  motLog('nextMotRound() called, motRound='+motRound);
+  if(motRound >= MOT_ROUNDS){
+    motRunning = false;
+    document.querySelectorAll('.mot-diff').forEach(b => b.disabled = false);
+    motBox.innerHTML = '';
+    const msgEl = document.createElement('div');
+    msgEl.id = 'motMsg';
+    msgEl.className = 'rt-msg';
+    msgEl.style.cssText = 'font-size:20px;';
+    msgEl.textContent = 'Hotovo!';
+    motBox.appendChild(msgEl);
+    motConfirmBtn.style.display = 'none';
+
+    const totalPossible = MOT_ROUNDS * MOT_TARGET_COUNT;
+    const acc = Math.round((motScore/totalPossible)*100);
+    const [tier, text] = rateMOT(acc);
+    motResultTier.textContent = tier;
+    motResultText.textContent = text;
+    motResult.style.display = 'block';
+    return;
+  }
+  motRound++;
+  updateMotStats();
+  motConfirmBtn.style.display = 'none';
+  motConfirmBtn.disabled = true;
+  motSelecting = false;
+
+  motBox.innerHTML = '';
+  motDots = [];
+  const targetIdx = new Set();
+  while(targetIdx.size < MOT_TARGET_COUNT){
+    targetIdx.add(Math.floor(Math.random()*MOT_TOTAL_DOTS));
+  }
+
+  for(let i=0;i<MOT_TOTAL_DOTS;i++){
+    const pos = randPos(motDots);
+    const angle = Math.random()*Math.PI*2;
+    const speedCfg = MOT_CONFIG[motDiff];
+    const speed = speedCfg.speedMin + Math.random()*(speedCfg.speedMax - speedCfg.speedMin);
+    const el = document.createElement('div');
+    el.style.cssText = 'position:absolute; width:'+(MOT_DOT_RADIUS*2)+'px; height:'+(MOT_DOT_RADIUS*2)+'px; margin:-'+MOT_DOT_RADIUS+'px 0 0 -'+MOT_DOT_RADIUS+'px; border-radius:50%; cursor:default; transition:background .15s, box-shadow .15s;';
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
+    const isTarget = targetIdx.has(i);
+    el.style.background = isTarget ? 'var(--orange)' : '#3A4452';
+    const dot = {x: pos.x, y: pos.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, isTarget, el, selected: false};
+    el.addEventListener('click', () => onMotDotClick(dot));
+    motBox.appendChild(el);
+    motDots.push(dot);
+  }
+
+  setTimeout(() => {
+    motDots.forEach(d => { d.el.style.background = '#3A4452'; });
+    beginMotMovement();
+  }, MOT_CUE_MS);
+}
+
+function beginMotMovement(){
+  // Recording variant: skip the rAF-driven per-frame animation (headless
+  // virtual-time capture doesn't reliably composite continuous rAF/CSS
+  // updates) and just jump straight to the end of the movement window.
+  motLog('beginMotMovement() called (recording: no live animation)');
+  setTimeout(beginMotSelection, MOT_MOVE_MS);
+}
+
+function beginMotSelection(){
+  motLog('beginMotSelection() called, motRound='+motRound);
+  motSelecting = true;
+  motConfirmBtn.style.display = 'block';
+  motConfirmBtn.disabled = true;
+  motDots.forEach(d => { d.el.style.background = '#3A4452'; d.el.style.cursor = 'pointer'; });
+}
+
+function onMotDotClick(dot){
+  if(!motSelecting) return;
+  const selectedCount = motDots.filter(d => d.selected).length;
+  if(dot.selected){
+    dot.selected = false;
+    dot.el.style.boxShadow = 'none';
+    dot.el.style.background = '#3A4452';
+  } else {
+    if(selectedCount >= MOT_TARGET_COUNT) return;
+    dot.selected = true;
+    dot.el.style.boxShadow = '0 0 0 3px var(--off-white)';
+    dot.el.style.background = '#5A6472';
+  }
+  const newCount = motDots.filter(d => d.selected).length;
+  motConfirmBtn.disabled = newCount !== MOT_TARGET_COUNT;
+}
+
+motConfirmBtn.addEventListener('click', () => {
+  motLog('confirmBtn click handler fired, disabled='+motConfirmBtn.disabled+' motRound='+motRound);
+  if(motConfirmBtn.disabled) return;
+  motSelecting = false;
+  motConfirmBtn.style.display = 'none';
+
+  let correct = 0;
+  motDots.forEach(d => {
+    d.el.style.cursor = 'default';
+    if(d.isTarget){
+      d.el.style.background = 'var(--green)';
+      d.el.style.boxShadow = d.selected ? '0 0 0 3px var(--off-white)' : 'none';
+      if(d.selected) correct++;
+    } else if(d.selected){
+      d.el.style.background = '#C0392B';
+    } else {
+      d.el.style.background = '#3A4452';
+    }
+  });
+  motScore += correct;
+  updateMotStats();
+
+  setTimeout(nextMotRound, 1400);
+});
+
+// --- Recording driver: always selects exactly the real targets, deterministically ---
+function motLog(){}
+setTimeout(startMOT, 900);
+let motAutoHandledRound = -1;
+setInterval(function(){
+  if(motRunning && motSelecting && motRound !== motAutoHandledRound){
+    motAutoHandledRound = motRound;
+    motDots.filter(d => d.isTarget).forEach(d => onMotDotClick(d));
+    setTimeout(function(){
+      if(!motConfirmBtn.disabled) motConfirmBtn.click();
+    }, 30);
+  }
+}, 80);
+</script>
+
+</body>
+</html>

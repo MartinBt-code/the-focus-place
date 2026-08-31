@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{background:var(--navy); height:1920px; margin:0; display:flex; align-items:center;}
+  .record-wrap{width:1080px; margin:0 auto; padding:0 90px; display:flex; flex-direction:column; align-items:center;}
+  .record-brand{display:flex; align-items:center; gap:16px; margin-bottom:56px;}
+  .record-brand img{height:52px; width:auto;}
+  .test-card-xl{width:100%; max-width:900px; padding:56px;}
+  .test-card-xl .test-label{font-size:20px; margin-bottom:32px;}
+  .test-card-xl .diff-select{margin-bottom:28px; gap:14px;}
+  .test-card-xl .diff-btn{padding:20px 10px; font-size:20px;}
+  #pcBox{height:640px !important;}
+  #pcMsg{font-size:24px !important;}
+  .test-card-xl .rt-stats{margin-top:34px; gap:20px;}
+  .test-card-xl .rt-stats .num{font-size:46px;}
+  .test-card-xl .rt-stats .lbl{font-size:16px;}
+  .test-card-xl .result-banner{padding:26px 30px; margin-top:26px;}
+  .test-card-xl .result-tier{font-size:20px;}
+  .test-card-xl .result-banner p{font-size:20px;}
+  .test-card-xl > p.mono{font-size:19px !important; margin-top:22px !important;}
+  .test-card-xl > .btn{font-size:20px !important; padding:24px !important;}
+</style>
+</head>
+<body>
+
+<div class="record-wrap">
+  <div class="record-brand">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+  </div>
+
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Presnosť kliknutia</span></div>
+    <div class="diff-select">
+      <button class="diff-btn pc-diff" data-diff="easy">Ľahká<br><span style="font-size:14px; opacity:0.7;">väčší terč</span></button>
+      <button class="diff-btn pc-diff active" data-diff="medium">Stredná<br><span style="font-size:14px; opacity:0.7;">bežný terč</span></button>
+      <button class="diff-btn pc-diff" data-diff="hard">Ťažká<br><span style="font-size:14px; opacity:0.7;">menší terč</span></button>
+    </div>
+    <div id="pcBox" class="rt-box" style="cursor:crosshair; position:relative; padding:0; height:420px;">
+      <div id="pcMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:'Inter'; color:var(--gray);">Klikni Spustiť</div>
+      <div id="pcTarget" style="position:absolute; width:90px; height:90px; border-radius:50%; border:2px solid var(--orange); display:none; pointer-events:none;">
+        <div id="pcRing2" style="position:absolute; top:50%; left:50%; width:50px; height:50px; margin:-25px 0 0 -25px; border-radius:50%; border:1px solid var(--orange); opacity:0.5;"></div>
+        <div id="pcDot" style="position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--orange);"></div>
+      </div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="pcHits">0</div><div class="lbl">Zásahy</div></div>
+      <div><div class="num" id="pcAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="pcRound">0/12</div><div class="lbl">Kolo</div></div>
+    </div>
+    <div class="result-banner" id="pcResult" style="display:none;">
+      <div class="result-tier" id="pcResultTier"></div>
+      <p id="pcResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni čo najbližšie k <strong style="color:var(--orange);">stredu terča</strong> — na rýchlosti nezáleží, len na presnosti.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPC()">Spustiť</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let seed = 55;
+  Math.random = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000000) / 1000000;
+  };
+})();
+</script>
+
+<script>
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+const pcBox = document.getElementById('pcBox');
+const pcTarget = document.getElementById('pcTarget');
+const pcRing2 = document.getElementById('pcRing2');
+const pcDot = document.getElementById('pcDot');
+const pcMsg = document.getElementById('pcMsg');
+const pcHitsEl = document.getElementById('pcHits');
+const pcAccEl = document.getElementById('pcAcc');
+const pcRoundEl = document.getElementById('pcRound');
+const pcResult = document.getElementById('pcResult');
+const pcResultTier = document.getElementById('pcResultTier');
+const pcResultText = document.getElementById('pcResultText');
+
+function ratePrecision(acc){
+  if(acc >= 90) return ['Špičková presnosť', 'Trafil(a) si takmer presne do stredu vo väčšine pokusov — patríš medzi najlepších.'];
+  if(acc >= 75) return ['Výborná presnosť', 'Nadpriemerná presnosť pohybu.'];
+  if(acc >= 55) return ['Priemerná presnosť', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná presnosť', 'Priestor na zlepšenie — presnosť sa dá trénovať rovnako ako rýchlosť.'];
+}
+
+const PC_ROUNDS = 12;
+const PC_SIZE_CONFIG = { easy: 120, medium: 90, hard: 60 };
+let pcDiff = 'medium';
+let PC_SIZE = 90;
+let PC_RADIUS = 45;
+let pcRound = 0, pcHits = 0, pcScores = [], pcCenterX = 0, pcCenterY = 0, pcRunning = false, pcWaiting = false;
+
+function selectPcDiff(d){
+  if(pcRunning) return;
+  pcDiff = d;
+  PC_SIZE = PC_SIZE_CONFIG[d];
+  PC_RADIUS = PC_SIZE / 2;
+  pcTarget.style.width = PC_SIZE + 'px';
+  pcTarget.style.height = PC_SIZE + 'px';
+  const ring2Size = Math.round(PC_SIZE * (50/90));
+  pcRing2.style.width = ring2Size + 'px';
+  pcRing2.style.height = ring2Size + 'px';
+  pcRing2.style.margin = -(ring2Size/2) + 'px 0 0 ' + -(ring2Size/2) + 'px';
+  const dotSize = Math.round(PC_SIZE * (10/90));
+  pcDot.style.width = dotSize + 'px';
+  pcDot.style.height = dotSize + 'px';
+  pcDot.style.margin = -(dotSize/2) + 'px 0 0 ' + -(dotSize/2) + 'px';
+  document.querySelectorAll('.pc-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
+
+function startPC(){
+  pcRound = 0; pcHits = 0; pcScores = [];
+  pcHitsEl.textContent = '0';
+  pcAccEl.textContent = '—';
+  pcResult.style.display = 'none';
+  pcRunning = true;
+  document.querySelectorAll('.pc-diff').forEach(b => b.disabled = true);
+  pcMsg.style.display = 'flex';
+  pcMsg.textContent = 'Priprav sa...';
+  setTimeout(() => {
+    pcMsg.style.display = 'none';
+    nextPcRound();
+  }, 700);
+}
+
+function nextPcRound(){
+  if(pcRound >= PC_ROUNDS){
+    pcRunning = false;
+    pcWaiting = false;
+    document.querySelectorAll('.pc-diff').forEach(b => b.disabled = false);
+    pcTarget.style.display = 'none';
+    pcMsg.style.display = 'flex';
+    pcMsg.textContent = 'Hotovo!';
+    pcRoundEl.textContent = PC_ROUNDS + '/' + PC_ROUNDS;
+    if(pcScores.length > 0){
+      const acc = Math.round((pcScores.reduce((a,b)=>a+b,0)/pcScores.length)*100);
+      const [tier, text] = ratePrecision(acc);
+      pcResultTier.textContent = tier;
+      pcResultText.textContent = text;
+      pcResult.style.display = 'block';
+    }
+    return;
+  }
+  pcRound++;
+  pcRoundEl.textContent = pcRound + '/' + PC_ROUNDS;
+  const boxRect = pcBox.getBoundingClientRect();
+  const size = PC_SIZE;
+  const maxX = Math.max(0, boxRect.width - size);
+  const maxY = Math.max(0, boxRect.height - size);
+  const left = Math.random()*maxX;
+  const top = Math.random()*maxY;
+  pcTarget.style.left = left + 'px';
+  pcTarget.style.top = top + 'px';
+  pcCenterX = left + size/2;
+  pcCenterY = top + size/2;
+  pcTarget.style.display = 'block';
+  pcTarget.classList.remove('show');
+  void pcTarget.offsetWidth;
+  pcTarget.classList.add('show');
+  pcWaiting = true;
+}
+
+pcBox.addEventListener('click', (e) => {
+  if(!pcRunning || !pcWaiting) return;
+  pcWaiting = false;
+  const boxRect = pcBox.getBoundingClientRect();
+  const clickX = e.clientX - boxRect.left;
+  const clickY = e.clientY - boxRect.top;
+  const dist = Math.hypot(clickX - pcCenterX, clickY - pcCenterY);
+  const score = Math.max(0, 1 - dist/PC_RADIUS);
+  pcScores.push(score);
+  if(score > 0){
+    pcHits++;
+    pcHitsEl.textContent = pcHits;
+    bump(pcHitsEl, true);
+  } else {
+    bump(pcHitsEl, false);
+  }
+  const acc = Math.round((pcScores.reduce((a,b)=>a+b,0)/pcScores.length)*100);
+  pcAccEl.textContent = acc + '%';
+  pcTarget.style.display = 'none';
+  setTimeout(nextPcRound, 250);
+});
+
+// --- Recording driver: clicks near-dead-center of the target each round ---
+setTimeout(startPC, 900);
+let pcAutoHandledRound = -1;
+setInterval(function(){
+  if(pcRunning && pcWaiting && pcRound !== pcAutoHandledRound){
+    pcAutoHandledRound = pcRound;
+    setTimeout(function(){
+      if(!pcWaiting) return;
+      const boxRect = pcBox.getBoundingClientRect();
+      const jitterX = (Math.random()*10) - 5;
+      const jitterY = (Math.random()*10) - 5;
+      const evt = new MouseEvent('click', {
+        bubbles: true, cancelable: true,
+        clientX: boxRect.left + pcCenterX + jitterX,
+        clientY: boxRect.top + pcCenterY + jitterY
+      });
+      pcBox.dispatchEvent(evt);
+    }, 550);
+  }
+}, 60);
+</script>
+
+</body>
+</html>

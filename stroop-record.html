@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{background:var(--navy); height:1920px; margin:0; display:flex; align-items:center;}
+  .record-wrap{
+    width:1080px; margin:0 auto; padding:0 90px; display:flex; flex-direction:column; align-items:center;
+  }
+  .record-brand{display:flex; align-items:center; gap:16px; margin-bottom:70px;}
+  .record-brand img{height:52px; width:auto;}
+  .test-card-xl{width:100%; max-width:900px; padding:56px;}
+  .test-card-xl .test-label{font-size:20px; margin-bottom:32px;}
+  .test-card-xl .diff-select{margin-bottom:28px; gap:14px;}
+  .test-card-xl .diff-btn{padding:20px 10px; font-size:20px;}
+  .test-card-xl .rt-box{height:460px;}
+  #stroopMsg{font-size:80px !important;}
+  .test-card-xl .stroop-options{gap:20px;}
+  .test-card-xl .rt-stats{margin-top:34px; gap:20px;}
+  .test-card-xl .rt-stats .num{font-size:46px;}
+  .test-card-xl .rt-stats .lbl{font-size:16px;}
+  .test-card-xl .result-banner{padding:26px 30px; margin-top:26px;}
+  .test-card-xl .result-tier{font-size:20px;}
+  .test-card-xl .result-banner p{font-size:20px;}
+  .test-card-xl > p.mono{font-size:19px !important; margin-top:22px !important;}
+  .test-card-xl > .btn{font-size:20px !important; padding:24px !important; margin-top:26px !important;}
+</style>
+</head>
+<body>
+
+<div class="record-wrap">
+  <div class="record-brand">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+  </div>
+
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Stroop test</span></div>
+    <div class="diff-select">
+      <button class="diff-btn stroop-diff" data-diff="easy">Ľahká<br><span style="font-size:14px; opacity:0.7;">2 farby</span></button>
+      <button class="diff-btn stroop-diff active" data-diff="medium">Stredná<br><span style="font-size:14px; opacity:0.7;">4 farby</span></button>
+      <button class="diff-btn stroop-diff" data-diff="hard">Ťažká<br><span style="font-size:14px; opacity:0.7;">6 farieb</span></button>
+    </div>
+    <div id="stroopBox" class="rt-box" style="flex-direction:column; gap:20px;">
+      <div class="rt-msg" id="stroopMsg">—</div>
+      <div class="stroop-options" id="stroopOptions" style="width:100%; padding:0 20px;"></div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="stroopScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="stroopAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="stroopAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+      <div><div class="num" id="stroopInterference">—</div><div class="lbl">Rušenie (ms)</div></div>
+    </div>
+    <div class="result-banner" id="stroopResult" style="display:none;">
+      <div class="result-tier" id="stroopResultTier"></div>
+      <p id="stroopResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na farbu, akou je slovo <strong style="color:var(--orange);">vyfarbené</strong> — nie na farbu, ktorú slovo pomenúva.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startStroop()">Spustiť</button>
+  </div>
+</div>
+
+<script>
+// Seeded PRNG so every headless launch (at any --virtual-time-budget) replays
+// the exact same deterministic sequence of words/colors/delays.
+(function(){
+  let seed = 42;
+  Math.random = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000000) / 1000000;
+  };
+})();
+</script>
+
+<script>
+const stroopBox = document.getElementById('stroopBox');
+const stroopMsg = document.getElementById('stroopMsg');
+const stroopScoreEl = document.getElementById('stroopScore');
+const stroopAccEl = document.getElementById('stroopAcc');
+const stroopAvgEl = document.getElementById('stroopAvg');
+const stroopInterferenceEl = document.getElementById('stroopInterference');
+const stroopResult = document.getElementById('stroopResult');
+const stroopResultTier = document.getElementById('stroopResultTier');
+const stroopResultText = document.getElementById('stroopResultText');
+const stroopOptions = document.getElementById('stroopOptions');
+let stroopSwatches = [];
+
+function rateStroop(acc){
+  if(acc >= 95) return ['Výnimočná kontrola', 'Takmer žiadne chyby napriek rušivému podnetu — patríš medzi najlepších.'];
+  if(acc >= 85) return ['Výborná kontrola', 'Nadpriemerná odolnosť voči rušivým podnetom.'];
+  if(acc >= 70) return ['Priemerná kontrola', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Podpriemerná kontrola', 'Slovo ťa častejšie oklame — pravidelný tréning túto kontrolu zlepšuje.'];
+}
+
+const STROOP_COLOR_SETS = {
+  easy: [
+    {key:'red', word:'ČERVENÁ', hex:'#E74C3C'},
+    {key:'blue', word:'MODRÁ', hex:'#3B82F6'}
+  ],
+  medium: [
+    {key:'red', word:'ČERVENÁ', hex:'#E74C3C'},
+    {key:'blue', word:'MODRÁ', hex:'#3B82F6'},
+    {key:'green', word:'ZELENÁ', hex:'#2ECC71'},
+    {key:'yellow', word:'ŽLTÁ', hex:'#F1C40F'}
+  ],
+  hard: [
+    {key:'red', word:'ČERVENÁ', hex:'#E74C3C'},
+    {key:'blue', word:'MODRÁ', hex:'#3B82F6'},
+    {key:'green', word:'ZELENÁ', hex:'#2ECC71'},
+    {key:'yellow', word:'ŽLTÁ', hex:'#F1C40F'},
+    {key:'orange', word:'ORANŽOVÁ', hex:'#F39C12'},
+    {key:'purple', word:'FIALOVÁ', hex:'#9B59B6'}
+  ]
+};
+const STROOP_ROUNDS = 24;
+let stroopDiff = 'medium';
+let stroopRound = 0, stroopScore = 0, stroopHits = 0, stroopMisses = 0;
+let stroopCongruentRts = [], stroopIncongruentRts = [];
+let stroopTimer, stroopShownAt, stroopWaitingResponse = false, stroopRunning = false;
+let stroopCurrent = null;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function renderStroopOptions(){
+  const colors = STROOP_COLOR_SETS[stroopDiff];
+  stroopOptions.innerHTML = '';
+  stroopOptions.style.gridTemplateColumns = colors.length <= 4 ? `repeat(${colors.length},1fr)` : 'repeat(3,1fr)';
+  colors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'stroop-swatch';
+    btn.dataset.key = c.key;
+    btn.style.background = c.hex;
+    btn.setAttribute('aria-label', c.word);
+    btn.addEventListener('click', () => onStroopSwatchClick(btn));
+    stroopOptions.appendChild(btn);
+  });
+  stroopSwatches = Array.from(stroopOptions.children);
+}
+
+function selectStroopDiff(d){
+  if(stroopRunning) return;
+  stroopDiff = d;
+  document.querySelectorAll('.stroop-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  renderStroopOptions();
+}
+renderStroopOptions();
+
+function startStroop(){
+  stroopRound = 0; stroopScore = 0; stroopHits = 0; stroopMisses = 0;
+  stroopCongruentRts = []; stroopIncongruentRts = [];
+  updateStroopStats();
+  stroopResult.style.display = 'none';
+  stroopRunning = true;
+  document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = true);
+  stroopMsg.style.opacity = '0';
+  stroopMsg.textContent = 'Priprav sa...';
+  stroopMsg.style.fontSize = '28px';
+  stroopMsg.style.color = 'var(--off-white)';
+  requestAnimationFrame(() => { stroopMsg.style.opacity = '1'; });
+  stroopTimer = setTimeout(() => {
+    nextStroopRound();
+  }, 900);
+}
+
+function updateStroopStats(){
+  stroopScoreEl.textContent = stroopScore;
+  const total = stroopHits + stroopMisses;
+  stroopAccEl.textContent = total ? Math.round((stroopHits/total)*100)+'%' : '—';
+  const allRts = stroopCongruentRts.concat(stroopIncongruentRts);
+  stroopAvgEl.textContent = allRts.length ? Math.round(allRts.reduce((a,b)=>a+b,0)/allRts.length) : '—';
+  if(stroopCongruentRts.length && stroopIncongruentRts.length){
+    const avgC = stroopCongruentRts.reduce((a,b)=>a+b,0)/stroopCongruentRts.length;
+    const avgI = stroopIncongruentRts.reduce((a,b)=>a+b,0)/stroopIncongruentRts.length;
+    stroopInterferenceEl.textContent = Math.round(avgI - avgC);
+  } else {
+    stroopInterferenceEl.textContent = '—';
+  }
+}
+
+function nextStroopRound(){
+  if(stroopRound >= STROOP_ROUNDS){
+    stroopRunning = false;
+    document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = false);
+    stroopMsg.style.fontSize = '36px';
+    stroopMsg.style.color = 'var(--off-white)';
+    stroopMsg.textContent = 'Hotovo!';
+    const total = stroopHits + stroopMisses;
+    if(total > 0){
+      const acc = Math.round((stroopHits/total)*100);
+      const [tier, text] = rateStroop(acc);
+      stroopResultTier.textContent = tier;
+      stroopResultText.textContent = text;
+      stroopResult.style.display = 'block';
+    }
+    return;
+  }
+  stroopRound++;
+  stroopWaitingResponse = false;
+  stroopMsg.style.opacity = '0';
+  const delay = 450 + Math.random()*400;
+  stroopTimer = setTimeout(showStroopWord, delay);
+}
+
+function showStroopWord(){
+  const colors = STROOP_COLOR_SETS[stroopDiff];
+  const wordObj = colors[Math.floor(Math.random()*colors.length)];
+  const congruent = Math.random() < 0.5;
+  let inkObj = wordObj;
+  if(!congruent){
+    const others = colors.filter(c => c.key !== wordObj.key);
+    inkObj = others[Math.floor(Math.random()*others.length)];
+  }
+  stroopCurrent = { wordObj, inkObj, congruent };
+  stroopMsg.style.fontSize = '80px';
+  stroopMsg.textContent = wordObj.word;
+  stroopMsg.style.color = inkObj.hex;
+  stroopMsg.style.opacity = '1';
+  stroopShownAt = performance.now();
+  stroopWaitingResponse = true;
+  stroopTimer = setTimeout(() => {
+    if(stroopWaitingResponse){
+      stroopWaitingResponse = false;
+      stroopMisses++;
+      updateStroopStats();
+      stroopMsg.style.opacity = '0';
+      setTimeout(nextStroopRound, 300);
+    }
+  }, 3000);
+}
+
+function onStroopSwatchClick(sw){
+  if(!stroopRunning || !stroopWaitingResponse || !stroopCurrent) return;
+  clearTimeout(stroopTimer);
+  stroopWaitingResponse = false;
+  const rt = Math.round(performance.now() - stroopShownAt);
+  const correct = sw.dataset.key === stroopCurrent.inkObj.key;
+  if(correct){
+    stroopHits++; stroopScore++;
+    if(stroopCurrent.congruent) stroopCongruentRts.push(rt); else stroopIncongruentRts.push(rt);
+    sw.classList.add('correct');
+    bump(stroopScoreEl, true);
+  } else {
+    stroopMisses++; stroopScore = Math.max(0, stroopScore - 1);
+    sw.classList.add('wrong');
+    bump(stroopScoreEl, false);
+  }
+  updateStroopStats();
+  setTimeout(() => {
+    sw.classList.remove('correct','wrong');
+    stroopMsg.style.opacity = '0';
+    setTimeout(nextStroopRound, 250);
+  }, 260);
+}
+
+// --- Recording driver: auto-answers every round correctly, deterministically ---
+setTimeout(startStroop, 900);
+setInterval(function(){
+  if(stroopRunning && stroopWaitingResponse && stroopCurrent){
+    const key = stroopCurrent.inkObj.key;
+    const btn = document.querySelector('.stroop-swatch[data-key="'+key+'"]');
+    if(btn) onStroopSwatchClick(btn);
+  }
+}, 50);
+</script>
+
+</body>
+</html>
