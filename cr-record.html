@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body{background:var(--navy); height:1920px; margin:0; display:flex; align-items:center;}
+  .record-wrap{width:1080px; margin:0 auto; padding:0 90px; display:flex; flex-direction:column; align-items:center;}
+  .record-brand{display:flex; align-items:center; gap:16px; margin-bottom:70px;}
+  .record-brand img{height:52px; width:auto;}
+  .test-card-xl{width:100%; max-width:900px; padding:56px;}
+  .test-card-xl .test-label{font-size:20px; margin-bottom:32px;}
+  .test-card-xl .diff-select{margin-bottom:28px; gap:14px;}
+  .test-card-xl .diff-btn{padding:20px 10px; font-size:20px;}
+  .test-card-xl .rt-box{height:460px;}
+  #crStim{width:120px !important; height:120px !important;}
+  .test-card-xl .stroop-options{gap:20px;}
+  .test-card-xl .rt-stats{margin-top:34px; gap:20px;}
+  .test-card-xl .rt-stats .num{font-size:46px;}
+  .test-card-xl .rt-stats .lbl{font-size:16px;}
+  .test-card-xl .result-banner{padding:26px 30px; margin-top:26px;}
+  .test-card-xl .result-tier{font-size:20px;}
+  .test-card-xl .result-banner p{font-size:20px;}
+  .test-card-xl > p.mono{font-size:19px !important; margin-top:22px !important;}
+  .test-card-xl > .btn{font-size:20px !important; padding:24px !important; margin-top:26px !important;}
+</style>
+</head>
+<body>
+
+<div class="record-wrap">
+  <div class="record-brand">
+    <img src="assets/thePlace_logo_white.png" alt="the Focus Place">
+  </div>
+
+  <div class="test-card test-card-xl">
+    <div class="test-label"><span>Live test</span><span>Reakcia na výber</span></div>
+    <div class="diff-select">
+      <button class="diff-btn cr-diff" data-diff="easy">Ľahká<br><span style="font-size:14px; opacity:0.7;">2 farby</span></button>
+      <button class="diff-btn cr-diff active" data-diff="medium">Stredná<br><span style="font-size:14px; opacity:0.7;">4 farby</span></button>
+      <button class="diff-btn cr-diff" data-diff="hard">Ťažká<br><span style="font-size:14px; opacity:0.7;">6 farieb</span></button>
+    </div>
+    <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
+      <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
+      <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;"></div>
+    </div>
+    <div class="rt-stats">
+      <div><div class="num" id="crScore">0</div><div class="lbl">Skóre</div></div>
+      <div><div class="num" id="crAcc">—</div><div class="lbl">Presnosť</div></div>
+      <div><div class="num" id="crAvg">—</div><div class="lbl">Priemer (ms)</div></div>
+    </div>
+    <div class="result-banner" id="crResult" style="display:none;">
+      <div class="result-tier" id="crResultTier"></div>
+      <p id="crResultText"></p>
+    </div>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na tlačidlo s <strong style="color:var(--orange);">rovnakou farbou</strong>, akú vidíš v strede.</p>
+    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startChoiceRT()">Spustiť</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let seed = 314;
+  Math.random = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000000) / 1000000;
+  };
+})();
+</script>
+
+<script>
+const crStim = document.getElementById('crStim');
+const crScoreEl = document.getElementById('crScore');
+const crAccEl = document.getElementById('crAcc');
+const crAvgEl = document.getElementById('crAvg');
+const crResult = document.getElementById('crResult');
+const crResultTier = document.getElementById('crResultTier');
+const crResultText = document.getElementById('crResultText');
+const crOptions = document.getElementById('crOptions');
+let crSwatches = [];
+
+function rateChoiceRT(avgMs){
+  if(avgMs < 400) return ['Špičková rozhodovacia rýchlosť', 'Rozhoduješ sa medzi viacerými možnosťami takmer tak rýchlo, ako iní reagujú na jeden podnet.'];
+  if(avgMs < 500) return ['Výborná rozhodovacia rýchlosť', 'Nadpriemerná rýchlosť výberu správnej reakcie.'];
+  if(avgMs < 600) return ['Priemerná rozhodovacia rýchlosť', 'Zodpovedá bežnému výsledku dospelého.'];
+  return ['Pomalšia rozhodovacia rýchlosť', 'Priestor na zlepšenie — rozhodovacia rýchlosť sa dá trénovať.'];
+}
+
+const CR_COLOR_SETS = {
+  easy: [
+    {key:'red', hex:'#E74C3C', label:'Červená'},
+    {key:'blue', hex:'#3B82F6', label:'Modrá'}
+  ],
+  medium: [
+    {key:'red', hex:'#E74C3C', label:'Červená'},
+    {key:'blue', hex:'#3B82F6', label:'Modrá'},
+    {key:'green', hex:'#2ECC71', label:'Zelená'},
+    {key:'yellow', hex:'#F1C40F', label:'Žltá'}
+  ],
+  hard: [
+    {key:'red', hex:'#E74C3C', label:'Červená'},
+    {key:'blue', hex:'#3B82F6', label:'Modrá'},
+    {key:'green', hex:'#2ECC71', label:'Zelená'},
+    {key:'yellow', hex:'#F1C40F', label:'Žltá'},
+    {key:'orange', hex:'#F39C12', label:'Oranžová'},
+    {key:'purple', hex:'#9B59B6', label:'Fialová'}
+  ]
+};
+const CR_ROUNDS = 20;
+let crDiff = 'medium';
+let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
+let crTimer, crShownAt, crCurrent = null, crWaitingResponse = false, crRunning = false;
+
+function bump(el, good){
+  el.classList.remove('bump','good','bad');
+  void el.offsetWidth;
+  el.classList.add('bump', good ? 'good' : 'bad');
+  setTimeout(() => el.classList.remove('bump','good','bad'), 260);
+}
+
+function renderCrOptions(){
+  const colors = CR_COLOR_SETS[crDiff];
+  crOptions.innerHTML = '';
+  crOptions.style.gridTemplateColumns = colors.length <= 4 ? `repeat(${colors.length},1fr)` : 'repeat(3,1fr)';
+  colors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'stroop-swatch';
+    btn.dataset.key = c.key;
+    btn.style.background = c.hex;
+    btn.setAttribute('aria-label', c.label);
+    btn.addEventListener('click', () => onCrSwatchClick(btn));
+    crOptions.appendChild(btn);
+  });
+  crSwatches = Array.from(crOptions.children);
+}
+
+function selectCrDiff(d){
+  if(crRunning) return;
+  crDiff = d;
+  document.querySelectorAll('.cr-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+  renderCrOptions();
+}
+renderCrOptions();
+
+function startChoiceRT(){
+  crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
+  updateCrStats();
+  crResult.style.display = 'none';
+  crRunning = true;
+  document.querySelectorAll('.cr-diff').forEach(b => b.disabled = true);
+  nextCrRound();
+}
+
+function updateCrStats(){
+  crScoreEl.textContent = crScore;
+  const total = crHits + crMisses;
+  crAccEl.textContent = total ? Math.round((crHits/total)*100)+'%' : '—';
+  crAvgEl.textContent = crRts.length ? Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length) : '—';
+}
+
+function nextCrRound(){
+  if(crRound >= CR_ROUNDS){
+    crRunning = false;
+    document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
+    const total = crHits + crMisses;
+    if(crRts.length > 0){
+      const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
+      const [tier, text] = rateChoiceRT(avgMs);
+      crResultTier.textContent = tier;
+      crResultText.textContent = text;
+      crResult.style.display = 'block';
+    }
+    return;
+  }
+  crRound++;
+  crWaitingResponse = false;
+  crStim.style.opacity = '0';
+  const delay = 500 + Math.random()*700;
+  crTimer = setTimeout(showCrStim, delay);
+}
+
+function showCrStim(){
+  const colors = CR_COLOR_SETS[crDiff];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  crCurrent = color;
+  crStim.style.background = color.hex;
+  crStim.style.opacity = '1';
+  crShownAt = performance.now();
+  crWaitingResponse = true;
+  crTimer = setTimeout(() => {
+    if(crWaitingResponse){
+      crWaitingResponse = false;
+      crMisses++;
+      updateCrStats();
+      crStim.style.opacity = '0';
+      setTimeout(nextCrRound, 300);
+    }
+  }, 2500);
+}
+
+function onCrSwatchClick(sw){
+  if(!crRunning || !crWaitingResponse || !crCurrent) return;
+  clearTimeout(crTimer);
+  crWaitingResponse = false;
+  const rt = Math.round(performance.now() - crShownAt);
+  const correct = sw.dataset.key === crCurrent.key;
+  if(correct){
+    crHits++; crScore++; crRts.push(rt);
+    sw.classList.add('correct');
+    bump(crScoreEl, true);
+  } else {
+    crMisses++;
+    sw.classList.add('wrong');
+    bump(crScoreEl, false);
+  }
+  updateCrStats();
+  setTimeout(() => {
+    sw.classList.remove('correct','wrong');
+    crStim.style.opacity = '0';
+    setTimeout(nextCrRound, 250);
+  }, 260);
+}
+
+// --- Recording driver ---
+setTimeout(startChoiceRT, 900);
+let crAutoHandledRound = -1;
+setInterval(function(){
+  if(crRunning && crWaitingResponse && crCurrent && crRound !== crAutoHandledRound){
+    crAutoHandledRound = crRound;
+    setTimeout(function(){
+      if(!crWaitingResponse || !crCurrent) return;
+      const key = crCurrent.key;
+      const btn = document.querySelector('.stroop-swatch[data-key="'+key+'"]');
+      if(btn) onCrSwatchClick(btn);
+    }, 450);
+  }
+}, 50);
+</script>
+
+</body>
+</html>
