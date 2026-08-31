@@ -389,6 +389,34 @@ footer .mono{color:var(--gray); font-size:12px;}
 }
 .partner-logos img{height:32px; width:auto; opacity:0.5; filter:grayscale(1); transition:opacity .2s, filter .2s;}
 .partner-logos img:hover{opacity:1; filter:grayscale(0);}
+
+/* ATHLETES */
+.athlete-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+.athlete-card{
+  position:relative; display:block; border-radius:8px; overflow:hidden;
+  aspect-ratio:3/4; background:var(--navy-panel); border:1px solid var(--navy-line);
+}
+.athlete-card img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transition:transform .35s ease;
+}
+.athlete-card:hover img, .athlete-card:focus-within img{transform:scale(1.06);}
+.athlete-overlay{
+  position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:20px; background:linear-gradient(180deg, transparent 45%, rgba(17,24,29,0.55) 75%, rgba(17,24,29,0.96) 100%);
+}
+.athlete-overlay h3{font-size:19px; margin-bottom:0; color:var(--off-white); transition:margin .25s ease;}
+.athlete-overlay p{
+  font-family:'Space Mono'; font-size:12.5px; color:var(--gray); line-height:1.5;
+  max-height:0; opacity:0; overflow:hidden; transition:max-height .3s ease, opacity .25s ease, margin-top .3s ease;
+}
+.athlete-card:hover .athlete-overlay p, .athlete-card:focus-within .athlete-overlay p{
+  max-height:90px; opacity:1; margin-top:8px;
+}
+@media(max-width:860px){
+  .athlete-grid{grid-template-columns:1fr; max-width:360px; margin:0 auto;}
+  .athlete-overlay p{max-height:90px; opacity:1; margin-top:8px;}
+}
 .workshop-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:start;}
 
 /* FULLSCREEN TEST PAGES */
