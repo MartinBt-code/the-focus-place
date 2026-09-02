@@ -29,15 +29,15 @@
 <main class="test-page">
   <div class="test-page-inner">
     <div class="test-card test-card-xl">
-      <div class="test-label"><span>Live test</span><span>Reakcia na výber</span></div>
+      <div class="test-label"><span>Live test</span><span>Reakcia na výber</span><span id="crProgress"></span></div>
       <div class="diff-select">
-        <button class="diff-btn cr-diff" data-diff="easy" onclick="selectCrDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">2 farby</span></button>
-        <button class="diff-btn cr-diff active" data-diff="medium" onclick="selectCrDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">4 farby</span></button>
-        <button class="diff-btn cr-diff" data-diff="hard" onclick="selectCrDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">6 farieb</span></button>
+        <button class="diff-btn cr-diff" data-diff="easy" onclick="selectCrDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">Písmená</span></button>
+        <button class="diff-btn cr-diff active" data-diff="medium" onclick="selectCrDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">Základné tvary</span></button>
+        <button class="diff-btn cr-diff" data-diff="hard" onclick="selectCrDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">Podobné tvary</span></button>
       </div>
       <div id="crBox" class="rt-box" style="flex-direction:column; gap:20px;">
-        <div id="crStim" style="width:60px; height:60px; border-radius:50%; opacity:0;"></div>
-        <div class="stroop-options" id="crOptions" style="width:100%; padding:0 20px;"></div>
+        <div id="crStim" class="cr-stim" style="opacity:0;"></div>
+        <div class="cr-options" id="crOptions" style="width:100%; padding:0 20px;"></div>
       </div>
       <div class="rt-stats">
         <div><div class="num" id="crScore">0</div><div class="lbl">Skóre</div></div>
@@ -48,8 +48,8 @@
         <div class="result-tier" id="crResultTier"></div>
         <p id="crResultText"></p>
       </div>
-      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na tlačidlo s <strong style="color:var(--orange);">rovnakou farbou</strong>, akú vidíš v strede.</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startChoiceRT()">Spustiť</button>
+      <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Prsty na klávesy podľa písmen pri symboloch. Stlač kláves so <strong style="color:var(--orange);">symbolom, aký vidíš v strede</strong>. <strong style="color:var(--orange);">Medzerník</strong> test spustí aj kedykoľvek zastaví.</p>
+      <button class="btn btn-primary" id="crStartBtn" style="margin-top:16px; width:100%;" onclick="toggleChoiceRT()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -86,6 +86,8 @@ const crResult = document.getElementById('crResult');
 const crResultTier = document.getElementById('crResultTier');
 const crResultText = document.getElementById('crResultText');
 const crOptions = document.getElementById('crOptions');
+const crProgress = document.getElementById('crProgress');
+const crStartBtn = document.getElementById('crStartBtn');
 let crSwatches = [];
 
 function rateChoiceRT(avgMs){
@@ -95,26 +97,27 @@ function rateChoiceRT(avgMs){
   return ['Pomalšia rozhodovacia rýchlosť', 'Priestor na zlepšenie — rozhodovacia rýchlosť sa dá trénovať.'];
 }
 
-const CR_COLOR_SETS = {
+// Obtiažnosť tu neznamená viac možností (vždy sú len 2 — F/J), ale čoraz
+// jemnejšiu vizuálnu diskrimináciu: písmeno → jednoznačný tvar → dva takmer
+// identické tvary, ktoré treba rozlíšiť pod tlakom.
+const CR_LEVELS = {
   easy: [
-    {key:'red', hex:'#E74C3C', label:'Červená'},
-    {key:'blue', hex:'#3B82F6', label:'Modrá'}
+    {key:'f', label:'Písmeno F', svg:'<text x="12" y="17.5" text-anchor="middle" font-family="\'Space Mono\',monospace" font-weight="700" font-size="18">F</text>'},
+    {key:'j', label:'Písmeno J', svg:'<text x="12" y="17.5" text-anchor="middle" font-family="\'Space Mono\',monospace" font-weight="700" font-size="18">J</text>'}
   ],
   medium: [
-    {key:'red', hex:'#E74C3C', label:'Červená'},
-    {key:'blue', hex:'#3B82F6', label:'Modrá'},
-    {key:'green', hex:'#2ECC71', label:'Zelená'},
-    {key:'yellow', hex:'#F1C40F', label:'Žltá'}
+    {key:'circle', label:'Kruh',    svg:'<circle cx="12" cy="12" r="9"/>'},
+    {key:'square', label:'Štvorec', svg:'<rect x="4" y="4" width="16" height="16" rx="2"/>'}
   ],
   hard: [
-    {key:'red', hex:'#E74C3C', label:'Červená'},
-    {key:'blue', hex:'#3B82F6', label:'Modrá'},
-    {key:'green', hex:'#2ECC71', label:'Zelená'},
-    {key:'yellow', hex:'#F1C40F', label:'Žltá'},
-    {key:'orange', hex:'#F39C12', label:'Oranžová'},
-    {key:'purple', hex:'#9B59B6', label:'Fialová'}
+    {key:'trapA', label:'Lichobežník A', svg:'<path d="M8 7H16L20 18H4Z"/>'},
+    {key:'trapB', label:'Lichobežník B', svg:'<path d="M9.5 7H14.5L18 18H6Z"/>'}
   ]
 };
+const CR_KEYS = ['f','j'];
+function crSymbolSet(diff){
+  return CR_LEVELS[diff];
+}
 const CR_ROUNDS = 20;
 let crDiff = 'medium';
 let crRound = 0, crScore = 0, crHits = 0, crMisses = 0, crRts = [];
@@ -128,20 +131,37 @@ function bump(el, good){
 }
 
 function renderCrOptions(){
-  const colors = CR_COLOR_SETS[crDiff];
+  const symbols = crSymbolSet(crDiff);
+  const keys = CR_KEYS;
   crOptions.innerHTML = '';
-  crOptions.style.gridTemplateColumns = colors.length <= 4 ? `repeat(${colors.length},1fr)` : 'repeat(3,1fr)';
-  colors.forEach(c => {
+  crOptions.style.gridTemplateColumns = `repeat(${symbols.length}, minmax(0, 110px))`;
+  crOptions.style.justifyContent = 'center';
+  symbols.forEach((s, i) => {
     const btn = document.createElement('button');
-    btn.className = 'stroop-swatch';
-    btn.dataset.key = c.key;
-    btn.style.background = c.hex;
-    btn.setAttribute('aria-label', c.label);
+    btn.className = 'cr-swatch';
+    btn.dataset.key = s.key;
+    btn.dataset.inputKey = keys[i];
+    btn.innerHTML = `<span class="cr-key">${keys[i].toUpperCase()}</span><svg viewBox="0 0 24 24" fill="currentColor">${s.svg}</svg>`;
+    btn.setAttribute('aria-label', s.label + ' (kláves ' + keys[i].toUpperCase() + ')');
     btn.addEventListener('click', () => onCrSwatchClick(btn));
     crOptions.appendChild(btn);
   });
   crSwatches = Array.from(crOptions.children);
 }
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){
+    e.preventDefault();
+    toggleChoiceRT();
+    return;
+  }
+  if(!crRunning || !crWaitingResponse) return;
+  const k = e.key.toLowerCase();
+  const btn = crSwatches.find(b => b.dataset.inputKey === k);
+  if(!btn) return;
+  e.preventDefault();
+  onCrSwatchClick(btn);
+});
 
 function selectCrDiff(d){
   if(crRunning) return;
@@ -151,13 +171,49 @@ function selectCrDiff(d){
 }
 renderCrOptions();
 
+function toggleChoiceRT(){
+  crRunning ? stopChoiceRT() : startChoiceRT();
+}
+
 function startChoiceRT(){
+  if(crRunning) return;
   crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
   updateCrStats();
   crResult.style.display = 'none';
   crRunning = true;
   document.querySelectorAll('.cr-diff').forEach(b => b.disabled = true);
-  nextCrRound();
+  crStartBtn.textContent = 'Zastaviť';
+  crStartBtn.classList.add('btn-stop');
+  crCountdown(3);
+}
+
+function crCountdown(n){
+  if(!crRunning) return;
+  if(n <= 0){
+    crStim.style.opacity = '0';
+    crProgress.textContent = '';
+    nextCrRound();
+    return;
+  }
+  crStim.innerHTML = `<span class="cr-countdown">${n}</span>`;
+  crStim.style.opacity = '1';
+  crProgress.textContent = 'Priprav sa…';
+  crTimer = setTimeout(() => crCountdown(n-1), 600);
+}
+
+function stopChoiceRT(){
+  clearTimeout(crTimer);
+  crRunning = false;
+  crWaitingResponse = false;
+  crCurrent = null;
+  document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
+  crStim.style.opacity = '0';
+  crProgress.textContent = '';
+  crStartBtn.textContent = 'Spustiť';
+  crStartBtn.classList.remove('btn-stop');
+  crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
+  updateCrStats();
+  crResult.style.display = 'none';
 }
 
 function updateCrStats(){
@@ -168,9 +224,13 @@ function updateCrStats(){
 }
 
 function nextCrRound(){
+  if(!crRunning) return;
   if(crRound >= CR_ROUNDS){
     crRunning = false;
     document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
+    crStartBtn.textContent = 'Spustiť';
+    crStartBtn.classList.remove('btn-stop');
+    crProgress.textContent = '';
     const total = crHits + crMisses;
     if(crRts.length > 0){
       const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
@@ -182,17 +242,20 @@ function nextCrRound(){
     return;
   }
   crRound++;
+  crProgress.textContent = 'Kolo ' + crRound + '/' + CR_ROUNDS;
   crWaitingResponse = false;
   crStim.style.opacity = '0';
-  const delay = 500 + Math.random()*700;
+  // Široký, nepravidelný rozsah — pri úzkom okne (napr. 500-1200ms) si telo
+  // po pár kolách vytvorí rytmus a začne predvídať, nie reagovať.
+  const delay = 400 + Math.random()*1800;
   crTimer = setTimeout(showCrStim, delay);
 }
 
 function showCrStim(){
-  const colors = CR_COLOR_SETS[crDiff];
-  const color = colors[Math.floor(Math.random()*colors.length)];
-  crCurrent = color;
-  crStim.style.background = color.hex;
+  const symbols = crSymbolSet(crDiff);
+  const symbol = symbols[Math.floor(Math.random()*symbols.length)];
+  crCurrent = symbol;
+  crStim.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${symbol.svg}</svg>`;
   crStim.style.opacity = '1';
   crShownAt = performance.now();
   crWaitingResponse = true;

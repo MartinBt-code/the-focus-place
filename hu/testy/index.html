@@ -58,6 +58,96 @@
   </div>
 </section>
 
+<section style="padding-top:24px;">
+  <div class="wrap">
+    <div class="battery-widget">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Ajánlott tesztsor</span>
+          <h2>Milyen sportot űzöl?</h2>
+        </div>
+        <p>Válaszd ki a sportodat, és megmutatjuk pontosan azokat a teszteket, amelyek a legfontosabbak hozzá.</p>
+      </div>
+      <div class="sport-select-row" id="sportSelectRow">
+        <button type="button" class="sport-btn" data-sport="moto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="4" x2="12" y2="10"/><line x1="6" y1="16" x2="10" y2="13"/><line x1="18" y1="16" x2="14" y2="13"/></svg>Motorsport</button>
+        <button type="button" class="sport-btn" data-sport="futbal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8.3l2.7 2-1 3.2h-3.4l-1-3.2z" fill="currentColor"/><path d="M12 3.5v2.7M6.3 7.3l2.2 1.7M17.7 7.3l-2.2 1.7M8.6 16.7l1-3.2M15.4 16.7l-1-3.2" stroke-width="1.3"/></svg>Futball</button>
+        <button type="button" class="sport-btn" data-sport="basketbal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M5.5 5.5C8 8.5 8 15.5 5.5 18.5"/><path d="M18.5 5.5C16 8.5 16 15.5 18.5 18.5"/></svg>Kosárlabda (NBA)</button>
+        <button type="button" class="sport-btn" data-sport="nfl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c0-3.5 4-7.5 8-7.5s8 4 8 7.5-4 7.5-8 7.5-8-4-8-7.5z"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="9.5" y1="10" x2="9.5" y2="14"/><line x1="12" y1="9.3" x2="12" y2="14.7"/><line x1="14.5" y1="10" x2="14.5" y2="14"/></svg>Amerikai futball (NFL)</button>
+        <button type="button" class="sport-btn" data-sport="hokej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 2.5L9 15.5"/><path d="M9 15.5c-.6 1.3-1.7 2.2-3.2 2.2H4.5"/><ellipse cx="4.2" cy="19.2" rx="2.3" ry="1.1" fill="currentColor" stroke="none"/></svg>Jégkorong</button>
+        <button type="button" class="sport-btn" data-sport="combat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="5" y1="20" x2="19" y2="4"/><line x1="19" y1="20" x2="5" y2="4"/><line x1="8" y1="16.5" x2="10.5" y2="18.3"/><line x1="16" y1="16.5" x2="13.5" y2="18.3"/><circle cx="5" cy="20" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="20" r="1" fill="currentColor" stroke="none"/></svg>Küzdősportok és vívás</button>
+      </div>
+      <div class="battery-result" id="batteryResult">
+        <div class="br-head" id="batteryHead">Ajánlott tesztsorod</div>
+        <h3 id="batteryTitle"></h3>
+        <div class="battery-list" id="batteryList"></div>
+        <p class="battery-hint">A tesztek aszerint vannak sorba rendezve, hogy mennyire kapcsolódnak közvetlenül a sportodhoz — nyugodtan haladj végig rajtuk ebben a sorrendben.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function(){
+    const BATTERY = {
+      moto: { name: "Motorsport", tests: [
+        {name:"Választásos reakció", href:"reakcia-na-vyber.html"},
+        {name:"Perifériás látás", href:"periferne.html"},
+        {name:"Pályaívjóslás", href:"predikcia-trajektorie.html"},
+        {name:"Kéz-szem koordináció", href:"koordinacia.html"},
+        {name:"Szakkádikus felismerés", href:"sakadicke-rozpoznavanie.html"}
+      ]},
+      futbal: { name: "Futball", tests: [
+        {name:"Több objektum követése", href:"viacere-objekty.html"},
+        {name:"Perifériás látás", href:"periferne.html"},
+        {name:"Pályaívjóslás", href:"predikcia-trajektorie.html"},
+        {name:"Választásos reakció", href:"reakcia-na-vyber.html"}
+      ]},
+      basketbal: { name: "Kosárlabda (NBA)", tests: [
+        {name:"Több objektum követése", href:"viacere-objekty.html"},
+        {name:"Perifériás látás", href:"periferne.html"},
+        {name:"Feladatváltás", href:"prepinanie-uloh.html"},
+        {name:"Kéz-szem koordináció", href:"koordinacia.html"}
+      ]},
+      nfl: { name: "Amerikai futball (NFL)", tests: [
+        {name:"Perifériás látás", href:"periferne.html"},
+        {name:"Pályaívjóslás", href:"predikcia-trajektorie.html"},
+        {name:"Go/No-Go teszt", href:"pozornost.html"},
+        {name:"Szakkádikus felismerés", href:"sakadicke-rozpoznavanie.html"}
+      ]},
+      hokej: { name: "Jégkorong", tests: [
+        {name:"Perifériás látás", href:"periferne.html"},
+        {name:"Választásos reakció", href:"reakcia-na-vyber.html"},
+        {name:"Több objektum követése", href:"viacere-objekty.html"}
+      ]},
+      combat: { name: "Küzdősportok és vívás", tests: [
+        {name:"Go/No-Go teszt", href:"pozornost.html"},
+        {name:"Választásos reakció", href:"reakcia-na-vyber.html"},
+        {name:"Kontrasztérzékenység", href:"kontrast-citlivost.html"},
+        {name:"Koncentrációs rács", href:"koncentracna-mriezka.html"}
+      ]}
+    };
+
+    const row = document.getElementById('sportSelectRow');
+    const result = document.getElementById('batteryResult');
+    const title = document.getElementById('batteryTitle');
+    const list = document.getElementById('batteryList');
+
+    row.addEventListener('click', function(e){
+      const btn = e.target.closest('.sport-btn');
+      if (!btn) return;
+      row.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const data = BATTERY[btn.dataset.sport];
+      title.textContent = data.name;
+      list.innerHTML = data.tests.map(t =>
+        `<a class="battery-item" href="${t.href}"><span class="bi-name">${t.name}</span><span class="bi-arrow">→</span></a>`
+      ).join('');
+      result.classList.add('visible');
+    });
+  })();
+</script>
+
 <section style="padding-top:20px;">
   <div class="wrap">
 
