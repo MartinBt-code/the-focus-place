@@ -170,6 +170,7 @@ function selectCrDiff(d){
   renderCrOptions();
 }
 renderCrOptions();
+crProgress.textContent = CR_ROUNDS + ' kôl';
 
 function toggleChoiceRT(){
   crRunning ? stopChoiceRT() : startChoiceRT();
@@ -208,7 +209,7 @@ function stopChoiceRT(){
   crCurrent = null;
   document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
   crStim.style.opacity = '0';
-  crProgress.textContent = '';
+  crProgress.textContent = CR_ROUNDS + ' kôl';
   crStartBtn.textContent = 'Spustiť';
   crStartBtn.classList.remove('btn-stop');
   crRound = 0; crScore = 0; crHits = 0; crMisses = 0; crRts = [];
@@ -230,7 +231,7 @@ function nextCrRound(){
     document.querySelectorAll('.cr-diff').forEach(b => b.disabled = false);
     crStartBtn.textContent = 'Spustiť';
     crStartBtn.classList.remove('btn-stop');
-    crProgress.textContent = '';
+    crProgress.textContent = CR_ROUNDS + ' kôl';
     const total = crHits + crMisses;
     if(crRts.length > 0){
       const avgMs = Math.round(crRts.reduce((a,b)=>a+b,0)/crRts.length);
