@@ -31,9 +31,9 @@
     <div class="test-card test-card-xl">
       <div class="test-label"><span>Live test</span><span>Go/No-Go test</span></div>
       <div class="diff-select">
-        <button class="diff-btn cpt-diff" data-diff="easy" onclick="selectCptDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">častejšie X</span></button>
-        <button class="diff-btn cpt-diff active" data-diff="medium" onclick="selectCptDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">bežné X</span></button>
-        <button class="diff-btn cpt-diff" data-diff="hard" onclick="selectCptDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">zriedkavé X</span></button>
+        <button class="diff-btn cpt-diff" data-diff="easy" onclick="selectCptDiff('easy')">Ľahká<br><span style="font-size:10px; opacity:0.7;">X 7× z 20</span></button>
+        <button class="diff-btn cpt-diff active" data-diff="medium" onclick="selectCptDiff('medium')">Stredná<br><span style="font-size:10px; opacity:0.7;">X 5× z 20</span></button>
+        <button class="diff-btn cpt-diff" data-diff="hard" onclick="selectCptDiff('hard')">Ťažká<br><span style="font-size:10px; opacity:0.7;">X 3× z 20</span></button>
       </div>
       <div id="cptBox" class="rt-box" style="cursor:pointer;">
         <div class="rt-msg" id="cptMsg" style="font-size:64px;">—</div>
@@ -95,14 +95,31 @@ function rateAttention(acc){
 
 const CPT_TARGET = 'X';
 const CPT_ROUNDS = 20;
+// targetCount = koľkokrát sa X v 20 kolách garantovane objaví (nie čisto náhodne —
+// pri nízkej pravdepodobnosti sa mohlo stať, že X nepadlo za celý test ani raz).
 const CPT_CONFIG = {
-  easy: {letters: ['A','E','K','P','X'], window: 1300},
-  medium: {letters: ['A','B','E','K','M','P','R','T','X'], window: 1000},
-  hard: {letters: ['A','B','C','D','E','F','G','H','K','M','P','R','T','X'], window: 750}
+  easy:   {letters: ['A','E','K','P'], window: 1300, targetCount: 7},
+  medium: {letters: ['A','B','E','K','M','P','R','T'], window: 1000, targetCount: 5},
+  hard:   {letters: ['A','B','C','D','E','F','G','H','K','M','P','R','T'], window: 750, targetCount: 3}
 };
 let cptDiff = 'medium';
-let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptRts = [];
+let cptRound = 0, cptScore = 0, cptHits = 0, cptMisses = 0, cptFalseAlarms = 0, cptCorrect = 0, cptWrong = 0, cptRts = [];
+let cptSequence = [];
 let cptTimer, cptShownAt, cptWaitingResponse = false, cptRunning = false;
+
+function buildCptSequence(diff){
+  const config = CPT_CONFIG[diff];
+  const seq = [];
+  for(let i = 0; i < config.targetCount; i++) seq.push(CPT_TARGET);
+  while(seq.length < CPT_ROUNDS){
+    seq.push(config.letters[Math.floor(Math.random()*config.letters.length)]);
+  }
+  for(let i = seq.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [seq[i], seq[j]] = [seq[j], seq[i]];
+  }
+  return seq;
+}
 
 function selectCptDiff(d){
   if(cptRunning) return;
@@ -123,7 +140,8 @@ function cptFlash(cls){
 }
 
 function startCPT(){
-  cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptRts = [];
+  cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptFalseAlarms = 0; cptCorrect = 0; cptWrong = 0; cptRts = [];
+  cptSequence = buildCptSequence(cptDiff);
   updateCptStats();
   cptRunning = true;
   document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = true);
@@ -139,8 +157,12 @@ function startCPT(){
 
 function updateCptStats(){
   cptScoreEl.textContent = cptScore;
-  const totalTargets = cptHits + cptMisses;
-  cptAccEl.textContent = totalTargets ? Math.round((cptHits/totalTargets)*100)+'%' : '—';
+  // Presnosť počíta so VŠETKÝMI odohranými kolami — trafený X aj správne
+  // nekliknuté iné písmeno je "správne", zmeškaný X aj falošný klik na iné
+  // písmeno je "chyba". Bez toho by rýchle klikanie na všetko vedelo dosiahnuť
+  // vysokú presnosť, ak sa medzi tým náhodou trafil aj vzácny X.
+  const totalDone = cptCorrect + cptWrong;
+  cptAccEl.textContent = totalDone ? Math.round((cptCorrect/totalDone)*100)+'%' : '—';
   cptAvgEl.textContent = cptRts.length ? Math.round(cptRts.reduce((a,b)=>a+b,0)/cptRts.length) : '—';
 }
 
@@ -150,9 +172,9 @@ function nextCptRound(){
     document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = false);
     cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Hotovo!';
-    const totalTargets = cptHits + cptMisses;
-    if(totalTargets > 0){
-      const acc = Math.round((cptHits/totalTargets)*100);
+    const totalDone = cptCorrect + cptWrong;
+    if(totalDone > 0){
+      const acc = Math.round((cptCorrect/totalDone)*100);
       const [tier, text] = rateAttention(acc);
       cptResultTier.textContent = tier;
       cptResultText.textContent = text;
@@ -169,7 +191,7 @@ function nextCptRound(){
 
 function showCptLetter(){
   const config = CPT_CONFIG[cptDiff];
-  const letter = config.letters[Math.floor(Math.random()*config.letters.length)];
+  const letter = cptSequence[cptRound - 1];
   cptMsg.textContent = letter;
   cptMsg.style.opacity = '1';
   cptShownAt = performance.now();
@@ -177,7 +199,12 @@ function showCptLetter(){
   cptTimer = setTimeout(() => {
     if(cptWaitingResponse){
       cptWaitingResponse = false;
-      if(letter === CPT_TARGET){ cptMisses++; cptFlash('early'); }
+      if(letter === CPT_TARGET){
+        cptMisses++; cptWrong++;
+        cptFlash('early');
+      } else {
+        cptCorrect++; // správne nekliknuté na non-target písmeno
+      }
       updateCptStats();
       cptMsg.style.opacity = '0';
       setTimeout(nextCptRound, 350);
@@ -192,10 +219,11 @@ cptBox.addEventListener('click', () => {
   cptWaitingResponse = false;
   if(letter === CPT_TARGET){
     cptRts.push(Math.round(performance.now() - cptShownAt));
-    cptHits++; cptScore++;
+    cptHits++; cptCorrect++; cptScore++;
     cptFlash('go');
     bump(cptScoreEl, true);
   } else {
+    cptFalseAlarms++; cptWrong++;
     cptScore = Math.max(0, cptScore - 1);
     cptFlash('early');
     bump(cptScoreEl, false);
