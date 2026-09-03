@@ -130,21 +130,28 @@ function updateSpStats(){
 }
 
 function startSmooth(){
-  spRunning = true;
-  spStartTime = null;
-  spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
-  spFlashesScheduled = 0;
-  spFlashActive = false;
   updateSpStats();
   spResult.style.display = 'none';
-  spMsg.style.display = 'none';
-  spTarget.style.display = 'block';
-  spTarget.style.background = 'var(--orange)';
-  spRespondBtn.disabled = false;
+  spTarget.style.display = 'none';
+  spRespondBtn.disabled = true;
   document.querySelectorAll('.sp-diff').forEach(b => b.disabled = true);
+  spMsg.style.display = 'flex';
+  spMsg.textContent = 'Priprav sa...';
 
-  scheduleNextFlash();
-  spRafId = requestAnimationFrame(spLoop);
+  setTimeout(() => {
+    spRunning = true;
+    spStartTime = null;
+    spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
+    spFlashesScheduled = 0;
+    spFlashActive = false;
+    spMsg.style.display = 'none';
+    spTarget.style.display = 'block';
+    spTarget.style.background = 'var(--orange)';
+    spRespondBtn.disabled = false;
+
+    scheduleNextFlash();
+    spRafId = requestAnimationFrame(spLoop);
+  }, 900);
 }
 
 function scheduleNextFlash(){

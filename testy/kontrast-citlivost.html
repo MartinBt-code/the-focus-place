@@ -127,7 +127,7 @@ function startContrast(){
   csResult.style.display = 'none';
   csRunning = true;
   document.querySelectorAll('.cs-diff').forEach(b => b.disabled = true);
-  nextCsRound();
+  setTimeout(nextCsRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
 
 function deltaForLevel(level){

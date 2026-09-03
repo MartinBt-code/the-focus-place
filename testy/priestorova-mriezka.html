@@ -121,7 +121,7 @@ function startGridMemory(){
   gridResult.style.display = 'none';
   gridRunning = true;
   document.querySelectorAll('.grid-diff').forEach(b => b.disabled = true);
-  nextGridRound();
+  setTimeout(nextGridRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
 
 function cellsForLevel(level){

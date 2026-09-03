@@ -130,7 +130,11 @@ function startDigitSpan(){
   dsResult.style.display = 'none';
   dsRunning = true;
   document.querySelectorAll('.ds-diff').forEach(b => b.disabled = true);
-  dsNextRound();
+  dsMsg.style.opacity = '0';
+  dsMsg.textContent = 'Priprav sa...';
+  dsMsg.style.fontSize = '18px';
+  requestAnimationFrame(() => { dsMsg.style.opacity = '1'; });
+  setTimeout(dsNextRound, 900);
 }
 
 function dsNextRound(){

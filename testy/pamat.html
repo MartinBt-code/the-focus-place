@@ -124,7 +124,7 @@ function startMemoryGame(){
   memRunning = true;
   document.querySelectorAll('.mem-diff').forEach(b => b.disabled = true);
   memResult.style.display = 'none';
-  nextRound();
+  setTimeout(nextRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
 
 function nextRound(){

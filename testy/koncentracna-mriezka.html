@@ -156,8 +156,16 @@ function shuffle(arr){
 }
 
 function startGrid(){
-  cgTarget = 1;
   cgResult.style.display = 'none';
+  cgGrid.style.display = 'none';
+  cgSizeSlider.disabled = true;
+  cgMsg.style.display = 'flex';
+  cgMsg.textContent = 'Priprav sa...';
+  setTimeout(beginGrid, 900);
+}
+
+function beginGrid(){
+  cgTarget = 1;
   cgMsg.style.display = 'none';
   cgGrid.style.display = 'grid';
   cgGrid.style.gridTemplateColumns = 'repeat(' + cgSize + ',1fr)';
@@ -165,7 +173,6 @@ function startGrid(){
   cgCells = [];
   cgProgressEl.textContent = '0 / ' + cgTotal;
   cgTimeEl.textContent = '0.0s';
-  cgSizeSlider.disabled = true;
 
   const numbers = shuffle(Array.from({length:cgTotal}, (_, i) => i + 1));
   const fontSize = Math.max(8, Math.min(22, Math.round(26 - cgSize * 1.3)));

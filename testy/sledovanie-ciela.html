@@ -115,17 +115,22 @@ function selectCtDiff(d){
 }
 
 function startCursorTrack(){
-  ctRunning = true;
   document.querySelectorAll('.ct-diff').forEach(b => b.disabled = true);
-  ctStartTime = null;
-  ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
   ctResult.style.display = 'none';
   ctAccEl.textContent = '0%';
   ctStreakEl.textContent = '0.0';
   ctTimeEl.textContent = '20s';
-  ctMsg.style.display = 'none';
-  ctTarget.style.display = 'block';
-  ctRafId = requestAnimationFrame(ctLoop);
+  ctTarget.style.display = 'none';
+  ctMsg.style.display = 'flex';
+  ctMsg.textContent = 'Priprav sa...';
+  setTimeout(() => {
+    ctRunning = true;
+    ctStartTime = null;
+    ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
+    ctMsg.style.display = 'none';
+    ctTarget.style.display = 'block';
+    ctRafId = requestAnimationFrame(ctLoop);
+  }, 900);
 }
 
 function ctLoop(timestamp){

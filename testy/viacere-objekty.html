@@ -132,12 +132,16 @@ function updateMotStats(){
 
 function startMOT(){
   motRound = 0; motScore = 0;
-  motRunning = true;
   document.querySelectorAll('.mot-diff').forEach(b => b.disabled = true);
   updateMotStats();
   motResult.style.display = 'none';
   motConfirmBtn.style.display = 'none';
-  nextMotRound();
+  const msg = document.getElementById('motMsg');
+  if(msg) msg.textContent = 'Priprav sa...';
+  setTimeout(() => {
+    motRunning = true;
+    nextMotRound();
+  }, 900);
 }
 
 function randPos(existing){
