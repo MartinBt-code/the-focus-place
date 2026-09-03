@@ -41,6 +41,7 @@
     </div>
     <div class="rt-stats">
       <div><div class="num" id="hecHits">0</div><div class="lbl">Zásahy</div></div>
+      <div><div class="num" id="hecAcc">—</div><div class="lbl">Presnosť</div></div>
       <div><div class="num" id="hecAvg">—</div><div class="lbl">Priemer (ms)</div></div>
       <div><div class="num" id="hecRound">0/15</div><div class="lbl">Kolo</div></div>
     </div>
@@ -48,8 +49,8 @@
       <div class="result-tier" id="hecResultTier"></div>
       <p id="hecResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Test presnosti a rýchlosti reakcie na pohybujúce sa ciele.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startHEC()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Test presnosti a rýchlosti reakcie na pohybujúce sa ciele. Na cieľ máš obmedzený čas — netrafíš včas, ráta sa to ako chybný pokus a ide sa na ďalšie kolo.</p>
+    <button class="btn btn-primary" id="hecStartBtn" style="margin-top:16px; width:100%;" onclick="toggleHEC()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -89,11 +90,13 @@ const hecBox = document.getElementById('hecBox');
 const hecTarget = document.getElementById('hecTarget');
 const hecMsg = document.getElementById('hecMsg');
 const hecHitsEl = document.getElementById('hecHits');
+const hecAccEl = document.getElementById('hecAcc');
 const hecAvgEl = document.getElementById('hecAvg');
 const hecRoundEl = document.getElementById('hecRound');
 const hecResult = document.getElementById('hecResult');
 const hecResultTier = document.getElementById('hecResultTier');
 const hecResultText = document.getElementById('hecResultText');
+const hecStartBtn = document.getElementById('hecStartBtn');
 
 function rateCoordination(avgMs){
   if(avgMs < 400) return ['Špičková koordinácia', 'Toto zodpovedá reakciám špičkových hráčov loptových športov (pod 400 ms).'];
@@ -104,9 +107,10 @@ function rateCoordination(avgMs){
 
 const HEC_ROUNDS = 15;
 const HEC_SIZE_CONFIG = { easy: 48, medium: 36, hard: 24 };
+const HEC_TIMEOUT_CONFIG = { easy: 2000, medium: 1500, hard: 1100 };
 let hecDiff = 'medium';
 let hecSize = 36;
-let hecRound = 0, hecHits = 0, hecTimes = [], hecShownAt, hecRunning = false;
+let hecRound = 0, hecHits = 0, hecMisses = 0, hecTimes = [], hecShownAt, hecRunning = false, hecTimer = null;
 
 function selectHecDiff(d){
   if(hecRunning) return;
@@ -117,24 +121,60 @@ function selectHecDiff(d){
   document.querySelectorAll('.hec-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
 
+function toggleHEC(){
+  hecRunning ? stopHEC() : startHEC();
+}
+
 function startHEC(){
-  hecRound = 0; hecHits = 0; hecTimes = [];
+  if(hecRunning) return;
+  hecRound = 0; hecHits = 0; hecMisses = 0; hecTimes = [];
   hecHitsEl.textContent = '0';
+  hecAccEl.textContent = '—';
   hecAvgEl.textContent = '—';
+  hecResult.style.display = 'none';
   hecRunning = true;
   document.querySelectorAll('.hec-diff').forEach(b => b.disabled = true);
+  hecStartBtn.textContent = 'Zastaviť';
+  hecStartBtn.classList.add('btn-stop');
   hecMsg.style.display = 'flex';
   hecMsg.textContent = 'Priprav sa...';
-  setTimeout(() => {
+  hecTimer = setTimeout(() => {
     hecMsg.style.display = 'none';
     nextHecRound();
   }, 700);
 }
 
+function stopHEC(){
+  clearTimeout(hecTimer);
+  hecRunning = false;
+  hecTarget.style.display = 'none';
+  document.querySelectorAll('.hec-diff').forEach(b => b.disabled = false);
+  hecStartBtn.textContent = 'Spustiť';
+  hecStartBtn.classList.remove('btn-stop');
+  hecMsg.style.display = 'flex';
+  hecMsg.textContent = 'Klikni Spustiť';
+  hecRound = 0; hecHits = 0; hecMisses = 0; hecTimes = [];
+  hecHitsEl.textContent = '0';
+  hecAccEl.textContent = '—';
+  hecAvgEl.textContent = '—';
+  hecRoundEl.textContent = '0/' + HEC_ROUNDS;
+  hecResult.style.display = 'none';
+}
+
+function updateHecStats(){
+  hecHitsEl.textContent = hecHits;
+  const attempts = hecHits + hecMisses;
+  hecAccEl.textContent = attempts ? Math.round((hecHits/attempts)*100)+'%' : '—';
+  hecAvgEl.textContent = hecTimes.length ? Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length) : '—';
+}
+
 function nextHecRound(){
+  if(!hecRunning) return;
   if(hecRound >= HEC_ROUNDS){
     hecRunning = false;
     document.querySelectorAll('.hec-diff').forEach(b => b.disabled = false);
+    hecStartBtn.textContent = 'Spustiť';
+    hecStartBtn.classList.remove('btn-stop');
     hecTarget.style.display = 'none';
     hecMsg.style.display = 'flex';
     hecMsg.textContent = 'Hotovo!';
@@ -161,6 +201,12 @@ function nextHecRound(){
   void hecTarget.offsetWidth;
   hecTarget.classList.add('show');
   hecShownAt = performance.now();
+  hecTimer = setTimeout(() => {
+    hecMisses++;
+    updateHecStats();
+    hecTarget.style.display = 'none';
+    setTimeout(nextHecRound, 220);
+  }, HEC_TIMEOUT_CONFIG[hecDiff]);
 }
 
 function hecPulse(x, y){
@@ -178,11 +224,11 @@ function hecPulse(x, y){
 hecTarget.addEventListener('click', (e) => {
   e.stopPropagation();
   if(!hecRunning) return;
+  clearTimeout(hecTimer);
   hecTimes.push(Math.round(performance.now() - hecShownAt));
   hecHits++;
-  hecHitsEl.textContent = hecHits;
   bump(hecHitsEl, true);
-  hecAvgEl.textContent = Math.round(hecTimes.reduce((a,b)=>a+b,0)/hecTimes.length);
+  updateHecStats();
   hecPulse(parseFloat(hecTarget.style.left) + hecSize/2, parseFloat(hecTarget.style.top) + hecSize/2);
   hecTarget.style.display = 'none';
   setTimeout(nextHecRound, 220);
