@@ -51,7 +51,7 @@
       <p id="tpResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Loptička sa rozbehne a <strong style="color:var(--orange);">na chvíľu zmizne</strong>. Klikni na "TERAZ!" presne v momente, keď by mala dosiahnuť čiarkovanú čiaru.</p>
-    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startPrediction()">Spustiť</button>
+    <button class="btn btn-primary" id="tpStartBtn" style="margin-top:8px; width:100%;" onclick="togglePrediction()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -91,6 +91,7 @@ const tpAvgEl = document.getElementById('tpAvg');
 const tpResult = document.getElementById('tpResult');
 const tpResultTier = document.getElementById('tpResultTier');
 const tpResultText = document.getElementById('tpResultText');
+const tpStartBtn = document.getElementById('tpStartBtn');
 
 function ratePrediction(avgMs){
   if(avgMs <= 60) return ['Výnimočný odhad', 'Tvoj časový odhad je extrémne presný — patríš medzi najlepších.'];
@@ -119,7 +120,7 @@ function selectTpDiff(d){
 }
 let tpRunning = false, tpRoundActive = false, tpClickedThisRound = false;
 let tpRoundStartPerf = 0, tpDuration = 0, tpOccludeFrac = 0;
-let tpRafId = null, tpMissTimer = null;
+let tpRafId = null, tpMissTimer = null, tpPrepTimer = null;
 
 function updateTpStats(){
   tpScoreEl.textContent = tpHits;
@@ -127,27 +128,60 @@ function updateTpStats(){
   tpAvgEl.textContent = tpErrors.length ? Math.round(tpErrors.reduce((a,b)=>a+b,0)/tpErrors.length) : '—';
 }
 
+function togglePrediction(){
+  tpRunning ? stopPrediction() : startPrediction();
+}
+
 function startPrediction(){
+  if(tpRunning) return;
   tpRound = 0; tpHits = 0; tpErrors = [];
   updateTpStats();
   tpResult.style.display = 'none';
   tpRunning = true;
   document.querySelectorAll('.tp-diff').forEach(b => b.disabled = true);
+  tpStartBtn.textContent = 'Zastaviť';
+  tpStartBtn.classList.add('btn-stop');
   tpMsg.style.display = 'flex';
   tpMsg.textContent = 'Priprav sa...';
   tpGoal.style.display = 'none';
   tpBall.style.display = 'none';
   tpRespondBtn.disabled = true;
-  setTimeout(() => {
+  tpPrepTimer = setTimeout(() => {
     tpMsg.style.display = 'none';
     nextTpRound();
   }, 700);
 }
 
+function stopPrediction(){
+  clearTimeout(tpPrepTimer);
+  clearTimeout(tpMissTimer);
+  if(tpRafId) cancelAnimationFrame(tpRafId);
+  tpRunning = false;
+  tpRoundActive = false;
+  document.querySelectorAll('.tp-diff').forEach(b => b.disabled = false);
+  tpStartBtn.textContent = 'Spustiť';
+  tpStartBtn.classList.remove('btn-stop');
+  tpBall.style.display = 'none';
+  tpGoal.style.display = 'none';
+  tpRespondBtn.disabled = true;
+  tpMsg.style.display = 'flex';
+  tpMsg.textContent = 'Klikni Spustiť';
+  tpRound = 0; tpHits = 0; tpErrors = [];
+  updateTpStats();
+  tpResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); togglePrediction(); }
+});
+
 function nextTpRound(){
+  if(!tpRunning) return;
   if(tpRound >= TP_ROUNDS){
     tpRunning = false;
     document.querySelectorAll('.tp-diff').forEach(b => b.disabled = false);
+    tpStartBtn.textContent = 'Spustiť';
+    tpStartBtn.classList.remove('btn-stop');
     tpMsg.style.display = 'flex';
     tpMsg.textContent = 'Hotovo!';
     tpRespondBtn.disabled = true;

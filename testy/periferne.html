@@ -68,7 +68,7 @@
       <p id="pvResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Pozeraj sa na stred. Na zlomok sekundy sa naraz objaví tvar v strede aj bodka na okraji. Najprv over tvar, potom smer bodky.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPV()">Spustiť</button>
+    <button class="btn btn-primary" id="pvStartBtn" style="margin-top:16px; width:100%;" onclick="togglePV()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -115,6 +115,7 @@ const pvRoundEl = document.getElementById('pvRound');
 const pvResult = document.getElementById('pvResult');
 const pvResultTier = document.getElementById('pvResultTier');
 const pvResultText = document.getElementById('pvResultText');
+const pvStartBtn = document.getElementById('pvStartBtn');
 
 function ratePeripheral(acc){
   if(acc >= 90) return ['Výnimočné periférne videnie', 'Špičkový výsledok — na úrovni skúsených hráčov kolektívnych športov.'];
@@ -151,13 +152,21 @@ function selectPvDiff(d){
   document.querySelectorAll('.pv-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
 
+function togglePV(){
+  pvRunning ? stopPV() : startPV();
+}
+
 function startPV(){
+  if(pvRunning) return;
   pvRound = 0; pvScore = 0; pvCorrect = 0;
   pvScoreEl.textContent = '0';
   pvAccEl.textContent = '—';
   pvRoundEl.textContent = '0/' + PV_ROUNDS;
   pvRunning = true;
   document.querySelectorAll('.pv-diff').forEach(b => b.disabled = true);
+  pvStartBtn.textContent = 'Zastaviť';
+  pvStartBtn.classList.add('btn-stop');
+  pvResult.style.display = 'none';
   pvStep1.style.display = 'none';
   pvStep2.style.display = 'none';
   pvMsg.style.display = 'flex';
@@ -165,10 +174,36 @@ function startPV(){
   pvTimer = setTimeout(nextPvRound, 700);
 }
 
+function stopPV(){
+  clearTimeout(pvTimer);
+  pvRunning = false;
+  document.querySelectorAll('.pv-diff').forEach(b => b.disabled = false);
+  pvStartBtn.textContent = 'Spustiť';
+  pvStartBtn.classList.remove('btn-stop');
+  pvStep1.style.display = 'none';
+  pvStep2.style.display = 'none';
+  pvCenterShape.style.opacity = '0';
+  pvTarget.style.opacity = '0';
+  pvMsg.style.display = 'flex';
+  pvMsg.textContent = 'Klikni na Spustiť';
+  pvRound = 0; pvScore = 0; pvCorrect = 0;
+  pvScoreEl.textContent = '0';
+  pvAccEl.textContent = '—';
+  pvRoundEl.textContent = '0/' + PV_ROUNDS;
+  pvResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); togglePV(); }
+});
+
 function nextPvRound(){
+  if(!pvRunning) return;
   if(pvRound >= PV_ROUNDS){
     pvRunning = false;
     document.querySelectorAll('.pv-diff').forEach(b => b.disabled = false);
+    pvStartBtn.textContent = 'Spustiť';
+    pvStartBtn.classList.remove('btn-stop');
     pvMsg.style.display = 'flex';
     pvMsg.textContent = 'Hotovo!';
     const acc = Math.round((pvCorrect/PV_ROUNDS)*100);

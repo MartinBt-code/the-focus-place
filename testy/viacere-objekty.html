@@ -49,7 +49,7 @@
       <p id="motResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si <strong style="color:var(--orange);" id="motTargetCountLabel">3 zvýraznené bodky</strong>. Po tom, čo sa všetky rozpohybujú a zastavia, klikni na tie, ktoré si si zapamätal.</p>
-    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startMOT()">Spustiť</button>
+    <button class="btn btn-primary" id="motStartBtn" style="margin-top:8px; width:100%;" onclick="toggleMOT()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -87,6 +87,7 @@ const motRoundEl = document.getElementById('motRound');
 const motResult = document.getElementById('motResult');
 const motResultTier = document.getElementById('motResultTier');
 const motResultText = document.getElementById('motResultText');
+const motStartBtn = document.getElementById('motStartBtn');
 
 function rateMOT(acc){
   if(acc >= 90) return ['Výnimočná pozornosť', 'Dokázal(a) si súčasne sledovať všetky ciele takmer bezchybne — patríš medzi najlepších.'];
@@ -114,6 +115,7 @@ let motDots = [];
 let motSelecting = false;
 let motRafId = null;
 let motRunning = false;
+let motPrepTimer = null;
 
 function selectMotDiff(d){
   if(motRunning) return;
@@ -130,19 +132,45 @@ function updateMotStats(){
   motRoundEl.textContent = motRound + '/' + MOT_ROUNDS;
 }
 
+function toggleMOT(){
+  motRunning ? stopMOT() : startMOT();
+}
+
 function startMOT(){
+  if(motRunning) return;
   motRound = 0; motScore = 0;
+  motRunning = true;
   document.querySelectorAll('.mot-diff').forEach(b => b.disabled = true);
+  motStartBtn.textContent = 'Zastaviť';
+  motStartBtn.classList.add('btn-stop');
   updateMotStats();
   motResult.style.display = 'none';
   motConfirmBtn.style.display = 'none';
   const msg = document.getElementById('motMsg');
   if(msg) msg.textContent = 'Priprav sa...';
-  setTimeout(() => {
-    motRunning = true;
+  motPrepTimer = setTimeout(() => {
     nextMotRound();
   }, 900);
 }
+
+function stopMOT(){
+  clearTimeout(motPrepTimer);
+  if(motRafId) cancelAnimationFrame(motRafId);
+  motRunning = false;
+  motSelecting = false;
+  document.querySelectorAll('.mot-diff').forEach(b => b.disabled = false);
+  motStartBtn.textContent = 'Spustiť';
+  motStartBtn.classList.remove('btn-stop');
+  motConfirmBtn.style.display = 'none';
+  motBox.innerHTML = '<div id="motMsg" class="rt-msg" style="font-size:16px; text-transform:none; font-family:\'Inter\'; color:var(--gray);">Klikni na Spustiť</div>';
+  motRound = 0; motScore = 0;
+  updateMotStats();
+  motResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleMOT(); }
+});
 
 function randPos(existing){
   const boxRect = motBox.getBoundingClientRect();
@@ -162,9 +190,12 @@ function randPos(existing){
 }
 
 function nextMotRound(){
+  if(!motRunning) return;
   if(motRound >= MOT_ROUNDS){
     motRunning = false;
     document.querySelectorAll('.mot-diff').forEach(b => b.disabled = false);
+    motStartBtn.textContent = 'Spustiť';
+    motStartBtn.classList.remove('btn-stop');
     motBox.innerHTML = '';
     const msgEl = document.createElement('div');
     msgEl.id = 'motMsg';

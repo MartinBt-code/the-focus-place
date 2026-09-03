@@ -56,7 +56,7 @@
       <p id="srResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Symbol sa na náhodnom mieste mihne len na <strong style="color:var(--orange);" id="srFlashLabel">130 ms</strong>. Vyber, ktorý to bol.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startSaccadic()">Spustiť</button>
+    <button class="btn btn-primary" id="srStartBtn" style="margin-top:16px; width:100%;" onclick="toggleSaccadic()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -95,6 +95,7 @@ const srAvgEl = document.getElementById('srAvg');
 const srResult = document.getElementById('srResult');
 const srResultTier = document.getElementById('srResultTier');
 const srResultText = document.getElementById('srResultText');
+const srStartBtn = document.getElementById('srStartBtn');
 const srButtons = Array.from(document.querySelectorAll('#srOptions .pv-btn'));
 
 function rateSaccadic(acc){
@@ -131,25 +132,55 @@ function updateSrStats(){
   srAvgEl.textContent = srRts.length ? Math.round(srRts.reduce((a,b)=>a+b,0)/srRts.length) : '—';
 }
 
+function toggleSaccadic(){
+  srRunning ? stopSaccadic() : startSaccadic();
+}
+
 function startSaccadic(){
+  if(srRunning) return;
   srRound = 0; srScore = 0; srHits = 0; srMisses = 0; srRts = [];
   updateSrStats();
   srResult.style.display = 'none';
   srRunning = true;
   document.querySelectorAll('.sr-diff').forEach(b => b.disabled = true);
+  srStartBtn.textContent = 'Zastaviť';
+  srStartBtn.classList.add('btn-stop');
   srOptions.style.display = 'none';
   srMsg.style.display = 'flex';
   srMsg.textContent = 'Priprav sa...';
-  setTimeout(() => {
+  srTimer = setTimeout(() => {
     srMsg.style.display = 'none';
     nextSrRound();
   }, 700);
 }
 
+function stopSaccadic(){
+  clearTimeout(srTimer);
+  srRunning = false;
+  srWaitingResponse = false;
+  document.querySelectorAll('.sr-diff').forEach(b => b.disabled = false);
+  srStartBtn.textContent = 'Spustiť';
+  srStartBtn.classList.remove('btn-stop');
+  srOptions.style.display = 'none';
+  srStim.style.opacity = '0';
+  srMsg.style.display = 'flex';
+  srMsg.textContent = 'Klikni Spustiť';
+  srRound = 0; srScore = 0; srHits = 0; srMisses = 0; srRts = [];
+  updateSrStats();
+  srResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleSaccadic(); }
+});
+
 function nextSrRound(){
+  if(!srRunning) return;
   if(srRound >= SR_ROUNDS){
     srRunning = false;
     document.querySelectorAll('.sr-diff').forEach(b => b.disabled = false);
+    srStartBtn.textContent = 'Spustiť';
+    srStartBtn.classList.remove('btn-stop');
     srOptions.style.display = 'none';
     srMsg.style.display = 'flex';
     srMsg.textContent = 'Hotovo!';
