@@ -126,6 +126,35 @@
       </div>
     </div>
   </div>
+
+  <div class="wrap">
+    <div class="battery-widget">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Odporúčaná batéria</span>
+          <h2>Akému športu sa venuješ?</h2>
+        </div>
+        <p>Vyber si šport a ukážeme ti presne tie testy, ktoré sú preň najdôležitejšie.</p>
+      </div>
+      <div class="sport-picker">
+        <button type="button" class="picker-cta">
+          <span class="pc-label">Vyber si svoj šport a otestuj sa</span>
+          <span class="pc-arrow">→</span>
+        </button>
+        <div class="picker-panel" hidden>
+          <input type="text" class="picker-search" placeholder="Hľadať šport…" autocomplete="off">
+          <div class="picker-scroll"></div>
+        </div>
+      </div>
+      <div class="battery-result">
+        <button type="button" class="battery-back">← Vybrať iný šport</button>
+        <div class="br-head">Tvoja odporúčaná batéria</div>
+        <h3 class="battery-title"></h3>
+        <div class="battery-list"></div>
+        <p class="battery-hint">Testy sú zoradené podľa toho, ako priamo súvisia s tvojím športom — pokojne ich absolvuj v tomto poradí.</p>
+      </div>
+    </div>
+  </div>
 </header>
 
 <section id="vyuzitie" style="padding:20px 0 60px;">
@@ -315,6 +344,32 @@
       <a href="testy/index.html#vizualne-vnimanie" class="filter-pill" style="display:inline-flex; align-items:center; gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Vizuálne vnímanie</a>
       <a href="testy/index.html#vizualne-sledovanie" class="filter-pill" style="display:inline-flex; align-items:center; gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="flex-shrink:0;"><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/><circle cx="12" cy="4" r="1.6" fill="currentColor" stroke="none"/></svg>Vizuálne sledovanie</a>
     </div>
+    <div class="battery-widget" style="margin-bottom:40px;">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Odporúčaná batéria</span>
+          <h2>Akému športu sa venuješ?</h2>
+        </div>
+        <p>Vyber si šport a ukážeme ti presne tie testy, ktoré sú preň najdôležitejšie.</p>
+      </div>
+      <div class="sport-picker">
+        <button type="button" class="picker-cta">
+          <span class="pc-label">Vyber si svoj šport a otestuj sa</span>
+          <span class="pc-arrow">→</span>
+        </button>
+        <div class="picker-panel" hidden>
+          <input type="text" class="picker-search" placeholder="Hľadať šport…" autocomplete="off">
+          <div class="picker-scroll"></div>
+        </div>
+      </div>
+      <div class="battery-result">
+        <button type="button" class="battery-back">← Vybrať iný šport</button>
+        <div class="br-head">Tvoja odporúčaná batéria</div>
+        <h3 class="battery-title"></h3>
+        <div class="battery-list"></div>
+        <p class="battery-hint">Testy sú zoradené podľa toho, ako priamo súvisia s tvojím športom — pokojne ich absolvuj v tomto poradí.</p>
+      </div>
+    </div>
     <div class="grid-3">
       <div class="card active" onclick="document.getElementById('reakcny-test').scrollIntoView({behavior:'smooth'})">
         <span class="tag live">● Live</span>
@@ -364,6 +419,440 @@
     </div>
   </div>
 </section>
+
+<script>
+  (function(){
+    const HREF = {
+      "Reakčný čas":"#reakcny-test",
+      "Reakcia na výber":"testy/reakcia-na-vyber.html",
+      "Sluchová reakcia":"testy/sluchova-reakcia.html",
+      "Pamäťová sekvencia":"testy/pamat.html",
+      "Číselný rozsah":"testy/cislovy-rozsah.html",
+      "Priestorová mriežka":"testy/priestorova-mriezka.html",
+      "Zapamätanie slov":"testy/zapamatanie-slov.html",
+      "Go/No-Go test":"testy/pozornost.html",
+      "Stroop test":"testy/stroop.html",
+      "N-Back":"testy/n-back.html",
+      "Prepínanie úloh":"testy/prepinanie-uloh.html",
+      "Koordinácia rúk a očí":"testy/koordinacia.html",
+      "Presnosť kliknutia":"testy/presnost-kliknutia.html",
+      "Sledovanie cieľa myšou":"testy/sledovanie-ciela.html",
+      "Koncentračná mriežka":"testy/koncentracna-mriezka.html",
+      "Periférne videnie":"testy/periferne.html",
+      "Sakadické rozpoznávanie":"testy/sakadicke-rozpoznavanie.html",
+      "Kontrast a citlivosť":"testy/kontrast-citlivost.html",
+      "Plynulé sledovanie":"testy/plynule-sledovanie.html",
+      "Predikcia trajektórie":"testy/predikcia-trajektorie.html",
+      "Sledovanie viacerých objektov":"testy/viacere-objekty.html"
+    };
+
+    const CATEGORIES = [
+      { cat:"Kolektívne športy", sports:[
+        {key:"futbal", name:"Futbal", tests:[
+          {n:"Sledovanie viacerých objektov", w:"súčasne sledovať pohyb spoluhráčov aj súperov po celom ihrisku"},
+          {n:"Periférne videnie", w:"zaregistrovať nabiehajúceho hráča mimo priameho pohľadu, bez straty lopty"},
+          {n:"Predikcia trajektórie", w:"odhadnúť dráhu prihrávky alebo strely v behu, pred jej dokončením"},
+          {n:"Reakcia na výber", w:"vybrať správnu reakciu spomedzi viacerých možností v zlomku sekundy"}
+        ]},
+        {key:"basketbal", name:"Basketbal (5×5 a 3×3)", tests:[
+          {n:"Sledovanie viacerých objektov", w:"čítanie clon, prihrávok a rozostavenia obrany naraz"},
+          {n:"Periférne videnie", w:"vidieť spoluhráča na krídle bez otočenia hlavy"},
+          {n:"Prepínanie úloh", w:"okamžitý prechod z útočného do obranného módu myslenia a naopak"},
+          {n:"Koordinácia rúk a očí", w:"presnosť streľby a driblingu pod časovým aj fyzickým tlakom"}
+        ]},
+        {key:"hadzana", name:"Hádzaná", tests:[
+          {n:"Predikcia trajektórie", w:"odhad letu lopty pri prihrávke aj streľbe na bránu"},
+          {n:"Periférne videnie", w:"detekcia clon a nabiehajúcich spoluhráčov mimo stredu pohľadu"},
+          {n:"Reakcia na výber", w:"rozhodnutie strela / prihrávka / driblovanie v behu"},
+          {n:"Koordinácia rúk a očí", w:"presnosť streľby na malú bránku spod tlaku obrancu"}
+        ]},
+        {key:"volejbal", name:"Volejbal (hala aj plážový)", tests:[
+          {n:"Predikcia trajektórie", w:"odhad dráhy loptičky pri príjme podania a pri smeči"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle preskočenie pohľadu medzi loptou, nahrávačom a blokom"},
+          {n:"Reakcia na výber", w:"výber typu odbitia (kľúč/prihrávka/kop) v zlomku sekundy"},
+          {n:"Koordinácia rúk a očí", w:"presnosť nahrávky a timing úderu pri smeči"}
+        ]},
+        {key:"nfl", name:"Americký futbal", tests:[
+          {n:"Periférne videnie", w:"quarterback musí vidieť celé rozostavenie poľa naraz"},
+          {n:"Predikcia trajektórie", w:"odhad dráhy prihrávky na bežiaceho hráča"},
+          {n:"Go/No-Go test", w:"rozhodnutie hodiť / nehodiť pod tlakom nabiehajúcej obrany"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle prepínanie pohľadu medzi viacerými receivermi"}
+        ]},
+        {key:"rugby", name:"Rugby", tests:[
+          {n:"Periférne videnie", w:"vidieť voľného spoluhráča bez straty kontroly nad loptou"},
+          {n:"Sledovanie viacerých objektov", w:"sledovanie obranných aj útočných hráčov súčasne"},
+          {n:"Reakcia na výber", w:"rozhodnutie prihrať / behať / kopnúť v behu"},
+          {n:"Koordinácia rúk a očí", w:"presnosť prihrávky pod fyzickým kontaktom"}
+        ]},
+        {key:"hokej", name:"Ľadový hokej", tests:[
+          {n:"Periférne videnie", w:"najvyššia rýchlosť hry zo všetkých kolektívnych športov vyžaduje širšie videnie"},
+          {n:"Reakcia na výber", w:"rozhodovanie pri prechodoch útok/obrana v sekundách"},
+          {n:"Sledovanie viacerých objektov", w:"sledovanie puku, spoluhráčov aj súperov naraz"}
+        ]},
+        {key:"pozemny-hokej", name:"Pozemný hokej", tests:[
+          {n:"Periférne videnie", w:"registrovanie spoluhráčov mimo priameho pohľadu pri vedení loptičky"},
+          {n:"Reakcia na výber", w:"rýchle rozhodnutia v úzkom priestore okolo kruhu"},
+          {n:"Predikcia trajektórie", w:"odhad odrazu loptičky od hokejky a trávnika"}
+        ]},
+        {key:"baseball", name:"Baseball / Softball", tests:[
+          {n:"Predikcia trajektórie", w:"odhad dráhy loptičky letiacej k pálkarovi za cca 0,4 sekundy"},
+          {n:"Reakcia na výber", w:"rozhodnutie swing / no-swing tesne pred dopadom"},
+          {n:"Sakadické rozpoznávanie", w:"sledovanie loptičky od uvoľnenia z ruky hádzača"},
+          {n:"Koordinácia rúk a očí", w:"presné načasovanie úderu pálkou"}
+        ]},
+        {key:"vodne-polo", name:"Vodné pólo", tests:[
+          {n:"Periférne videnie", w:"orientácia v bazéne bez možnosti oprieť sa o zem"},
+          {n:"Predikcia trajektórie", w:"odhad letu lopty pri prihrávke a streľbe nad hladinou"},
+          {n:"Reakcia na výber", w:"rýchle rozhodnutia v kontaktnej hre pod vodou aj nad ňou"}
+        ]}
+      ]},
+      { cat:"Raketové a pálkové športy", sports:[
+        {key:"tenis", name:"Tenis", tests:[
+          {n:"Predikcia trajektórie", w:"odhad dopadu loptičky pri podaniach nad 150 km/h"},
+          {n:"Plynulé sledovanie", w:"udržanie pohľadu na loptičke počas celého letu"},
+          {n:"Reakcia na výber", w:"voľba úderu podľa postavenia súpera v zlomku sekundy"},
+          {n:"Koordinácia rúk a očí", w:"presné časovanie úderu rakety"}
+        ]},
+        {key:"stolny-tenis", name:"Stolný tenis", tests:[
+          {n:"Reakcia na výber", w:"reakčný čas pod 0,3 s pri returnovaní smeču z krátkej vzdialenosti"},
+          {n:"Predikcia trajektórie", w:"odhad rotácie a odrazu loptičky pred dopadom"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle prepínanie pohľadu medzi loptičkou a súperom"},
+          {n:"Koordinácia rúk a očí", w:"mikro-presné časovanie úderu na krátku vzdialenosť"}
+        ]},
+        {key:"bedminton", name:"Bedminton", tests:[
+          {n:"Reakcia na výber", w:"najrýchlejší projektil v športe (smeč cez 400 km/h) núti reagovať skôr, než sa dá vedome rozmýšľať"},
+          {n:"Predikcia trajektórie", w:"odhad dráhy košíčka, ktorý spomaľuje inak než lopta"},
+          {n:"Plynulé sledovanie", w:"udržanie pohľadu na košíčku pri prudkých zmenách rýchlosti"},
+          {n:"Koordinácia rúk a očí", w:"presnosť úderu pri rýchlych výmenách pri sieti"}
+        ]},
+        {key:"squash", name:"Squash", tests:[
+          {n:"Reakcia na výber", w:"rýchle rozhodnutia v uzavretom priestore so súperom pri tele"},
+          {n:"Predikcia trajektórie", w:"odrazy od stien menia dráhu loptičky nepredvídateľne"},
+          {n:"Periférne videnie", w:"sledovanie súpera aj loptičky súčasne v malom priestore"},
+          {n:"Koordinácia rúk a očí", w:"presnosť úderu po nepredvídateľnom odraze"}
+        ]},
+        {key:"padel", name:"Padel", tests:[
+          {n:"Reakcia na výber", w:"rýchle rozhodnutia vo štvorhre na menšom kurte"},
+          {n:"Predikcia trajektórie", w:"odrazy od sklenených stien menia dráhu loptičky"},
+          {n:"Koordinácia rúk a očí", w:"presnosť úderu po odraze od skla"}
+        ]}
+      ]},
+      { cat:"Bojové a úpolové športy", sports:[
+        {key:"box", name:"Box", tests:[
+          {n:"Go/No-Go test", w:"útok len vtedy, keď sa objaví skutočná medzera v obrane súpera"},
+          {n:"Reakcia na výber", w:"výber úhyb / kryt / protiúder v zlomku sekundy"},
+          {n:"Kontrast a citlivosť", w:"detekcia rýchleho pohybu rúk pri slabšom osvetlení haly"},
+          {n:"Koncentračná mriežka", w:"udržanie pozornosti počas celého kola bez poklesu"}
+        ]},
+        {key:"zapasenie", name:"Zápasenie", tests:[
+          {n:"Go/No-Go test", w:"chyt spustiť len pri správnom otvorení súpera"},
+          {n:"Reakcia na výber", w:"výber techniky podľa postavenia súpera v kontakte"},
+          {n:"Koordinácia rúk a očí", w:"presné vedenie úchopu pri priamom kontakte"}
+        ]},
+        {key:"judo", name:"Judo", tests:[
+          {n:"Go/No-Go test", w:"načasovanie hodu presne na moment straty rovnováhy súpera"},
+          {n:"Reakcia na výber", w:"výber techniky podľa reakcie súpera na úchop"},
+          {n:"Koordinácia rúk a očí", w:"presné vedenie hodu v kontaktnej výmene"}
+        ]},
+        {key:"taekwondo", name:"Taekwondo", tests:[
+          {n:"Go/No-Go test", w:"kop spustiť len pri reálnej príležitosti, nie na klamný pohyb"},
+          {n:"Reakcia na výber", w:"výber typu kopu podľa vzdialenosti a postavenia súpera"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle prepínanie pohľadu medzi rukami a nohami súpera"}
+        ]},
+        {key:"serm", name:"Šerm", tests:[
+          {n:"Go/No-Go test", w:"výpad len v správnom momente — šerm má jedny z najrýchlejších reakcií v športe vôbec"},
+          {n:"Reakcia na výber", w:"výber útok / obrana / protiútok v desatinách sekundy"},
+          {n:"Kontrast a citlivosť", w:"detekcia jemného pohybu čepele súpera"},
+          {n:"Koncentračná mriežka", w:"udržanie pozornosti počas krátkych, opakovaných súbojov"}
+        ]},
+        {key:"mma", name:"MMA", tests:[
+          {n:"Go/No-Go test", w:"útok len pri reálnej príležitosti naprieč údermi aj chytmi"},
+          {n:"Reakcia na výber", w:"výber medzi úderovou a zápasníckou reakciou v jednom momente"},
+          {n:"Periférne videnie", w:"kop alebo direct môže prísť mimo priameho zorného poľa"},
+          {n:"Kontrast a citlivosť", w:"detekcia rýchleho pohybu pri rôznom osvetlení klietky/ringu"}
+        ]}
+      ]},
+      { cat:"Presnostné športy", sports:[
+        {key:"golf", name:"Golf", tests:[
+          {n:"Presnosť kliknutia", w:"jemná motorická presnosť pod tlakom jedného pokusu"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia počas 4-hodinového kola"},
+          {n:"Kontrast a citlivosť", w:"čítanie svahu a rýchlosti greenu v meniacom sa svetle"}
+        ]},
+        {key:"lukostrelba", name:"Lukostreľba", tests:[
+          {n:"Presnosť kliknutia", w:"stabilita zamerania pri statickom, dlhšie trvajúcom držaní tetivy"},
+          {n:"Koncentračná mriežka", w:"opakovaná presnosť naprieč desiatkami výstrelov"},
+          {n:"Kontrast a citlivosť", w:"rozlíšenie terča na rôznu vzdialenosť a svetlo"},
+          {n:"Sledovanie cieľa myšou", w:"jemná priebežná korekcia zamerania pred uvoľnením"}
+        ]},
+        {key:"sportova-strelba", name:"Športová streľba", tests:[
+          {n:"Presnosť kliknutia", w:"mikro-jemná motorika prsta na spúšti — kľúčová KPI disciplíny"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia na jeden bod dlhší čas bez poklesu"},
+          {n:"Kontrast a citlivosť", w:"rozlíšenie muška/terč v rôznom osvetlení strelnice"},
+          {n:"Sledovanie cieľa myšou", w:"stabilita zamerania pri drobných korekciách tesne pred výstrelom"}
+        ]}
+      ]},
+      { cat:"Kinesteticko-estetické športy", sports:[
+        {key:"gymnastika", name:"Gymnastika (športová, moderná, trampolína)", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia počas rotácií a preskokov"},
+          {n:"Koordinácia rúk a očí", w:"presné načasovanie chytov a doskokov"},
+          {n:"Koncentračná mriežka", w:"bezchybná presnosť pod tlakom priameho hodnotenia"}
+        ]},
+        {key:"skoky-do-vody", name:"Skoky do vody", tests:[
+          {n:"Priestorová mriežka", w:"orientácia v priestore počas rýchlych rotácií vo vzduchu"},
+          {n:"Koncentračná mriežka", w:"udržanie presnosti pri jedinom, neopakovateľnom pokuse"}
+        ]},
+        {key:"krasokorculovanie", name:"Krasokorčuľovanie", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia počas viacnásobných rotácií vo vzduchu"},
+          {n:"Koordinácia rúk a očí", w:"presné načasovanie doskoku a nadväzujúceho prvku"},
+          {n:"Koncentračná mriežka", w:"bezchybná presnosť pod priamym hodnotením rozhodcov"}
+        ]},
+        {key:"breaking", name:"Breaking", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia tela počas rýchlych rotačných prvkov"},
+          {n:"Koordinácia rúk a očí", w:"presné vedenie pohybu do rytmu hudby"},
+          {n:"Sluchová reakcia", w:"improvizácia a synchronizácia pohybu so zvukovým podnetom"}
+        ]}
+      ]},
+      { cat:"Vytrvalostné športy", sports:[
+        {key:"atletika-vytrvalost", name:"Atletika — vytrvalostné behy", tests:[
+          {n:"Koncentračná mriežka", w:"udržanie tempa a pozornosti počas dlhého výkonu"},
+          {n:"Stroop test", w:"odolnosť rozhodovania voči rušivým podnetom a únave"},
+          {n:"N-Back", w:"mentálna vytrvalosť a pracovná pamäť pod fyzickou záťažou"}
+        ]},
+        {key:"dialkove-plavanie", name:"Diaľkové plávanie (open water)", tests:[
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia počas viachodinového výkonu"},
+          {n:"N-Back", w:"udržanie mentálnej výkonnosti a orientácie počas dlhých pretekov"},
+          {n:"Stroop test", w:"odolnosť rozhodovania voči narastajúcej únave"}
+        ]},
+        {key:"triatlon", name:"Triatlon", tests:[
+          {n:"Prepínanie úloh", w:"tri odlišné disciplíny za sebou (plávanie/bicykel/beh) vyžadujú rýchly mentálny prechod"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia počas dlhého, viacfázového výkonu"},
+          {n:"N-Back", w:"rozhodovanie (tempo, taktika) v stave narastajúcej únavy"}
+        ]},
+        {key:"bezecke-lyzovanie", name:"Bežecké lyžovanie", tests:[
+          {n:"Koncentračná mriežka", w:"udržanie techniky a tempa počas dlhého vytrvalostného výkonu"},
+          {n:"N-Back", w:"vytrvalosť pozornosti a taktické rozhodovanie pod únavou"},
+          {n:"Stroop test", w:"odolnosť rozhodovania voči rušivým podnetom pri únave"}
+        ]},
+        {key:"veslovanie", name:"Veslovanie", tests:[
+          {n:"Koncentračná mriežka", w:"synchronizácia záberov s posádkou bez straty pozornosti"},
+          {n:"Priestorová mriežka", w:"vnímanie polohy a smeru lode bez priameho výhľadu dopredu"},
+          {n:"Stroop test", w:"vytrvalosť pozornosti počas dlhého, opakovaného pohybu"}
+        ]}
+      ]},
+      { cat:"Technické a extrémne športy", sports:[
+        {key:"skateboarding", name:"Skateboarding", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia počas rotácií vo vzduchu"},
+          {n:"Koordinácia rúk a očí", w:"presné časovanie doskoku a korekcie rovnováhy"},
+          {n:"Presnosť kliknutia", w:"technická presnosť triku opakovaná identicky"}
+        ]},
+        {key:"surfing", name:"Surfing", tests:[
+          {n:"Predikcia trajektórie", w:"odhad dráhy a sily nabiehajúcej vlny pred jej dokončením"},
+          {n:"Priestorová mriežka", w:"priestorová orientácia na nestabilnom povrchu"},
+          {n:"Periférne videnie", w:"registrovanie ostatných surferov a meniaceho sa tvaru vlny"}
+        ]},
+        {key:"wakeboarding", name:"Wakeboarding", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia počas rotácií a skokov vo vzduchu"},
+          {n:"Predikcia trajektórie", w:"načasovanie skoku presne na okamih nábehu na vlnu za člnom"},
+          {n:"Koordinácia rúk a očí", w:"udržanie ťahu za rukoväť a korekcia rovnováhy pri doskoku"}
+        ]},
+        {key:"lezenie", name:"Športové lezenie", tests:[
+          {n:"Priestorová mriežka", w:"plánovanie postupu po stene niekoľko chytov dopredu"},
+          {n:"Koordinácia rúk a očí", w:"presné umiestnenie ruky/nohy na malý chyt"},
+          {n:"Presnosť kliknutia", w:"jemná motorická presnosť pod záťažou vlastnej váhy"}
+        ]},
+        {key:"snowboard", name:"Snowboard", tests:[
+          {n:"Priestorová mriežka", w:"orientácia v priestore počas rotačných skokov"},
+          {n:"Predikcia trajektórie", w:"odhad línie zjazdu alebo dráhy v U-rampe pred jej dokončením"},
+          {n:"Koordinácia rúk a očí", w:"presné časovanie doskoku a korekcie rovnováhy"}
+        ]},
+        {key:"cyklistika", name:"Cyklistika (cesta, dráha, MTB, BMX)", tests:[
+          {n:"Periférne videnie", w:"jazda v skupine — súperi tesne po stranách mimo priameho pohľadu"},
+          {n:"Reakcia na výber", w:"rýchle rozhodnutia pri pádoch, únikoch a zmenách tempa v pelotóne"},
+          {n:"Predikcia trajektórie", w:"odhad línie súperov a terénu pri vysokej rýchlosti"}
+        ]},
+        {key:"kanoistika", name:"Kanoistika (slalom aj šprint)", tests:[
+          {n:"Predikcia trajektórie", w:"línia cez bránky alebo prúd vody, ktorý sa mení v reálnom čase"},
+          {n:"Reakcia na výber", w:"okamžitá korekcia smeru pri slalome medzi bránkami"},
+          {n:"Priestorová mriežka", w:"priestorová orientácia lode voči prúdu a bránkam"}
+        ]},
+        {key:"jachting", name:"Jachting", tests:[
+          {n:"Periférne videnie", w:"sledovanie vetra, súperov aj prekážok súčasne"},
+          {n:"Priestorová mriežka", w:"priestorová orientácia na otvorenej vode bez pevných referenčných bodov"},
+          {n:"Prepínanie úloh", w:"súčasné riadenie plachiet, kurzu a taktiky voči súperom"}
+        ]}
+      ]},
+      { cat:"Rýchlostno-silové športy", sports:[
+        {key:"atletika-sprint", name:"Atletika — šprint", tests:[
+          {n:"Reakčný čas", w:"štart z blokov — o výsledku rozhodujú desiatky milisekúnd"},
+          {n:"Reakcia na výber", w:"rozlíšenie štartovacieho signálu od falošného štartu"},
+          {n:"Koncentračná mriežka", w:"udržanie plnej pozornosti počas krátkeho, ale rozhodujúceho čakania na štart"}
+        ]},
+        {key:"atletika-skoky-vrhy", name:"Atletika — skoky a vrhy", tests:[
+          {n:"Priestorová mriežka", w:"priestorová orientácia pri rozbehu a odraze/hode"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia medzi obmedzeným počtom pokusov"},
+          {n:"Presnosť kliknutia", w:"technická presnosť pohybu opakovaná identicky pri každom pokuse"}
+        ]},
+        {key:"vzpieranie", name:"Vzpieranie", tests:[
+          {n:"Presnosť kliknutia", w:"technicky presný pohyb, ktorý sa nesmie odchýliť ani pod maximálnou záťažou"},
+          {n:"Koncentračná mriežka", w:"plné sústredenie na jeden krátky, rozhodujúci pokus"}
+        ]}
+      ]},
+      { cat:"Ostatné individuálne športy", sports:[
+        {key:"plavanie", name:"Plávanie", tests:[
+          {n:"Reakčný čas", w:"štart na zvukový signál — bez zrakovej kontroly súperov"},
+          {n:"Sluchová reakcia", w:"štartovací signál je zvukový, nie zrakový"},
+          {n:"Koncentračná mriežka", w:"počítanie temp a otáčok bez straty koncentrácie"}
+        ]},
+        {key:"patboj", name:"Moderný päťboj", tests:[
+          {n:"Prepínanie úloh", w:"päť odlišných disciplín (šerm, plávanie, jazdectvo, streľba, beh) v jednom dni"},
+          {n:"N-Back", w:"udržanie výkonnosti naprieč disciplínami bez mentálneho poklesu"},
+          {n:"Reakcia na výber", w:"rýchle rozhodovanie v šermiarskej a streleckej časti"}
+        ]},
+        {key:"jazdectvo", name:"Jazdectvo", tests:[
+          {n:"Koordinácia rúk a očí", w:"jemná, priebežná komunikácia s koňom cez opraty"},
+          {n:"Priestorová mriežka", w:"odhad vzdialenosti a uhla k prekážke pred skokom"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia počas celého parkúru bez chyby"}
+        ]},
+        {key:"moto", name:"Motošport (auto aj moto)", tests:[
+          {n:"Reakcia na výber", w:"rozhodnutia o predbiehaní a brzdení pri stovkách km/h"},
+          {n:"Periférne videnie", w:"registrovanie súperov v spätných zrkadlách aj mimo priameho výhľadu"},
+          {n:"Predikcia trajektórie", w:"odhad línie súperov a zákrut niekoľko sekúnd dopredu"},
+          {n:"Koordinácia rúk a očí", w:"jemné, priebežné korekcie volantu/riadidiel pri vysokej rýchlosti"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle prepínanie pohľadu medzi traťou, zrkadlami a prístrojovkou"}
+        ]}
+      ]},
+      { cat:"Zimné športy", sports:[
+        {key:"lyzovanie-zjazdove", name:"Lyžovanie — zjazdové disciplíny", tests:[
+          {n:"Periférne videnie", w:"registrovanie brán aj terénu mimo priameho smeru pohľadu pri vysokej rýchlosti"},
+          {n:"Predikcia trajektórie", w:"rýchle čítanie trate niekoľko brán dopredu"},
+          {n:"Sakadické rozpoznávanie", w:"rýchle prepínanie pohľadu medzi bránami v tesnom slede"},
+          {n:"Reakcia na výber", w:"okamžitá korekcia línie pri zmene podmienok na trati"}
+        ]},
+        {key:"biatlon", name:"Biatlon", tests:[
+          {n:"Prepínanie úloh", w:"okamžité prepnutie z behu na strelecký pokoj (a späť) — jadrová KPI disciplíny"},
+          {n:"Presnosť kliknutia", w:"jemná motorika spúšte so zrýchleným tepom po behu"},
+          {n:"Koncentračná mriežka", w:"udržanie sústredenia na streľbe napriek fyzickému vyčerpaniu"}
+        ]},
+        {key:"rychlokorculovanie", name:"Rýchlokorčuľovanie / short track", tests:[
+          {n:"Reakčný čas", w:"štart rozhoduje o taktickej pozícii na celý pretek"},
+          {n:"Periférne videnie", w:"v short tracku sú súperi tesne vedľa seba mimo priameho pohľadu"},
+          {n:"Reakcia na výber", w:"okamžité rozhodnutia pri predbiehaní v kontaktnej blízkosti"}
+        ]},
+        {key:"curling", name:"Curling", tests:[
+          {n:"Presnosť kliknutia", w:"jemná kontrola sily hodu kameňa na presnú vzdialenosť"},
+          {n:"Koncentračná mriežka", w:"udržanie presnosti pri opakovaných hodoch počas celého zápasu"},
+          {n:"Priestorová mriežka", w:"odhad dráhy kameňa a účinku metenia na jeho zákrutu"}
+        ]},
+        {key:"boby", name:"Boby (bobsleigh)", tests:[
+          {n:"Reakčný čas", w:"výbušný spoločný rozjazd posádky rozhoduje o výslednom čase celej jazdy"},
+          {n:"Koordinácia rúk a očí", w:"jemné riadiace korekcie pilota lanami pri rýchlostiach nad 130 km/h"},
+          {n:"Predikcia trajektórie", w:"čítanie zákrut dráhy niekoľko sekúnd dopredu"}
+        ]},
+        {key:"sankovanie", name:"Sánkovanie (luge)", tests:[
+          {n:"Reakčný čas", w:"výbušný odraz rukami na štarte rozhoduje o výslednom čase"},
+          {n:"Predikcia trajektórie", w:"čítanie zákrut dráhy pri rýchlostiach nad 140 km/h v polohe na chrbte"},
+          {n:"Koncentračná mriežka", w:"udržanie plnej pozornosti napriek extrémnej rýchlosti a obmedzenému výhľadu"}
+        ]},
+        {key:"skeleton", name:"Skeleton", tests:[
+          {n:"Reakčný čas", w:"šprintový rozbeh pred naskočením na sane rozhoduje o výslednom čase"},
+          {n:"Predikcia trajektórie", w:"riadenie posunom hlavy a pliec vyžaduje odhad zákruty ešte pred jej nábehom"},
+          {n:"Kontrast a citlivosť", w:"rozlíšenie štruktúry ľadovej dráhy tesne pred tvárou pri vysokej rýchlosti"}
+        ]}
+      ]},
+      { cat:"Esports", sports:[
+        {key:"esports", name:"Esports", tests:[
+          {n:"Reakcia na výber", w:"výber správnej akcie spomedzi mnohých možností v zlomku sekundy"},
+          {n:"Sledovanie viacerých objektov", w:"sledovanie spoluhráčov, súperov aj minimapy naraz"},
+          {n:"Prepínanie úloh", w:"rýchly prechod medzi mikro-manažmentom a taktickým prehľadom"},
+          {n:"Periférne videnie", w:"registrovanie pohybu na okraji obrazovky bez straty stredu pozornosti"}
+        ]}
+      ]}
+    ];
+
+    function findSport(key){
+      for (let i = 0; i < CATEGORIES.length; i++){
+        const found = CATEGORIES[i].sports.find(function(s){ return s.key === key; });
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function initSportPicker(widget){
+      const picker = widget.querySelector('.sport-picker');
+      const cta = widget.querySelector('.picker-cta');
+      const panel = widget.querySelector('.picker-panel');
+      const search = widget.querySelector('.picker-search');
+      const scroll = widget.querySelector('.picker-scroll');
+      const result = widget.querySelector('.battery-result');
+      const title = widget.querySelector('.battery-title');
+      const list = widget.querySelector('.battery-list');
+      const backBtn = widget.querySelector('.battery-back');
+
+      function renderList(filter){
+        const f = (filter || '').trim().toLowerCase();
+        let html = '';
+        let any = false;
+        CATEGORIES.forEach(function(cat){
+          const sports = cat.sports.filter(function(s){ return !f || s.name.toLowerCase().indexOf(f) !== -1; });
+          if (!sports.length) return;
+          any = true;
+          html += '<div class="picker-cat-label">' + cat.cat + '</div>';
+          sports.forEach(function(s){
+            html += '<button type="button" class="picker-item" data-key="' + s.key + '">' + s.name + '</button>';
+          });
+        });
+        scroll.innerHTML = any ? html : '<div class="picker-empty">Nič sme nenašli. Skús iné hľadanie.</div>';
+      }
+
+      function openPanel(){
+        panel.hidden = false;
+        cta.classList.add('open');
+        result.classList.remove('visible');
+        renderList('');
+        search.value = '';
+        search.focus();
+      }
+      function closePanel(){
+        panel.hidden = true;
+        cta.classList.remove('open');
+      }
+
+      cta.addEventListener('click', function(){
+        if (panel.hidden) openPanel(); else closePanel();
+      });
+
+      search.addEventListener('input', function(){ renderList(search.value); });
+
+      scroll.addEventListener('click', function(e){
+        const btn = e.target.closest('.picker-item');
+        if (!btn) return;
+        const sport = findSport(btn.dataset.key);
+        if (!sport) return;
+
+        title.textContent = sport.name;
+        list.innerHTML = sport.tests.map(function(t){
+          const href = HREF[t.n] || '#';
+          return '<a class="battery-item" href="' + href + '"><span class="bi-text"><span class="bi-name">' + t.n + '</span><span class="bi-why">' + t.w + '</span></span><span class="bi-arrow">→</span></a>';
+        }).join('');
+
+        closePanel();
+        result.classList.add('visible');
+        result.scrollIntoView({behavior:'smooth', block:'nearest'});
+      });
+
+      backBtn.addEventListener('click', function(){
+        result.classList.remove('visible');
+        openPanel();
+      });
+
+      document.addEventListener('click', function(e){
+        if (!panel.hidden && !picker.contains(e.target) && !result.contains(e.target)) closePanel();
+      });
+    }
+
+    document.querySelectorAll('.battery-widget').forEach(initSportPicker);
+  })();
+</script>
 
 <!--
 <section id="videa" style="background:var(--navy-panel);">
