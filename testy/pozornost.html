@@ -48,7 +48,7 @@
         <p id="cptResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len keď sa objaví <strong style="color:var(--orange);">X</strong>. Pri iných písmenách neklikaj.</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCPT()">Spustiť</button>
+      <button class="btn btn-primary" id="cptStartBtn" style="margin-top:16px; width:100%;" onclick="toggleCPT()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -85,6 +85,7 @@ const cptAvgEl = document.getElementById('cptAvg');
 const cptResult = document.getElementById('cptResult');
 const cptResultTier = document.getElementById('cptResultTier');
 const cptResultText = document.getElementById('cptResultText');
+const cptStartBtn = document.getElementById('cptStartBtn');
 
 function rateAttention(acc){
   if(acc >= 95) return ['Výnimočná pozornosť', 'Toto zodpovedá výsledkom trénovaných športovcov a pilotov — bežný priemer je 80–90 %.'];
@@ -139,12 +140,20 @@ function cptFlash(cls){
   setTimeout(() => cptBox.classList.remove(cls), 220);
 }
 
+function toggleCPT(){
+  cptRunning ? stopCPT() : startCPT();
+}
+
 function startCPT(){
+  if(cptRunning) return;
   cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptFalseAlarms = 0; cptCorrect = 0; cptWrong = 0; cptRts = [];
   cptSequence = buildCptSequence(cptDiff);
   updateCptStats();
+  cptResult.style.display = 'none';
   cptRunning = true;
   document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = true);
+  cptStartBtn.textContent = 'Zastaviť';
+  cptStartBtn.classList.add('btn-stop');
   cptMsg.style.opacity = '0';
   cptMsg.textContent = 'Priprav sa...';
   cptMsg.style.fontSize = '18px';
@@ -154,6 +163,23 @@ function startCPT(){
     nextCptRound();
   }, 900);
 }
+
+function stopCPT(){
+  clearTimeout(cptTimer);
+  cptRunning = false;
+  cptWaitingResponse = false;
+  document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = false);
+  cptStartBtn.textContent = 'Spustiť';
+  cptStartBtn.classList.remove('btn-stop');
+  cptMsg.style.opacity = '0';
+  cptRound = 0; cptScore = 0; cptHits = 0; cptMisses = 0; cptFalseAlarms = 0; cptCorrect = 0; cptWrong = 0; cptRts = [];
+  updateCptStats();
+  cptResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleCPT(); }
+});
 
 function updateCptStats(){
   cptScoreEl.textContent = cptScore;
@@ -167,9 +193,12 @@ function updateCptStats(){
 }
 
 function nextCptRound(){
+  if(!cptRunning) return;
   if(cptRound >= CPT_ROUNDS){
     cptRunning = false;
     document.querySelectorAll('.cpt-diff').forEach(b => b.disabled = false);
+    cptStartBtn.textContent = 'Spustiť';
+    cptStartBtn.classList.remove('btn-stop');
     cptMsg.style.fontSize = '20px';
     cptMsg.textContent = 'Hotovo!';
     const totalDone = cptCorrect + cptWrong;

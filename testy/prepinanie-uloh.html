@@ -54,7 +54,7 @@
         <p id="tsResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nad číslom je farebne označené <strong style="color:var(--orange);">aktuálne pravidlo</strong> — striedavo párnosť a veľkosť čísla. Vyber správnu odpoveď čo najrýchlejšie.</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startTaskSwitch()">Spustiť</button>
+      <button class="btn btn-primary" id="tsStartBtn" style="margin-top:16px; width:100%;" onclick="toggleTaskSwitch()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -94,6 +94,7 @@ const tsResult = document.getElementById('tsResult');
 const tsResultTier = document.getElementById('tsResultTier');
 const tsResultText = document.getElementById('tsResultText');
 const tsButtons = Array.from(document.querySelectorAll('.ts-btn'));
+const tsStartBtn = document.getElementById('tsStartBtn');
 
 function rateTaskSwitch(acc){
   if(acc >= 95) return ['Výnimočná flexibilita', 'Takmer žiadne chyby ani pri zmene pravidla — patríš medzi najlepších.'];
@@ -125,7 +126,12 @@ function bump(el, good){
   setTimeout(() => el.classList.remove('bump','good','bad'), 260);
 }
 
+function toggleTaskSwitch(){
+  tsRunning ? stopTaskSwitch() : startTaskSwitch();
+}
+
 function startTaskSwitch(){
+  if(tsRunning) return;
   tsRound = 0; tsScore = 0; tsHits = 0; tsMisses = 0;
   tsRepeatRts = []; tsSwitchRts = [];
   tsPrevRule = null;
@@ -133,6 +139,8 @@ function startTaskSwitch(){
   tsResult.style.display = 'none';
   tsRunning = true;
   document.querySelectorAll('.ts-diff').forEach(b => b.disabled = true);
+  tsStartBtn.textContent = 'Zastaviť';
+  tsStartBtn.classList.add('btn-stop');
   tsMsg.style.opacity = '0';
   tsCue.style.opacity = '0';
   tsOptionsOpacity(0);
@@ -143,6 +151,27 @@ function startTaskSwitch(){
     nextTsRound();
   }, 900);
 }
+
+function stopTaskSwitch(){
+  clearTimeout(tsTimer);
+  tsRunning = false;
+  tsWaitingResponse = false;
+  document.querySelectorAll('.ts-diff').forEach(b => b.disabled = false);
+  tsStartBtn.textContent = 'Spustiť';
+  tsStartBtn.classList.remove('btn-stop');
+  tsMsg.style.opacity = '0';
+  tsCue.style.opacity = '0';
+  tsOptionsOpacity(0);
+  tsRound = 0; tsScore = 0; tsHits = 0; tsMisses = 0;
+  tsRepeatRts = []; tsSwitchRts = [];
+  tsPrevRule = null;
+  updateTsStats();
+  tsResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleTaskSwitch(); }
+});
 
 function tsOptionsOpacity(v){
   document.getElementById('tsOptions').style.opacity = v;
@@ -164,9 +193,12 @@ function updateTsStats(){
 }
 
 function nextTsRound(){
+  if(!tsRunning) return;
   if(tsRound >= TS_ROUNDS){
     tsRunning = false;
     document.querySelectorAll('.ts-diff').forEach(b => b.disabled = false);
+    tsStartBtn.textContent = 'Spustiť';
+    tsStartBtn.classList.remove('btn-stop');
     tsMsg.style.fontSize = '20px';
     tsMsg.textContent = 'Hotovo!';
     tsCue.style.opacity = '0';

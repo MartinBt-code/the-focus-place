@@ -49,8 +49,8 @@
       <div class="result-tier" id="spResultTier"></div>
       <p id="spResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Sleduj pohybujúci sa terč očami. Keď na chvíľu <strong style="color:var(--orange);">zabliká na zeleno</strong>, klikni na tlačidlo čo najrýchlejšie.</p>
-    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startSmooth()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Sleduj pohybujúci sa terč očami. Keď na chvíľu <strong style="color:var(--orange);">zabliká na zeleno</strong>, klikni na tlačidlo čo najrýchlejšie. Test je náročný na presné a rýchle klikanie — odporúčame <strong style="color:var(--orange);">desktop s myšou</strong>, na touchpade či mobile je to podstatne ťažšie.</p>
+    <button class="btn btn-primary" id="spStartBtn" style="margin-top:8px; width:100%;" onclick="toggleSmooth()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -115,6 +115,7 @@ function selectSpDiff(d){
   spDiff = d;
   document.querySelectorAll('.sp-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
+const spStartBtn = document.getElementById('spStartBtn');
 let spStartTime = null;
 let spFlashActive = false, spFlashShownAt = 0;
 let spHits = 0, spMisses = 0, spFalseAlarms = 0, spRts = [];
@@ -122,6 +123,7 @@ let spFlashesScheduled = 0;
 let spCanClick = true;
 let spRafId = null;
 let spFlashTimer = null;
+let spPrepTimer = null;
 
 function updateSpStats(){
   spScoreEl.textContent = spHits;
@@ -133,17 +135,24 @@ function updateSpStats(){
   spAvgEl.textContent = spRts.length ? Math.round(spRts.reduce((a,b)=>a+b,0)/spRts.length) : '—';
 }
 
+function toggleSmooth(){
+  spRunning ? stopSmooth() : startSmooth();
+}
+
 function startSmooth(){
+  if(spRunning) return;
+  spRunning = true;
   updateSpStats();
   spResult.style.display = 'none';
   spTarget.style.display = 'none';
   spRespondBtn.disabled = true;
   document.querySelectorAll('.sp-diff').forEach(b => b.disabled = true);
+  spStartBtn.textContent = 'Zastaviť';
+  spStartBtn.classList.add('btn-stop');
   spMsg.style.display = 'flex';
   spMsg.textContent = 'Priprav sa...';
 
-  setTimeout(() => {
-    spRunning = true;
+  spPrepTimer = setTimeout(() => {
     spStartTime = null;
     spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
     spFlashesScheduled = 0;
@@ -157,6 +166,32 @@ function startSmooth(){
     spRafId = requestAnimationFrame(spLoop);
   }, 900);
 }
+
+function stopSmooth(){
+  clearTimeout(spPrepTimer);
+  clearTimeout(spFlashTimer);
+  if(spRafId) cancelAnimationFrame(spRafId);
+  spRunning = false;
+  spFlashActive = false;
+  document.querySelectorAll('.sp-diff').forEach(b => b.disabled = false);
+  spStartBtn.textContent = 'Spustiť';
+  spStartBtn.classList.remove('btn-stop');
+  spTarget.style.display = 'none';
+  spRespondBtn.disabled = true;
+  spMsg.style.display = 'flex';
+  spMsg.textContent = 'Klikni na Spustiť';
+  spHits = 0; spMisses = 0; spFalseAlarms = 0; spRts = [];
+  spFlashesScheduled = 0;
+  updateSpStats();
+  spResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){
+    e.preventDefault();
+    toggleSmooth();
+  }
+});
 
 function scheduleNextFlash(){
   if(spFlashesScheduled >= SP_FLASH_COUNT) return;
@@ -208,6 +243,8 @@ function spLoop(timestamp){
 function finishSmooth(){
   spRunning = false;
   document.querySelectorAll('.sp-diff').forEach(b => b.disabled = false);
+  spStartBtn.textContent = 'Spustiť';
+  spStartBtn.classList.remove('btn-stop');
   if(spRafId) cancelAnimationFrame(spRafId);
   clearTimeout(spFlashTimer);
   spTarget.style.display = 'none';

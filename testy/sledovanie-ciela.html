@@ -48,8 +48,8 @@
       <div class="result-tier" id="ctResultTier"></div>
       <p id="ctResultText"></p>
     </div>
-    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Udrž kurzor myši na <strong style="color:var(--orange);">pohybujúcom sa cieli</strong> čo najdlhšie počas 20 sekúnd.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startCursorTrack()">Spustiť</button>
+    <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Udrž kurzor myši na <strong style="color:var(--orange);">pohybujúcom sa cieli</strong> čo najdlhšie počas 20 sekúnd. Test vyžaduje plynulý pohyb kurzora — <strong style="color:var(--orange);">odporúčame desktop s myšou</strong>, na touchpade či mobile je oveľa náročnejší.</p>
+    <button class="btn btn-primary" id="ctStartBtn" style="margin-top:16px; width:100%;" onclick="toggleCursorTrack()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -87,6 +87,7 @@ const ctTimeEl = document.getElementById('ctTime');
 const ctResult = document.getElementById('ctResult');
 const ctResultTier = document.getElementById('ctResultTier');
 const ctResultText = document.getElementById('ctResultText');
+const ctStartBtn = document.getElementById('ctStartBtn');
 
 function rateCursorTrack(pct){
   if(pct >= 85) return ['Výnimočné sledovanie', 'Udržal(a) si kontakt s cieľom takmer nepretržite — patríš medzi najlepších.'];
@@ -107,6 +108,7 @@ let ctStartTime = null, ctLastFrameTime = 0;
 let ctMouseX = null, ctMouseY = null;
 let ctContactMs = 0, ctCurrentStreakMs = 0, ctLongestStreakMs = 0;
 let ctRafId = null;
+let ctPrepTimer = null;
 
 function selectCtDiff(d){
   if(ctRunning) return;
@@ -114,8 +116,16 @@ function selectCtDiff(d){
   document.querySelectorAll('.ct-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
 
+function toggleCursorTrack(){
+  ctRunning ? stopCursorTrack() : startCursorTrack();
+}
+
 function startCursorTrack(){
+  if(ctRunning) return;
+  ctRunning = true;
   document.querySelectorAll('.ct-diff').forEach(b => b.disabled = true);
+  ctStartBtn.textContent = 'Zastaviť';
+  ctStartBtn.classList.add('btn-stop');
   ctResult.style.display = 'none';
   ctAccEl.textContent = '0%';
   ctStreakEl.textContent = '0.0';
@@ -123,8 +133,7 @@ function startCursorTrack(){
   ctTarget.style.display = 'none';
   ctMsg.style.display = 'flex';
   ctMsg.textContent = 'Priprav sa...';
-  setTimeout(() => {
-    ctRunning = true;
+  ctPrepTimer = setTimeout(() => {
     ctStartTime = null;
     ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
     ctMsg.style.display = 'none';
@@ -132,6 +141,27 @@ function startCursorTrack(){
     ctRafId = requestAnimationFrame(ctLoop);
   }, 900);
 }
+
+function stopCursorTrack(){
+  clearTimeout(ctPrepTimer);
+  if(ctRafId) cancelAnimationFrame(ctRafId);
+  ctRunning = false;
+  document.querySelectorAll('.ct-diff').forEach(b => b.disabled = false);
+  ctStartBtn.textContent = 'Spustiť';
+  ctStartBtn.classList.remove('btn-stop');
+  ctTarget.style.display = 'none';
+  ctMsg.style.display = 'flex';
+  ctMsg.textContent = 'Klikni Spustiť';
+  ctContactMs = 0; ctCurrentStreakMs = 0; ctLongestStreakMs = 0;
+  ctAccEl.textContent = '—';
+  ctStreakEl.textContent = '—';
+  ctTimeEl.textContent = '20s';
+  ctResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleCursorTrack(); }
+});
 
 function ctLoop(timestamp){
   if(!ctRunning) return;
@@ -182,6 +212,8 @@ function ctLoop(timestamp){
 function finishCursorTrack(){
   ctRunning = false;
   document.querySelectorAll('.ct-diff').forEach(b => b.disabled = false);
+  ctStartBtn.textContent = 'Spustiť';
+  ctStartBtn.classList.remove('btn-stop');
   if(ctRafId) cancelAnimationFrame(ctRafId);
   ctTarget.style.display = 'none';
   ctMsg.style.display = 'flex';

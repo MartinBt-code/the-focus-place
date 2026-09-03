@@ -50,7 +50,7 @@
         <p id="stroopResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na farbu, akou je slovo <strong style="color:var(--orange);">vyfarbené</strong> — nie na farbu, ktorú slovo pomenúva.</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startStroop()">Spustiť</button>
+      <button class="btn btn-primary" id="stroopStartBtn" style="margin-top:16px; width:100%;" onclick="toggleStroop()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -88,6 +88,7 @@ const stroopInterferenceEl = document.getElementById('stroopInterference');
 const stroopResult = document.getElementById('stroopResult');
 const stroopResultTier = document.getElementById('stroopResultTier');
 const stroopResultText = document.getElementById('stroopResultText');
+const stroopStartBtn = document.getElementById('stroopStartBtn');
 const stroopOptions = document.getElementById('stroopOptions');
 let stroopSwatches = [];
 
@@ -156,13 +157,20 @@ function selectStroopDiff(d){
 }
 renderStroopOptions();
 
+function toggleStroop(){
+  stroopRunning ? stopStroop() : startStroop();
+}
+
 function startStroop(){
+  if(stroopRunning) return;
   stroopRound = 0; stroopScore = 0; stroopHits = 0; stroopMisses = 0;
   stroopCongruentRts = []; stroopIncongruentRts = [];
   updateStroopStats();
   stroopResult.style.display = 'none';
   stroopRunning = true;
   document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = true);
+  stroopStartBtn.textContent = 'Zastaviť';
+  stroopStartBtn.classList.add('btn-stop');
   stroopMsg.style.opacity = '0';
   stroopMsg.textContent = 'Priprav sa...';
   stroopMsg.style.fontSize = '18px';
@@ -172,6 +180,24 @@ function startStroop(){
     nextStroopRound();
   }, 900);
 }
+
+function stopStroop(){
+  clearTimeout(stroopTimer);
+  stroopRunning = false;
+  stroopWaitingResponse = false;
+  document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = false);
+  stroopStartBtn.textContent = 'Spustiť';
+  stroopStartBtn.classList.remove('btn-stop');
+  stroopMsg.style.opacity = '0';
+  stroopRound = 0; stroopScore = 0; stroopHits = 0; stroopMisses = 0;
+  stroopCongruentRts = []; stroopIncongruentRts = [];
+  updateStroopStats();
+  stroopResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleStroop(); }
+});
 
 function updateStroopStats(){
   stroopScoreEl.textContent = stroopScore;
@@ -189,9 +215,12 @@ function updateStroopStats(){
 }
 
 function nextStroopRound(){
+  if(!stroopRunning) return;
   if(stroopRound >= STROOP_ROUNDS){
     stroopRunning = false;
     document.querySelectorAll('.stroop-diff').forEach(b => b.disabled = false);
+    stroopStartBtn.textContent = 'Spustiť';
+    stroopStartBtn.classList.remove('btn-stop');
     stroopMsg.style.fontSize = '20px';
     stroopMsg.style.color = 'var(--off-white)';
     stroopMsg.textContent = 'Hotovo!';

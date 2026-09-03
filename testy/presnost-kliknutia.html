@@ -52,7 +52,7 @@
       <p id="pcResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni čo najbližšie k <strong style="color:var(--orange);">stredu terča</strong> — na rýchlosti nezáleží, len na presnosti.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startPC()">Spustiť</button>
+    <button class="btn btn-primary" id="pcStartBtn" style="margin-top:16px; width:100%;" onclick="togglePC()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -99,6 +99,7 @@ const pcRoundEl = document.getElementById('pcRound');
 const pcResult = document.getElementById('pcResult');
 const pcResultTier = document.getElementById('pcResultTier');
 const pcResultText = document.getElementById('pcResultText');
+const pcStartBtn = document.getElementById('pcStartBtn');
 
 function ratePrecision(acc){
   if(acc >= 90) return ['Špičková presnosť', 'Trafil(a) si takmer presne do stredu vo väčšine pokusov — patríš medzi najlepších.'];
@@ -112,7 +113,7 @@ const PC_SIZE_CONFIG = { easy: 120, medium: 90, hard: 60 };
 let pcDiff = 'medium';
 let PC_SIZE = 90;
 let PC_RADIUS = 45;
-let pcRound = 0, pcHits = 0, pcScores = [], pcCenterX = 0, pcCenterY = 0, pcRunning = false, pcWaiting = false;
+let pcRound = 0, pcHits = 0, pcScores = [], pcCenterX = 0, pcCenterY = 0, pcRunning = false, pcWaiting = false, pcTimer = null;
 
 function selectPcDiff(d){
   if(pcRunning) return;
@@ -132,26 +133,57 @@ function selectPcDiff(d){
   document.querySelectorAll('.pc-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
 
+function togglePC(){
+  pcRunning ? stopPC() : startPC();
+}
+
 function startPC(){
+  if(pcRunning) return;
   pcRound = 0; pcHits = 0; pcScores = [];
   pcHitsEl.textContent = '0';
   pcAccEl.textContent = '—';
   pcResult.style.display = 'none';
   pcRunning = true;
   document.querySelectorAll('.pc-diff').forEach(b => b.disabled = true);
+  pcStartBtn.textContent = 'Zastaviť';
+  pcStartBtn.classList.add('btn-stop');
   pcMsg.style.display = 'flex';
   pcMsg.textContent = 'Priprav sa...';
-  setTimeout(() => {
+  pcTimer = setTimeout(() => {
     pcMsg.style.display = 'none';
     nextPcRound();
   }, 700);
 }
 
+function stopPC(){
+  clearTimeout(pcTimer);
+  pcRunning = false;
+  pcWaiting = false;
+  document.querySelectorAll('.pc-diff').forEach(b => b.disabled = false);
+  pcStartBtn.textContent = 'Spustiť';
+  pcStartBtn.classList.remove('btn-stop');
+  pcTarget.style.display = 'none';
+  pcMsg.style.display = 'flex';
+  pcMsg.textContent = 'Klikni Spustiť';
+  pcRound = 0; pcHits = 0; pcScores = [];
+  pcHitsEl.textContent = '0';
+  pcAccEl.textContent = '—';
+  pcRoundEl.textContent = '0/' + PC_ROUNDS;
+  pcResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); togglePC(); }
+});
+
 function nextPcRound(){
+  if(!pcRunning) return;
   if(pcRound >= PC_ROUNDS){
     pcRunning = false;
     pcWaiting = false;
     document.querySelectorAll('.pc-diff').forEach(b => b.disabled = false);
+    pcStartBtn.textContent = 'Spustiť';
+    pcStartBtn.classList.remove('btn-stop');
     pcTarget.style.display = 'none';
     pcMsg.style.display = 'flex';
     pcMsg.textContent = 'Hotovo!';

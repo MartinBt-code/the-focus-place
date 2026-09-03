@@ -48,7 +48,7 @@
         <p id="nbResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni do plochy len vtedy, keď je aktuálne písmeno <strong style="color:var(--orange);">rovnaké</strong> ako písmeno spred <strong style="color:var(--orange);" id="nbNLabel">2 krokov</strong> (<span id="nbNBackLabel">2-Back</span>).</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startNBack()">Spustiť</button>
+      <button class="btn btn-primary" id="nbStartBtn" style="margin-top:16px; width:100%;" onclick="toggleNBack()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -85,6 +85,7 @@ const nbAvgEl = document.getElementById('nbAvg');
 const nbResult = document.getElementById('nbResult');
 const nbResultTier = document.getElementById('nbResultTier');
 const nbResultText = document.getElementById('nbResultText');
+const nbStartBtn = document.getElementById('nbStartBtn');
 
 function rateNBack(acc){
   if(acc >= 90) return ['Výnimočná pracovná pamäť', 'Toto je výsledok na úrovni trénovaných jedincov — bežný priemer je 80–90 %.'];
@@ -134,13 +135,20 @@ function nbFlash(cls){
   setTimeout(() => nbBox.classList.remove(cls), 220);
 }
 
+function toggleNBack(){
+  nbRunning ? stopNBack() : startNBack();
+}
+
 function startNBack(){
+  if(nbRunning) return;
   nbHistory = []; nbRound = 0; nbScore = 0;
   nbHits = 0; nbMisses = 0; nbFalseAlarms = 0; nbCorrectRejections = 0; nbRts = [];
   updateNbStats();
   nbResult.style.display = 'none';
   nbRunning = true;
   document.querySelectorAll('.nb-diff').forEach(b => b.disabled = true);
+  nbStartBtn.textContent = 'Zastaviť';
+  nbStartBtn.classList.add('btn-stop');
   nbMsg.style.opacity = '0';
   nbMsg.textContent = 'Priprav sa...';
   nbMsg.style.fontSize = '18px';
@@ -151,6 +159,24 @@ function startNBack(){
   }, 900);
 }
 
+function stopNBack(){
+  clearTimeout(nbTimer);
+  nbRunning = false;
+  nbWaitingResponse = false;
+  document.querySelectorAll('.nb-diff').forEach(b => b.disabled = false);
+  nbStartBtn.textContent = 'Spustiť';
+  nbStartBtn.classList.remove('btn-stop');
+  nbMsg.style.opacity = '0';
+  nbHistory = []; nbRound = 0; nbScore = 0;
+  nbHits = 0; nbMisses = 0; nbFalseAlarms = 0; nbCorrectRejections = 0; nbRts = [];
+  updateNbStats();
+  nbResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleNBack(); }
+});
+
 function updateNbStats(){
   nbScoreEl.textContent = nbScore;
   const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
@@ -159,9 +185,12 @@ function updateNbStats(){
 }
 
 function nbNextRound(){
+  if(!nbRunning) return;
   if(nbRound >= NB_ROUNDS){
     nbRunning = false;
     document.querySelectorAll('.nb-diff').forEach(b => b.disabled = false);
+    nbStartBtn.textContent = 'Spustiť';
+    nbStartBtn.classList.remove('btn-stop');
     nbMsg.style.fontSize = '20px';
     nbMsg.textContent = 'Hotovo!';
     const resolved = nbHits + nbMisses + nbFalseAlarms + nbCorrectRejections;
