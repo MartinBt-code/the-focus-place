@@ -45,7 +45,7 @@
         <p id="gridResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si rozsvietené políčka a klikni na <strong style="color:var(--orange);">rovnaké</strong> — poradie nezáleží.</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startGridMemory()">Spustiť</button>
+      <button class="btn btn-primary" id="gridStartBtn" style="margin-top:16px; width:100%;" onclick="toggleGridMemory()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -80,6 +80,8 @@ const gridBestEl = document.getElementById('gridBest');
 const gridResult = document.getElementById('gridResult');
 const gridResultTier = document.getElementById('gridResultTier');
 const gridResultText = document.getElementById('gridResultText');
+const gridStartBtn = document.getElementById('gridStartBtn');
+let gridPrepTimer = null, gridViewTimer = null;
 
 function rateGridMemory(level){
   if(level >= 8) return ['Výnimočná priestorová pamäť', 'Toto je výsledok na úrovni trénovaných jedincov — bežný priemer je 4–5 políčok.'];
@@ -115,20 +117,46 @@ for(let i=0;i<GRID_SIZE;i++){
   gridTiles.push(t);
 }
 
+function toggleGridMemory(){
+  gridRunning ? stopGridMemory() : startGridMemory();
+}
+
 function startGridMemory(){
+  if(gridRunning) return;
   gridLevel = 0;
   gridLevelEl.textContent = gridLevel;
   gridResult.style.display = 'none';
   gridRunning = true;
   document.querySelectorAll('.grid-diff').forEach(b => b.disabled = true);
-  setTimeout(nextGridRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
+  gridStartBtn.textContent = 'Zastaviť';
+  gridStartBtn.classList.add('btn-stop');
+  gridPrepTimer = setTimeout(nextGridRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
+
+function stopGridMemory(){
+  clearTimeout(gridPrepTimer);
+  clearTimeout(gridViewTimer);
+  gridRunning = false;
+  gridAccepting = false;
+  document.querySelectorAll('.grid-diff').forEach(b => b.disabled = false);
+  gridStartBtn.textContent = 'Spustiť';
+  gridStartBtn.classList.remove('btn-stop');
+  resetTiles();
+  gridLevel = 0; gridFound = new Set(); gridTargets = new Set();
+  gridLevelEl.textContent = '0';
+  gridResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleGridMemory(); }
+});
 
 function cellsForLevel(level){
   return level + 2;
 }
 
 function nextGridRound(){
+  if(!gridRunning) return;
   gridLevel++;
   gridLevelEl.textContent = gridLevel;
   gridFound = new Set();
@@ -143,7 +171,7 @@ function nextGridRound(){
   gridTargets.forEach(idx => { gridTiles[idx].style.background = 'var(--orange)'; });
 
   const viewMs = (1000 + n*150) * GRID_VIEW_MULT[gridDiff];
-  setTimeout(() => {
+  gridViewTimer = setTimeout(() => {
     resetTiles();
     gridAccepting = true;
   }, viewMs);
@@ -169,6 +197,8 @@ function onGridClick(idx, tile){
     gridAccepting = false;
     gridRunning = false;
     document.querySelectorAll('.grid-diff').forEach(b => b.disabled = false);
+    gridStartBtn.textContent = 'Spustiť';
+    gridStartBtn.classList.remove('btn-stop');
     tile.style.background = '#C0392B';
     gridTargets.forEach(i => { if(!gridFound.has(i)) gridTiles[i].style.background = 'var(--orange)'; });
     const reached = gridLevel - 1;

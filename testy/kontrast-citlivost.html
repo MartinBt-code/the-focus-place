@@ -45,7 +45,7 @@
       <p id="csResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Klikni na políčko, ktoré sa <strong style="color:var(--orange);">jemne líši</strong> od ostatných. Rozdiel sa s každou úrovňou zmenšuje.</p>
-    <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startContrast()">Spustiť</button>
+    <button class="btn btn-primary" id="csStartBtn" style="margin-top:16px; width:100%;" onclick="toggleContrast()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -80,6 +80,7 @@ const csBestEl = document.getElementById('csBest');
 const csResult = document.getElementById('csResult');
 const csResultTier = document.getElementById('csResultTier');
 const csResultText = document.getElementById('csResultText');
+const csStartBtn = document.getElementById('csStartBtn');
 
 function rateContrast(level){
   if(level >= 16) return ['Výnimočná citlivosť', 'Rozoznal(a) si extrémne jemné rozdiely v kontraste — patríš medzi najlepších.'];
@@ -105,6 +106,7 @@ let csTargetIdx = -1;
 let csAccepting = false;
 let csRunning = false;
 let csTimer = null;
+let csPrepTimer = null;
 
 function selectCsDiff(d){
   if(csRunning) return;
@@ -121,14 +123,39 @@ for(let i=0;i<CS_GRID_SIZE;i++){
   csTiles.push(t);
 }
 
+function toggleContrast(){
+  csRunning ? stopContrast() : startContrast();
+}
+
 function startContrast(){
+  if(csRunning) return;
   csLevel = 0;
   csLevelEl.textContent = csLevel;
   csResult.style.display = 'none';
   csRunning = true;
   document.querySelectorAll('.cs-diff').forEach(b => b.disabled = true);
-  setTimeout(nextCsRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
+  csStartBtn.textContent = 'Zastaviť';
+  csStartBtn.classList.add('btn-stop');
+  csPrepTimer = setTimeout(nextCsRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
+
+function stopContrast(){
+  clearTimeout(csPrepTimer);
+  clearTimeout(csTimer);
+  csRunning = false;
+  csAccepting = false;
+  document.querySelectorAll('.cs-diff').forEach(b => b.disabled = false);
+  csStartBtn.textContent = 'Spustiť';
+  csStartBtn.classList.remove('btn-stop');
+  csTiles.forEach(t => { t.style.background = 'hsl(213, 15%, ' + CS_BASE_L + '%)'; });
+  csLevel = 0;
+  csLevelEl.textContent = '0';
+  csResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleContrast(); }
+});
 
 function deltaForLevel(level){
   const cfg = CS_CONFIG[csDiff];
@@ -136,6 +163,7 @@ function deltaForLevel(level){
 }
 
 function nextCsRound(){
+  if(!csRunning) return;
   csLevel++;
   csLevelEl.textContent = csLevel;
   csAccepting = false;
@@ -177,6 +205,8 @@ function onCsClick(idx){
 function endContrastRun(){
   csRunning = false;
   document.querySelectorAll('.cs-diff').forEach(b => b.disabled = false);
+  csStartBtn.textContent = 'Spustiť';
+  csStartBtn.classList.remove('btn-stop');
   const reached = csLevel - 1;
   if(reached > csBest){ csBest = reached; csBestEl.textContent = csBest; }
   if(reached > 0){

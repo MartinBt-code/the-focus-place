@@ -56,6 +56,7 @@
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Preštuduj si zoznam <strong style="color:var(--orange);" id="wrCountLabel">12 slov</strong>, potom napíš čo najviac z toho, čo si zapamätal. Na poradí nezáleží.</p>
       <button class="btn btn-primary" style="margin-top:16px; width:100%;" id="wrMainBtn" onclick="startWordRecall()">Spustiť</button>
+      <button class="battery-back" id="wrCancelBtn" style="display:none; margin-top:10px;" onclick="stopWordRecall()">✕ Zrušiť test</button>
     </div>
 
     <div class="test-info">
@@ -97,6 +98,7 @@ const wrResult = document.getElementById('wrResult');
 const wrResultTier = document.getElementById('wrResultTier');
 const wrResultText = document.getElementById('wrResultText');
 const wrMainBtn = document.getElementById('wrMainBtn');
+const wrCancelBtn = document.getElementById('wrCancelBtn');
 
 function rateWordRecall(score, total){
   const pct = (score/total)*100;
@@ -152,6 +154,7 @@ function updateWrStats(){
 }
 
 function startWordRecall(){
+  if(wrRunning) return;
   const cfg = WR_DIFF_CONFIG[wrDiff];
   WR_WORDS = shuffle(WR_WORD_POOL.slice()).slice(0, cfg.count);
   wrTargetsNorm = WR_WORDS.map(normalize);
@@ -164,6 +167,7 @@ function startWordRecall(){
   wrRecallArea.style.display = 'none';
   wrPhase = 'study';
   wrMainBtn.style.display = 'none';
+  wrCancelBtn.style.display = 'block';
   wrRunning = true;
   document.querySelectorAll('.wr-diff').forEach(b => b.disabled = true);
 
@@ -172,11 +176,13 @@ function startWordRecall(){
   wrMsg.style.opacity = '1';
 
   setTimeout(() => {
+    if(!wrRunning) return;
     let i = 0;
     function showNext(){
+      if(!wrRunning) return;
       if(i >= WR_WORDS.length){
         wrMsg.style.opacity = '0';
-        setTimeout(beginRecall, 400);
+        setTimeout(() => { if(wrRunning) beginRecall(); }, 400);
         return;
       }
       wrMsg.style.fontSize = '36px';
@@ -184,13 +190,37 @@ function startWordRecall(){
       wrMsg.style.opacity = '1';
       i++;
       setTimeout(() => {
+        if(!wrRunning) return;
         wrMsg.style.opacity = '0';
-        setTimeout(showNext, cfg.gapMs);
+        setTimeout(() => { if(wrRunning) showNext(); }, cfg.gapMs);
       }, cfg.studyMs);
     }
     showNext();
   }, 900);
 }
+
+function stopWordRecall(){
+  wrRunning = false;
+  wrPhase = 'idle';
+  document.querySelectorAll('.wr-diff').forEach(b => b.disabled = false);
+  wrCancelBtn.style.display = 'none';
+  wrMainBtn.style.display = 'block';
+  wrMainBtn.textContent = 'Spustiť';
+  wrMainBtn.onclick = startWordRecall;
+  wrRecallArea.style.display = 'none';
+  wrChips.innerHTML = '';
+  wrMsg.style.fontSize = '18px';
+  wrMsg.textContent = 'Klikni na Spustiť';
+  wrMsg.style.opacity = '1';
+  wrResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space' && document.activeElement !== wrInput){
+    e.preventDefault();
+    wrRunning ? stopWordRecall() : startWordRecall();
+  }
+});
 
 function beginRecall(){
   wrPhase = 'recall';
@@ -241,6 +271,7 @@ function finishRecall(){
   wrPhase = 'done';
   wrRunning = false;
   document.querySelectorAll('.wr-diff').forEach(b => b.disabled = false);
+  wrCancelBtn.style.display = 'none';
   wrRecallArea.style.display = 'none';
   wrMsg.style.fontSize = '20px';
   wrMsg.textContent = 'Hotovo!';

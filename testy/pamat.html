@@ -45,7 +45,7 @@
         <p id="memResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si a zopakuj rastúcu sekvenciu polí. Koľko úrovní zvládneš?</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startMemoryGame()">Spustiť</button>
+      <button class="btn btn-primary" id="memStartBtn" style="margin-top:16px; width:100%;" onclick="toggleMemoryGame()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -80,7 +80,9 @@ const memBestEl = document.getElementById('memBest');
 const memResult = document.getElementById('memResult');
 const memResultTier = document.getElementById('memResultTier');
 const memResultText = document.getElementById('memResultText');
+const memStartBtn = document.getElementById('memStartBtn');
 let memTiles = [];
+let memPlayInterval = null, memPrepTimer = null, memAcceptTimer = null;
 
 function rateMemory(level){
   if(level >= 10) return ['Výnimočná pamäť', 'Toto je výsledok na úrovni trénovaných pamäťových športovcov — bežný priemer je 4–6 úrovní.'];
@@ -117,17 +119,44 @@ for(let i=0;i<9;i++){
   memTiles.push(t);
 }
 
+function toggleMemoryGame(){
+  memRunning ? stopMemoryGame() : startMemoryGame();
+}
+
 function startMemoryGame(){
+  if(memRunning) return;
   sequence = [];
   memLevel = 0;
   memLevelEl.textContent = memLevel;
   memRunning = true;
   document.querySelectorAll('.mem-diff').forEach(b => b.disabled = true);
+  memStartBtn.textContent = 'Zastaviť';
+  memStartBtn.classList.add('btn-stop');
   memResult.style.display = 'none';
-  setTimeout(nextRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
+  memPrepTimer = setTimeout(nextRound, 900); // chvíľka na presun pohľadu z tlačidla na mriežku
 }
 
+function stopMemoryGame(){
+  clearTimeout(memPrepTimer);
+  clearInterval(memPlayInterval);
+  clearTimeout(memAcceptTimer);
+  memRunning = false;
+  accepting = false;
+  document.querySelectorAll('.mem-diff').forEach(b => b.disabled = false);
+  memStartBtn.textContent = 'Spustiť';
+  memStartBtn.classList.remove('btn-stop');
+  memTiles.forEach(t => { t.style.background = '#1A2029'; });
+  sequence = []; memLevel = 0; userStep = 0;
+  memLevelEl.textContent = '0';
+  memResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleMemoryGame(); }
+});
+
 function nextRound(){
+  if(!memRunning) return;
   memLevel++;
   memLevelEl.textContent = memLevel;
   userStep = 0;
@@ -139,12 +168,12 @@ function nextRound(){
 function playSequence(){
   const speed = MEM_SPEEDS[memDiff];
   let i = 0;
-  const interval = setInterval(() => {
+  memPlayInterval = setInterval(() => {
     flashTile(sequence[i]);
     i++;
     if(i >= sequence.length){
-      clearInterval(interval);
-      setTimeout(()=>{ accepting = true; }, 500);
+      clearInterval(memPlayInterval);
+      memAcceptTimer = setTimeout(()=>{ accepting = true; }, 500);
     }
   }, speed.interval);
 }
@@ -169,6 +198,8 @@ function onTileClick(idx){
     accepting = false;
     memRunning = false;
     document.querySelectorAll('.mem-diff').forEach(b => b.disabled = false);
+    memStartBtn.textContent = 'Spustiť';
+    memStartBtn.classList.remove('btn-stop');
     const reached = memLevel - 1;
     if(reached > memBest){ memBest = reached; memBestEl.textContent = memBest; }
     memTiles.forEach(t=>{ t.style.background = '#C0392B'; });

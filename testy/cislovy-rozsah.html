@@ -59,7 +59,7 @@
         <p id="dsResultText"></p>
       </div>
       <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Zapamätaj si postupnosť čísel a zopakuj ju v <strong style="color:var(--orange);">rovnakom poradí</strong>. Koľko číslic zvládneš?</p>
-      <button class="btn btn-primary" style="margin-top:16px; width:100%;" onclick="startDigitSpan()">Spustiť</button>
+      <button class="btn btn-primary" id="dsStartBtn" style="margin-top:16px; width:100%;" onclick="toggleDigitSpan()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -95,6 +95,8 @@ const dsResult = document.getElementById('dsResult');
 const dsResultTier = document.getElementById('dsResultTier');
 const dsResultText = document.getElementById('dsResultText');
 const dsButtons = Array.from(document.querySelectorAll('.digit-btn'));
+const dsStartBtn = document.getElementById('dsStartBtn');
+let dsPrepTimer = null, dsPlayInterval = null, dsAcceptTimer = null;
 
 function rateDigitSpan(level){
   if(level >= 9) return ['Výnimočná pamäť', 'Toto je výsledok na hornej hranici bežnej populácie — priemer je 7±2 číslic.'];
@@ -123,21 +125,48 @@ function selectDsDiff(d){
   document.querySelectorAll('.ds-diff').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
 }
 
+function toggleDigitSpan(){
+  dsRunning ? stopDigitSpan() : startDigitSpan();
+}
+
 function startDigitSpan(){
+  if(dsRunning) return;
   dsSequence = [];
   dsLevel = 0;
   dsLevelEl.textContent = dsLevel;
   dsResult.style.display = 'none';
   dsRunning = true;
   document.querySelectorAll('.ds-diff').forEach(b => b.disabled = true);
+  dsStartBtn.textContent = 'Zastaviť';
+  dsStartBtn.classList.add('btn-stop');
   dsMsg.style.opacity = '0';
   dsMsg.textContent = 'Priprav sa...';
   dsMsg.style.fontSize = '18px';
   requestAnimationFrame(() => { dsMsg.style.opacity = '1'; });
-  setTimeout(dsNextRound, 900);
+  dsPrepTimer = setTimeout(dsNextRound, 900);
 }
 
+function stopDigitSpan(){
+  clearTimeout(dsPrepTimer);
+  clearInterval(dsPlayInterval);
+  clearTimeout(dsAcceptTimer);
+  dsRunning = false;
+  dsAccepting = false;
+  document.querySelectorAll('.ds-diff').forEach(b => b.disabled = false);
+  dsStartBtn.textContent = 'Spustiť';
+  dsStartBtn.classList.remove('btn-stop');
+  dsMsg.style.opacity = '0';
+  dsSequence = []; dsLevel = 0; dsUserStep = 0;
+  dsLevelEl.textContent = '0';
+  dsResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleDigitSpan(); }
+});
+
 function dsNextRound(){
+  if(!dsRunning) return;
   dsLevel++;
   dsLevelEl.textContent = dsLevel;
   dsUserStep = 0;
@@ -150,14 +179,14 @@ function dsPlaySequence(){
   const speed = DS_SPEEDS[dsDiff];
   let i = 0;
   dsMsg.style.fontSize = '56px';
-  const interval = setInterval(() => {
+  dsPlayInterval = setInterval(() => {
     dsMsg.textContent = dsSequence[i];
     dsMsg.style.opacity = '1';
     setTimeout(() => { dsMsg.style.opacity = '0'; }, speed.visible);
     i++;
     if(i >= dsSequence.length){
-      clearInterval(interval);
-      setTimeout(() => {
+      clearInterval(dsPlayInterval);
+      dsAcceptTimer = setTimeout(() => {
         dsMsg.textContent = '?';
         dsMsg.style.opacity = '1';
         dsAccepting = true;
@@ -189,6 +218,8 @@ dsButtons.forEach(btn => {
       dsAccepting = false;
       dsRunning = false;
       document.querySelectorAll('.ds-diff').forEach(b => b.disabled = false);
+      dsStartBtn.textContent = 'Spustiť';
+      dsStartBtn.classList.remove('btn-stop');
       const reached = dsLevel - 1;
       if(reached > dsBest){ dsBest = reached; dsBestEl.textContent = dsBest; }
       dsMsg.style.fontSize = '20px';

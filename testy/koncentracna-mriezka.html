@@ -59,7 +59,7 @@
       <p id="cgResultText"></p>
     </div>
     <p class="mono" style="color:var(--gray); font-size:12px; margin-top:12px;">Nájdi a klikni čísla <strong style="color:var(--orange);">v poradí od 1</strong> — čo najrýchlejšie, bez chyby.</p>
-    <button class="btn btn-primary" style="margin-top:8px; width:100%;" onclick="startGrid()">Spustiť</button>
+    <button class="btn btn-primary" id="cgStartBtn" style="margin-top:8px; width:100%;" onclick="toggleGrid()">Spustiť</button>
     </div>
 
     <div class="test-info">
@@ -100,6 +100,7 @@ const cgSizeSlider = document.getElementById('cgSizeSlider');
 const cgSizeLabel = document.getElementById('cgSizeLabel');
 const cgSizeHint = document.getElementById('cgSizeHint');
 const cgTargetsHint = document.getElementById('cgTargetsHint');
+const cgStartBtn = document.getElementById('cgStartBtn');
 
 let cgSize = 8;
 let cgTotal = cgSize * cgSize;
@@ -108,6 +109,7 @@ let cgTarget = 1;
 let cgRunning = false;
 let cgStartTime = 0;
 let cgRafId = null;
+let cgPrepTimer = null;
 const cgBests = {};
 
 function difficultyLabel(n){
@@ -155,16 +157,45 @@ function shuffle(arr){
   return arr;
 }
 
+function toggleGrid(){
+  cgRunning ? stopGrid() : startGrid();
+}
+
 function startGrid(){
+  if(cgRunning) return;
+  cgRunning = true;
   cgResult.style.display = 'none';
   cgGrid.style.display = 'none';
   cgSizeSlider.disabled = true;
+  cgStartBtn.textContent = 'Zastaviť';
+  cgStartBtn.classList.add('btn-stop');
   cgMsg.style.display = 'flex';
   cgMsg.textContent = 'Priprav sa...';
-  setTimeout(beginGrid, 900);
+  cgPrepTimer = setTimeout(beginGrid, 900);
 }
 
+function stopGrid(){
+  clearTimeout(cgPrepTimer);
+  if(cgRafId) cancelAnimationFrame(cgRafId);
+  cgRunning = false;
+  cgSizeSlider.disabled = false;
+  cgStartBtn.textContent = 'Spustiť';
+  cgStartBtn.classList.remove('btn-stop');
+  cgGrid.style.display = 'none';
+  cgGrid.innerHTML = '';
+  cgMsg.style.display = 'flex';
+  cgMsg.textContent = 'Nastav veľkosť a klikni na Spustiť';
+  cgTimeEl.textContent = '0.0s';
+  cgProgressEl.textContent = '0 / ' + cgTotal;
+  cgResult.style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); toggleGrid(); }
+});
+
 function beginGrid(){
+  if(!cgRunning) return;
   cgTarget = 1;
   cgMsg.style.display = 'none';
   cgGrid.style.display = 'grid';
@@ -223,6 +254,8 @@ function endGrid(){
   cgTimeEl.textContent = finalTime.toFixed(1) + 's';
   cgCells.forEach(c => { c.style.cursor = 'default'; });
   cgSizeSlider.disabled = false;
+  cgStartBtn.textContent = 'Spustiť';
+  cgStartBtn.classList.remove('btn-stop');
 
   if(!cgBests[cgSize] || finalTime < cgBests[cgSize]){ cgBests[cgSize] = finalTime; }
   cgBestEl.textContent = cgBests[cgSize].toFixed(1) + 's';
