@@ -125,7 +125,11 @@ let spFlashTimer = null;
 
 function updateSpStats(){
   spScoreEl.textContent = spHits;
-  spAccEl.textContent = SP_FLASH_COUNT ? Math.round((spHits/SP_FLASH_COUNT)*100)+'%' : '—';
+  // Presnosť musí zarátať aj falošné poplachy (klik mimo zablikania) — inak by
+  // spam-klikanie počas celého testu vedelo "trafiť" takmer každé zablikanie
+  // čisto frekvenciou kliknutí, bez skutočného sledovania cieľa.
+  const attempts = spHits + spMisses + spFalseAlarms;
+  spAccEl.textContent = attempts ? Math.round((spHits/attempts)*100)+'%' : '—';
   spAvgEl.textContent = spRts.length ? Math.round(spRts.reduce((a,b)=>a+b,0)/spRts.length) : '—';
 }
 
@@ -211,7 +215,8 @@ function finishSmooth(){
   spMsg.style.display = 'flex';
   spMsg.textContent = 'Hotovo!';
 
-  const acc = Math.round((spHits/SP_FLASH_COUNT)*100);
+  const attempts = spHits + spMisses + spFalseAlarms;
+  const acc = attempts ? Math.round((spHits/attempts)*100) : 0;
   const [tier, text] = rateSmooth(acc);
   spResultTier.textContent = tier;
   spResultText.textContent = text;

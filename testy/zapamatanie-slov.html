@@ -143,7 +143,11 @@ function normalize(s){
 
 function updateWrStats(){
   wrScoreEl.textContent = wrHits;
-  wrAccEl.textContent = Math.round((wrHits/WR_WORDS.length)*100)+'%';
+  // Nesprávne "vsuvky" (slová, ktoré neboli v zozname) musia znížiť presnosť —
+  // inak by sa dalo napísať čo najviac slov naraz a garantovane trafiť všetky
+  // cieľové bez toho, aby si si ich reálne pamätal(a).
+  const net = Math.max(0, wrHits - wrIntrusions);
+  wrAccEl.textContent = Math.round((net/WR_WORDS.length)*100)+'%';
   wrExtraEl.textContent = wrIntrusions;
 }
 
@@ -243,7 +247,8 @@ function finishRecall(){
   wrMainBtn.textContent = 'Spustiť znova';
   wrMainBtn.onclick = startWordRecall;
 
-  const [tier, text] = rateWordRecall(wrHits, WR_WORDS.length);
+  const netScore = Math.max(0, wrHits - wrIntrusions);
+  const [tier, text] = rateWordRecall(netScore, WR_WORDS.length);
   wrResultTier.textContent = tier;
   wrResultText.textContent = text;
   wrResult.style.display = 'block';
